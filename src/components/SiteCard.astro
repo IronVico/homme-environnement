@@ -135,7 +135,9 @@ const StatusIcon = { historique: Flag, transmis: Handshake, 'en-cours': Sprout }
     object-fit: cover;
   }
 
+  /* Le texte occupe toute la hauteur restante : les liens s'alignent en bas des cartes d'une même rangée. */
   .site-card--default .site-card__body {
+    flex: 1 1 auto;
     padding: 24px 28px 28px;
   }
 
@@ -154,7 +156,8 @@ const StatusIcon = { historique: Flag, transmis: Handshake, 'en-cours': Sprout }
   }
 
   .site-card--default .site-card__link {
-    margin-top: var(--space-2);
+    margin-top: auto;
+    padding-top: var(--space-2);
   }
 
   /* Grande carte photo : texte blanc sur dégradé vers le bas. */
