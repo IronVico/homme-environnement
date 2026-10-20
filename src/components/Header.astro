@@ -120,8 +120,31 @@ const isCurrent = (href: string) => {
     };
     const closeSubmenus = (except?: HTMLElement) => items.forEach((item) => item !== except && setSubmenu(item, false));
 
+    // Survol (souris, desktop) : ouverture immédiate, fermeture après un court délai
+    // pour pouvoir traverser l'écart entre la rubrique et la carte.
+    const hover = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const CLOSE_DELAY = 180;
+    let closeTimer: number | undefined;
+    let hoverOpenedAt = 0;
+
     items.forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        if (!desktop.matches || !hover.matches) return;
+        window.clearTimeout(closeTimer);
+        if (!item.hasAttribute('data-expanded')) hoverOpenedAt = performance.now();
+        closeSubmenus(item);
+        setSubmenu(item, true);
+      });
+
+      item.addEventListener('mouseleave', () => {
+        if (!desktop.matches || !hover.matches) return;
+        window.clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(() => setSubmenu(item, false), CLOSE_DELAY);
+      });
+
       toggleOf(item)?.addEventListener('click', () => {
+        // Clic juste après l'ouverture au survol : on garde le sous-menu ouvert.
+        if (desktop.matches && hover.matches && performance.now() - hoverOpenedAt < 400) return;
         const open = !item.hasAttribute('data-expanded');
         if (desktop.matches) closeSubmenus(item);
         setSubmenu(item, open);
@@ -349,19 +372,13 @@ const isCurrent = (href: string) => {
     display: block;
   }
 
-  /* Desktop : ouverture aussi au survol de la souris et au focus clavier (utile sans JS). */
+  /*
+   * Sans JS : ouverture au survol et au focus clavier. Avec JS, c'est le script
+   * qui gère survol, clic et clavier, pour n'avoir qu'un sous-menu ouvert à la fois.
+   */
   @media (min-width: 1181px) {
-    @media (hover: hover) {
-      .header__item:hover > .header__submenu {
-        display: block;
-      }
-
-      .header__item:hover :global(.header__chevron) {
-        transform: rotate(180deg);
-      }
-    }
-
-    .header__item:focus-within > .header__submenu {
+    :global(html:not(.js)) .header__item:hover > .header__submenu,
+    :global(html:not(.js)) .header__item:focus-within > .header__submenu {
       display: block;
     }
   }
