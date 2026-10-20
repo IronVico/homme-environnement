@@ -1,0 +1,69 @@
+---
+import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const path = pathWithoutLocale(Astro.url.pathname);
+const codes = Object.keys(languages) as Lang[];
+---
+
+<ul class:list={['lang-switcher', className]} aria-label={t(lang).ui.langSwitcher}>
+  {
+    codes.map((code) => (
+      <li>
+        <a
+          href={localeUrl(code, path)}
+          hreflang={code}
+          lang={code}
+          aria-current={code === lang ? 'true' : undefined}
+          title={languages[code].name}
+        >
+          {languages[code].label}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .lang-switcher li + li::before {
+    content: '/';
+    margin-right: 2px;
+    color: var(--basalte);
+  }
+
+  .lang-switcher a {
+    display: inline-block;
+    padding: 4px;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+
+  .lang-switcher a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .lang-switcher a[aria-current] {
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+</style>

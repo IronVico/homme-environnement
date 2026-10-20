@@ -1,0 +1,76 @@
+---
+interface Props {
+  /** Titre en deux temps : partie forte (h2, ExtraBold)… */
+  strong: string;
+  /** …puis partie douce (h2-light, Light), facultative. */
+  light?: string;
+  eyebrow?: string;
+  /** Lien d'action aligné à droite du titre (« Toutes nos actions → »). */
+  link?: { label: string; href: string };
+  id?: string;
+}
+
+const { strong, light, eyebrow, link, id } = Astro.props;
+---
+
+<div class:list={['section-heading', { 'section-heading--with-link': link }]}>
+  <div class="section-heading__titles">
+    {eyebrow && <p class="section-heading__eyebrow eyebrow">{eyebrow}</p>}
+    <h2 class="section-heading__title" id={id}>
+      <span class="section-heading__strong">{strong}</span>
+      {light && ' '}
+      {light && <span class="section-heading__light">{light}</span>}
+    </h2>
+  </div>
+  {
+    link && (
+      <a class="section-heading__link" href={link.href}>
+        {link.label} <span aria-hidden="true">→</span>
+      </a>
+    )
+  }
+</div>
+
+<style>
+  .section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+
+  .section-heading__titles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .section-heading--with-link .section-heading__titles {
+    max-width: 720px;
+  }
+
+  /* Sur-titre basalte : posé aussi bien sur blanc que sur vert-clair. */
+  .section-heading__eyebrow {
+    color: var(--basalte);
+  }
+
+  .section-heading__title {
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+  }
+
+  .section-heading__strong {
+    font-weight: 800;
+  }
+
+  .section-heading__light {
+    font-weight: 300;
+  }
+
+  .section-heading__link {
+    font-size: var(--fs-body);
+    font-weight: 500;
+  }
+</style>

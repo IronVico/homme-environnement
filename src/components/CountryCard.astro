@@ -1,0 +1,88 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import Chip from './Chip.astro';
+
+interface Props {
+  name: string;
+  description: string;
+  sites: string[];
+  href: string;
+  image: ImageMetadata;
+  class?: string;
+}
+
+const { name, description, sites, href, image, class: className } = Astro.props;
+---
+
+<a class:list={['country-card', className]} href={href}>
+  <Picture
+    class="country-card__photo"
+    src={image}
+    alt=""
+    formats={['avif', 'webp']}
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 960px) 100vw, 860px"
+  />
+  <span class="country-card__body">
+    <span class="country-card__name">{name}</span>
+    <span class="country-card__text">{description}</span>
+    <span class="country-card__chips">
+      {sites.map((site) => <Chip label={site} />)}
+    </span>
+  </span>
+</a>
+
+<style>
+  .country-card {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 520px;
+    overflow: hidden;
+    border-radius: var(--radius-card-lg);
+    color: var(--blanc);
+    text-decoration: none;
+  }
+
+  .country-card:hover {
+    color: var(--blanc);
+  }
+
+  .country-card :global(.country-card__photo) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .country-card__body {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 40px;
+    background: var(--voile-degrade);
+  }
+
+  .country-card__name {
+    font-size: var(--fs-card-title-xl);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: var(--ls-h2);
+  }
+
+  .country-card__text {
+    max-width: 520px;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+  }
+
+  .country-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>

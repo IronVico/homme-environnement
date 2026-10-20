@@ -1,0 +1,119 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--blanc);
+  color: var(--basalte);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  /* Interligne fixé par style de texte (tokens) ; « normal » pour les libellés courts. */
+  line-height: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Les formes décoratives du hero débordent : on coupe sans créer de scroll horizontal. */
+.site {
+  overflow-x: clip;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* <Picture> d'astro:assets : l'<img> se met en page comme s'il était seul. */
+picture {
+  display: contents;
+}
+
+picture > source {
+  display: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--basalte);
+}
+
+a:hover {
+  color: var(--noir-95);
+}
+
+:focus-visible {
+  outline: 2px solid var(--basalte);
+  outline-offset: 2px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+/* Conteneur : contenu centré à 1312px, gouttières latérales. */
+.container {
+  box-sizing: content-box;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: var(--space-section);
+}
+
+.eyebrow {
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ardoise);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -100px;
+  z-index: 100;
+  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--basalte);
+  color: var(--blanc);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 12px;
+  color: var(--blanc);
+}

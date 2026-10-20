@@ -1,0 +1,37 @@
+---
+import { getLang, t } from '../i18n';
+import StatCard from './StatCard.astro';
+
+type Stat = Parameters<typeof StatCard>[0];
+
+interface Props {
+  stats: Stat[];
+}
+
+const { stats } = Astro.props;
+const { ui } = t(getLang(Astro.currentLocale));
+---
+
+<section class="stats" aria-label={ui.statsLabel}>
+  <div class="stats__grid container">
+    {stats.map((stat) => <StatCard {...stat} />)}
+  </div>
+</section>
+
+<script>
+  import { initStats } from '../scripts/stats';
+  initStats();
+</script>
+
+<style>
+  .stats {
+    background: var(--sauge);
+  }
+
+  .stats__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: var(--space-5);
+    padding-block: clamp(40px, 5vw, 56px);
+  }
+</style>

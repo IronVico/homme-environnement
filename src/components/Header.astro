@@ -1,0 +1,214 @@
+---
+import Menu from '@lucide/astro/icons/menu';
+import X from '@lucide/astro/icons/x';
+import logoEn from '../assets/logos/logo-couleur-en.svg';
+import logoFr from '../assets/logos/logo-couleur.svg';
+import { DON_URL, getMainNav } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import Button from './Button.astro';
+import LangSwitcher from './LangSwitcher.astro';
+
+const lang = getLang(Astro.currentLocale);
+const { ui } = t(lang);
+// Version anglaise : logo « Man & the Environment » (LOGO-ENG-2), jamais « Human ».
+const logo = lang === 'en' ? logoEn : logoFr;
+const mainNav = getMainNav(lang);
+---
+
+<header class="header container">
+  <a class="header__home" href={localeUrl(lang)} aria-label={ui.homeLink}>
+    <img class="header__logo" src={logo.src} width={logo.width} height={logo.height} alt={ui.logoAlt} />
+  </a>
+
+  <nav id="menu-principal" class="header__nav" aria-label={ui.mainNav}>
+    <ul>
+      {mainNav.map((link) => (
+        <li>
+          <a href={link.href}>{link.label}</a>
+        </li>
+      ))}
+    </ul>
+    <LangSwitcher class="header__lang" />
+  </nav>
+
+  <Button href={DON_URL} variant="don" size="sm" class="header__don">{ui.donate}</Button>
+
+  <button class="header__burger" type="button" aria-controls="menu-principal" aria-expanded="false" aria-label={ui.openMenu} data-label-open={ui.openMenu} data-label-close={ui.closeMenu}>
+    <Menu class="header__icon-open" size={28} />
+    <X class="header__icon-close" size={28} />
+  </button>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.header');
+  const burger = header?.querySelector<HTMLButtonElement>('.header__burger');
+  const nav = header?.querySelector<HTMLElement>('.header__nav');
+
+  if (header && burger && nav) {
+    const setOpen = (open: boolean) => {
+      header.toggleAttribute('data-open', open);
+      burger.setAttribute('aria-expanded', String(open));
+      const label = open ? burger.dataset.labelClose : burger.dataset.labelOpen;
+      if (label) burger.setAttribute('aria-label', label);
+    };
+
+    burger.addEventListener('click', () => setOpen(!header.hasAttribute('data-open')));
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && header.hasAttribute('data-open')) {
+        setOpen(false);
+        burger.focus();
+      }
+    });
+
+    // Repasser en desktop referme le menu mobile.
+    window.matchMedia('(min-width: 901px)').addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>
+
+<style>
+  .header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 28px;
+    padding-block: 20px;
+  }
+
+  .header__home {
+    display: flex;
+    flex-shrink: 0;
+    margin-right: auto;
+  }
+
+  /* Le fichier du logo inclut sa zone de protection : marges négatives. */
+  .header__logo {
+    height: 76px;
+    width: auto;
+    max-width: none;
+    margin: -14px -38px -14px -20px;
+  }
+
+  .header__nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .header__nav > ul {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .header__nav a {
+    text-decoration: none;
+  }
+
+  .header__nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .header__burger {
+    display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--basalte);
+    cursor: pointer;
+  }
+
+  .header :global(.header__icon-close),
+  .header[data-open] :global(.header__icon-open) {
+    display: none;
+  }
+
+  .header[data-open] :global(.header__icon-close) {
+    display: block;
+  }
+
+  @media (max-width: 900px) {
+    .header__logo {
+      height: 60px;
+    }
+
+    /* Sans JS : les liens restent visibles, sur une ligne sous le logo. */
+    .header__nav {
+      order: 10;
+      flex-basis: 100%;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+    }
+
+    .header__nav > ul {
+      flex-wrap: wrap;
+      gap: 8px 20px;
+    }
+
+    /* Avec JS : burger et panneau déroulant. */
+    :global(.js) .header__burger {
+      display: inline-flex;
+    }
+
+    :global(.js) .header__nav {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      padding: 8px var(--gutter) 24px;
+      background: var(--blanc);
+      border-top: 1px solid var(--bordure-douce);
+      box-shadow: var(--shadow-card);
+    }
+
+    :global(.js) .header[data-open] .header__nav {
+      display: block;
+    }
+
+    :global(.js) .header__nav > ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      font-size: 19px;
+    }
+
+    :global(.js) .header__nav li + li {
+      border-top: 1px solid var(--bordure-douce);
+    }
+
+    :global(.js) .header__nav li a {
+      display: block;
+      padding: 14px 0;
+    }
+
+    :global(.js) .header__nav :global(.header__lang) {
+      margin-top: 8px;
+      padding-top: 16px;
+      border-top: 1px solid var(--bordure-douce);
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .header :global(.header__don) {
+      padding: 10px 16px;
+      font-size: 15px;
+    }
+  }
+</style>

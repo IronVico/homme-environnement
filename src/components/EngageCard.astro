@@ -1,0 +1,125 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+
+interface Props {
+  title: string;
+  text: string;
+  href: string;
+  image: ImageMetadata;
+  /** Texte alternatif : vide si la photo est décorative. */
+  imageAlt?: string;
+  /** Cadrage de la photo (object-position). */
+  imagePosition?: string;
+  eyebrow?: string;
+  /** Libellé du lien final (« Faire un don → »). */
+  cta?: string;
+  /** engage : offre d'engagement. country : pays secondaire, à côté d'une CountryCard. */
+  variant?: 'engage' | 'country';
+}
+
+const { title, text, href, image, imageAlt = '', imagePosition = '50% 50%', eyebrow, cta, variant = 'engage' } = Astro.props;
+---
+
+<a class:list={['engage-card', `engage-card--${variant}`]} href={href}>
+  <Picture
+    class="engage-card__photo"
+    src={image}
+    alt={imageAlt}
+    style={`object-position: ${imagePosition}`}
+    formats={['avif', 'webp']}
+    widths={[400, 640, 900]}
+    sizes="(max-width: 960px) 100vw, 440px"
+  />
+  <span class="engage-card__body">
+    {eyebrow && <span class="engage-card__eyebrow">{eyebrow}</span>}
+    <span class="engage-card__title">{title}</span>
+    <span class="engage-card__text">{text}</span>
+    {
+      cta && (
+        <span class="engage-card__cta">
+          {cta} <span aria-hidden="true">→</span>
+        </span>
+      )
+    }
+  </span>
+</a>
+
+<style>
+  .engage-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--blanc);
+    color: var(--basalte);
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-sm);
+    box-shadow: var(--shadow-card);
+    text-decoration: none;
+  }
+
+  .engage-card:hover .engage-card__title,
+  .engage-card:hover .engage-card__cta {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+  }
+
+  .engage-card :global(.engage-card__photo) {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+  }
+
+  .engage-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: var(--space-7);
+  }
+
+  .engage-card__eyebrow {
+    font-size: var(--fs-eyebrow);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ardoise);
+  }
+
+  .engage-card__title {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .engage-card__text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .engage-card__cta {
+    margin-top: var(--space-2);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* Variante pays secondaire : photo plus basse, titre plus fort. */
+  .engage-card--country {
+    border-radius: var(--radius-card-lg);
+  }
+
+  .engage-card--country :global(.engage-card__photo) {
+    height: 160px;
+  }
+
+  .engage-card--country .engage-card__body {
+    gap: var(--space-2);
+    padding: 24px 28px 28px;
+  }
+
+  .engage-card--country .engage-card__title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: var(--ls-h2);
+  }
+</style>
