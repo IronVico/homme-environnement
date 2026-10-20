@@ -2,21 +2,30 @@
 import { getLang } from '../i18n';
 
 interface Props {
-  /** Valeur finale du compteur (affichée telle quelle sans JS). */
-  value: number;
+  /**
+   * Valeur finale du compteur (affichée telle quelle sans JS).
+   * Texte (« [X] ») : chiffre pas encore connu, affiché sans compteur.
+   */
+  value: number | string;
+  /** Signe placé devant le chiffre : « ≈ ». */
+  prefix?: string;
   /** Unité accolée au chiffre : « ans », « ha »… */
   unit?: string;
   text: string;
-  /** ring : 30 traits (années). bars : barres croissantes. dots : pastilles (1 = 1 000 ha). */
-  illustration: 'ring' | 'bars' | 'dots';
+  /**
+   * ring : 30 traits (années). bars : barres croissantes. dots : pastilles (1 = 1 000 ha).
+   * sites : 5 pastilles en cercle (un par site). share : anneau rempli à value %. families : deux silhouettes.
+   */
+  illustration: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families';
   illustrationLabel: string;
 }
 
-const { value, unit, text, illustration, illustrationLabel } = Astro.props;
+const { value, prefix, unit, text, illustration, illustrationLabel } = Astro.props;
 
 const NBSP = '\u00a0';
 const numberLocale = getLang(Astro.currentLocale) === 'en' ? 'en-GB' : 'fr-FR';
-const formatted = value.toLocaleString(numberLocale).replace(/\s/g, NBSP) + (unit ? NBSP + unit : '');
+const number = typeof value === 'number' ? value.toLocaleString(numberLocale).replace(/\s/g, NBSP) : value;
+const formatted = (prefix ? prefix + NBSP : '') + number + (unit ? NBSP + unit : '');
 
 // Anneau : 30 traits, un par année depuis 1993, dans le sens horaire depuis midi.
 const ringTicks = Array.from({ length: 30 }, (_, i) => {
@@ -38,6 +47,19 @@ const bars = [
   { x: 44, y: 44, h: 48, fill: 'var(--basalte)' },
   { x: 61, y: 28, h: 64, fill: 'var(--basalte)' },
   { x: 78, y: 8, h: 84, fill: 'var(--peche)' },
+];
+
+// Anneau de part : circonférence du cercle r=38, arc proportionnel à la valeur.
+const SHARE_CIRC = 2 * Math.PI * 38;
+const shareRatio = illustration === 'share' && typeof value === 'number' ? value / 100 : 0;
+
+// 5 pastilles réparties en cercle, dans le sens horaire depuis midi ; la dernière en pêche.
+const sitePoints = [
+  { cx: 50, cy: 22, fill: 'var(--sauge)' },
+  { cx: 78, cy: 42, fill: 'var(--sauge)' },
+  { cx: 67, cy: 76, fill: 'var(--basalte)' },
+  { cx: 33, cy: 76, fill: 'var(--basalte)' },
+  { cx: 22, cy: 42, fill: 'var(--peche)' },
 ];
 
 const dots = [
@@ -86,9 +108,54 @@ const dots = [
           <circle class="stat-card__step stat-card__dot" style={`--i: ${i}; fill: var(--sauge)`} cx={d.cx} cy={d.cy} r="11" />
         ))
     }
+    {
+      illustration === 'sites' &&
+        sitePoints.map((d, i) => (
+          <circle class="stat-card__step stat-card__dot" style={`--i: ${i}; fill: ${d.fill}`} cx={d.cx} cy={d.cy} r="11" />
+        ))
+    }
+    {
+      illustration === 'share' && (
+        <>
+          <circle cx="50" cy="50" r="38" fill="none" style="stroke: var(--grille)" stroke-width="12" />
+          <circle
+            class="stat-card__arc"
+            style={`--circ: ${SHARE_CIRC.toFixed(1)}; --offset: ${(SHARE_CIRC * (1 - shareRatio)).toFixed(1)}; stroke: var(--basalte)`}
+            cx="50"
+            cy="50"
+            r="38"
+            fill="none"
+            stroke-width="12"
+            stroke-linecap="round"
+            transform="rotate(-90 50 50)"
+          />
+          {/* Point d'arrivée au bout de l'arc ; la rotation est sur le groupe pour ne pas gêner l'animation. */}
+          <g transform={`rotate(${(shareRatio * 360).toFixed(0)} 50 50)`}>
+            <circle class="stat-card__step stat-card__dot" style="--i: 16; fill: var(--peche)" cx="50" cy="12" r="6" />
+          </g>
+        </>
+      )
+    }
+    {
+      illustration === 'families' && (
+        <>
+          <circle class="stat-card__step stat-card__dot" style="--i: 0; fill: var(--sauge)" cx="30" cy="34" r="12" />
+          <circle class="stat-card__step stat-card__dot" style="--i: 1; fill: var(--sauge)" cx="70" cy="34" r="12" />
+          <path class="stat-card__step stat-card__dot" style="--i: 2; fill: var(--basalte)" d="M10 82c2-14 10-22 20-22s18 8 20 22Z" />
+          <path class="stat-card__step stat-card__dot" style="--i: 3; fill: var(--basalte)" d="M50 82c2-14 10-22 20-22s18 8 20 22Z" />
+          <circle class="stat-card__step stat-card__dot" style="--i: 4; fill: var(--peche)" cx="50" cy="54" r="7" />
+        </>
+      )
+    }
   </svg>
   <div class="stat-card__body">
-    <span class="stat-card__value" data-count-to={value} data-unit={unit} data-locale={numberLocale}>{formatted}</span>
+    <span
+      class="stat-card__value"
+      data-count-to={typeof value === 'number' ? value : undefined}
+      data-prefix={prefix}
+      data-unit={unit}
+      data-locale={numberLocale}>{formatted}</span
+    >
     <p class="stat-card__text">{text}</p>
   </div>
 </div>
@@ -131,6 +198,12 @@ const dots = [
     line-height: 1.5;
   }
 
+  /* Anneau de part : arc proportionnel à la valeur, tracé depuis midi. */
+  .stat-card__arc {
+    stroke-dasharray: var(--circ);
+    stroke-dashoffset: var(--offset);
+  }
+
   /*
    * Animation au scroll (une fois) : uniquement avec JS et sans préférence
    * de mouvement réduit. Sans JS, l'illustration est affichée complète.
@@ -152,6 +225,14 @@ const dots = [
     :global(.js) .stat-card__dot {
       transform-box: fill-box;
       transform-origin: 50% 50%;
+    }
+
+    :global(.js) .stat-card__arc {
+      transition: stroke-dashoffset 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    :global(.js) [data-stat]:not(.is-visible) .stat-card__arc {
+      stroke-dashoffset: var(--circ);
     }
 
     :global(.js) [data-stat]:not(.is-visible) line.stat-card__step {

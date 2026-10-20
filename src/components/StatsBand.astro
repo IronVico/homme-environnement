@@ -6,13 +6,15 @@ type Stat = Parameters<typeof StatCard>[0];
 
 interface Props {
   stats: Stat[];
+  /** Nom de la région pour les lecteurs d'écran (par défaut « Chiffres clés »). */
+  label?: string;
 }
 
-const { stats } = Astro.props;
 const { ui } = t(getLang(Astro.currentLocale));
+const { stats, label = ui.statsLabel } = Astro.props;
 ---
 
-<section id="chiffres-cles" class="stats" aria-label={ui.statsLabel}>
+<section id="chiffres-cles" class="stats" aria-label={label}>
   <div class="stats__grid container">
     {stats.map((stat) => <StatCard {...stat} />)}
   </div>

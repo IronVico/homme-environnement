@@ -1,4 +1,5 @@
 ---
+import ArrowDown from '@lucide/astro/icons/arrow-down';
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Heart from '@lucide/astro/icons/heart';
 
@@ -8,16 +9,18 @@ interface Props {
   variant?: 'don' | 'secondary' | 'on-dark';
   /** md : hero. sm : header et footer. */
   size?: 'md' | 'sm';
+  /** Flèche des variantes secondaires : vers le bas pour une ancre dans la page. */
+  arrow?: 'right' | 'down';
   class?: string;
 }
 
-const { href, variant = 'secondary', size = 'md', class: className } = Astro.props;
+const { href, variant = 'secondary', size = 'md', arrow = 'right', class: className } = Astro.props;
 ---
 
 <a href={href} class:list={['btn', 'btn-motion', `btn--${variant}`, `btn--${size}`, className]}>
   {variant === 'don' && <Heart size={18} />}
   <slot />
-  {variant !== 'don' && <ArrowRight size={20} />}
+  {variant !== 'don' && (arrow === 'down' ? <ArrowDown size={20} /> : <ArrowRight size={20} />)}
 </a>
 
 <style>

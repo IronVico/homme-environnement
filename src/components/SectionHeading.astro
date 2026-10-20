@@ -5,12 +5,14 @@ interface Props {
   /** …puis partie douce (h2-light, Light), facultative. */
   light?: string;
   eyebrow?: string;
+  /** Chapeau, toujours sous le titre (jamais à côté). */
+  lead?: string;
   /** Lien d'action aligné à droite du titre (« Toutes nos actions → »). */
   link?: { label: string; href: string };
   id?: string;
 }
 
-const { strong, light, eyebrow, link, id } = Astro.props;
+const { strong, light, eyebrow, lead, link, id } = Astro.props;
 ---
 
 <div class:list={['section-heading', { 'section-heading--with-link': link }]}>
@@ -21,6 +23,7 @@ const { strong, light, eyebrow, link, id } = Astro.props;
       {light && ' '}
       {light && <span class="section-heading__light">{light}</span>}
     </h2>
+    {lead && <p class="section-heading__lead">{lead}</p>}
   </div>
   {
     link && (
@@ -44,6 +47,17 @@ const { strong, light, eyebrow, link, id } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
+  }
+
+  .section-heading__titles:has(.section-heading__lead) {
+    max-width: 760px;
+  }
+
+  .section-heading__lead {
+    max-width: 620px;
+    margin-top: 4px;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
   }
 
   .section-heading--with-link .section-heading__titles {

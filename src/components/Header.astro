@@ -3,11 +3,17 @@ import Menu from '@lucide/astro/icons/menu';
 import X from '@lucide/astro/icons/x';
 import logoEn from '../assets/logos/logo-couleur-en.svg';
 import logoFr from '../assets/logos/logo-couleur.svg';
-import { DON_URL, getMainNav } from '../data/navigation';
+import { DON_URL, getMainNav, type MainSection } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import Button from './Button.astro';
 import LangSwitcher from './LangSwitcher.astro';
 
+interface Props {
+  /** Rubrique de la page courante, soulignée dans le menu. */
+  current?: MainSection;
+}
+
+const { current } = Astro.props;
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
 // Version anglaise : logo « Man & the Environment » (LOGO-ENG-2), jamais « Human ».
@@ -24,7 +30,7 @@ const mainNav = getMainNav(lang);
     <ul>
       {mainNav.map((link) => (
         <li>
-          <a href={link.href}>{link.label}</a>
+          <a href={link.href} aria-current={link.section === current ? 'true' : undefined}>{link.label}</a>
         </li>
       ))}
     </ul>
@@ -112,6 +118,13 @@ const mainNav = getMainNav(lang);
   .header__nav a:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  /* Rubrique courante : soulignement épais, comme dans la maquette des pages internes. */
+  .header__nav a[aria-current] {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
   }
 
   .header__burger {

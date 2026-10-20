@@ -32,6 +32,8 @@ const en: Dictionary = {
     copyright: '© Man & the Environment · Photos © Day Nabih, © Marc Gansuana, © Langaha Be',
     statsLabel: 'Key figures',
     scrollHint: 'Scroll down',
+    breadcrumb: 'Breadcrumb',
+    breadcrumbHome: 'Home',
     newsletterEmailLabel: 'Your email address',
     newsletterPlaceholder: 'Your email address',
     newsletterSubmit: 'Subscribe',
@@ -51,6 +53,9 @@ const en: Dictionary = {
 
   // TODO traduction : contenu de la home encore en français (copie de fr.ts).
   home: structuredClone(fr.home),
+
+  // TODO traduction : contenu de la page Madagascar encore en français (copie de fr.ts).
+  madagascar: structuredClone(fr.madagascar),
 };
 
 export default en;

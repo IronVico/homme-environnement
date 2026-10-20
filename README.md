@@ -47,6 +47,10 @@ src/
   pages/
     index.astro       accueil en français (/)
     en/index.astro    accueil en anglais (/en/)
+    actions/madagascar.astro     page pays Madagascar (/actions/madagascar)
+    en/actions/madagascar.astro  page pays en anglais (/en/actions/madagascar)
+  content/sites/      un fichier Markdown par site (nom, pays, statut, photo, résumé)
+  content.config.ts   schéma de la collection « sites »
   scripts/stats.ts    animation des chiffres clés
   styles/
     tokens.css        tokens du design system en variables CSS
@@ -58,17 +62,22 @@ src/
 | Composant           | Rôle |
 | ------------------- | ---- |
 | `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
+| `MadagascarPage`    | Page pays Madagascar commune aux deux langues ; sites lus dans la collection `sites` |
+| `Breadcrumb`        | Fil d'Ariane des pages internes |
+| `PageHero`          | Hero des pages internes : H1 en deux temps, chapeau, bouton secondaire, photo en arche |
+| `SiteCard`          | Carte d'un site : grande carte photo (`featured`) ou carte blanche, statut en pastille |
+| `PhotoBanner`       | Carte sur photo assombrie (titre + phrase) avec contenu libre : newsletter, boutons d'appel |
 | `Header`            | Logo, menu principal, sélecteur FR / EN, bouton Don, burger en dessous de 1080px |
 | `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
-| `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles) |
-| `SectionHeading`    | Titre de section en deux temps (fort + doux), sur-titre et lien facultatifs |
+| `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles, sites, part, familles) ; valeur texte (« [X] ») affichée sans compteur |
+| `SectionHeading`    | Titre de section en deux temps (fort + doux), sur-titre, chapeau (toujours dessous) et lien facultatifs |
 | `PillarCard`        | Pilier de l'approche, photo en arche |
 | `CountryCard`       | Grande carte photo (pays mis en avant) avec pastilles de sites (`Chip`) |
 | `EngageCard`        | Carte blanche cliquable ; variante `country` pour les pays secondaires |
 | `PartnersStrip`     | Logos partenaires ; défilement en boucle en mobile |
-| `NewsletterSection` / `NewsletterForm` | Bloc newsletter sur photo, champ + bouton en une pilule |
+| `NewsletterSection` / `NewsletterForm` | Bloc newsletter (`PhotoBanner`), champ + bouton en une pilule |
 | `Footer`            | Pitch, bouton Don, LinkedIn et Facebook, plan du site, mentions, lien « English version » / « Version française » |
 
 ## Design system

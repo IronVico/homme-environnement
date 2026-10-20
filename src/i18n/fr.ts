@@ -28,6 +28,8 @@ const fr = {
     copyright: "© L'Homme & l'Environnement · Photos © Day Nabih, © Marc Gansuana, © Langaha Be",
     statsLabel: 'Chiffres clés',
     scrollHint: 'Faire défiler',
+    breadcrumb: "Fil d'Ariane",
+    breadcrumbHome: 'Accueil',
     newsletterEmailLabel: 'Votre adresse email',
     newsletterPlaceholder: 'Votre adresse email',
     newsletterSubmit: "Je m'inscris",
@@ -144,6 +146,73 @@ const fr = {
       titleStrong: 'Des nouvelles du terrain,',
       titleLight: 'quelques fois par an.',
       text: 'Résultats des projets, départs de volontaires, appels à soutien.',
+    },
+  },
+  // Page pays Madagascar. Les crochets et « [X] familles » sont des textes de maquette À COMPLÉTER avec l'ONG.
+  madagascar: {
+    title: 'Madagascar',
+    description:
+      "Depuis 1993, L'Homme & l'Environnement protège à Madagascar des forêts d'une richesse unique, avec les communautés qui en vivent, jusqu'à leur en confier la gestion.",
+    hero: {
+      titleStrong: 'Madagascar,',
+      titleLight: "une nature qui n'existe nulle part ailleurs.",
+      lead: "Depuis 1993, nous protégeons à Madagascar des forêts d'une richesse unique, avec les communautés qui en vivent, jusqu'à leur en confier la gestion.",
+      cta: 'Découvrir nos sites',
+      imageAlt: 'Vue aérienne de forêts et de mangroves au bord de la mer, Madagascar',
+    },
+    statsLabel: 'Madagascar en chiffres',
+    stats: [
+      {
+        unit: 'sites',
+        text: 'protégés et accompagnés, de la forêt humide aux mangroves.',
+        illustrationLabel: '5 sites',
+      },
+      {
+        unit: '%',
+        text: "des espèces de l'île n'existent nulle part ailleurs au monde.",
+        illustrationLabel: 'Part des espèces endémiques',
+      },
+      {
+        unit: 'familles',
+        text: 'impliquées dans la gestion des réserves et les filières locales.',
+        illustrationLabel: 'Familles impliquées',
+      },
+    ],
+    sites: {
+      titleStrong: 'Nos 5 sites',
+      titleLight: 'à Madagascar',
+      lead: 'Chaque site a sa fiche : ses enjeux, nos actions et les résultats obtenus avec les habitants.',
+      link: 'Voir la fiche du site',
+      status: {
+        historique: 'Site historique',
+        transmis: 'Transmis aux acteurs locaux',
+        'en-cours': 'En cours',
+      },
+    },
+    method: {
+      titleStrong: 'Comment nous agissons',
+      titleLight: "sur l'île",
+      imageAlt: 'Des élèves travaillent dans une salle de classe en bois, Vohimana',
+      steps: [
+        {
+          title: 'Protéger',
+          text: "Faire reconnaître et gérer des zones riches en espèces endémiques qui n'étaient pas protégées.",
+        },
+        {
+          title: 'Valoriser',
+          text: 'Créer des revenus liés à la forêt vivante : écotourisme, huiles essentielles avec Aroma Forest.',
+        },
+        {
+          title: 'Transmettre',
+          text: "Former et accompagner les acteurs locaux jusqu'à leur confier la gestion des sites.",
+        },
+      ],
+    },
+    cta: {
+      titleStrong: 'Soutenir Madagascar,',
+      titleLight: "c'est protéger des espèces uniques au monde.",
+      text: 'Votre don finance directement les actions sur les sites.',
+      field: 'Venir sur le terrain',
     },
   },
 };

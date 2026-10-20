@@ -3,7 +3,7 @@
  * Page d'accueil, commune aux deux langues : les textes viennent de src/i18n,
  * la langue de Astro.currentLocale (/ = français, /en/ = anglais).
  */
-import { DON_URL } from '../data/navigation';
+import { DON_URL, pagePath } from '../data/navigation';
 import { getLang, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CountryCard from './CountryCard.astro';
@@ -28,7 +28,8 @@ import pilierEconomie from '../assets/photos/pilier-economie-fete-ambohidravy.jp
 import pilierResponsabilisation from '../assets/photos/pilier-responsabilisation-classe.jpg';
 import projetsSoutenus from '../assets/photos/projets-soutenus-nicaragua.jpg';
 
-const dict = t(getLang(Astro.currentLocale));
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
 const { home } = dict;
 
 // Chiffres (identiques dans toutes les langues). 400 000 arbres : À CONFIRMER avec l'ONG.
@@ -95,7 +96,7 @@ const madagascarSites = ['Vohimana', 'Vohibola', 'Ambohidravy', 'Mont Passot', '
             name={home.actions.madagascar.name}
             description={home.actions.madagascar.description}
             sites={madagascarSites}
-            href="#"
+            href={pagePath(lang, 'madagascar')}
             image={paysMadagascar}
           />
           <div class="countries__side">
