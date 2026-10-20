@@ -75,7 +75,8 @@ const breadcrumb = [
               <SiteCard
                 class={site.data.featured ? 'sites-grid__featured' : undefined}
                 name={site.data.name}
-                status={page.sites.status[site.data.status]}
+                status={site.data.status}
+                statusLabel={page.sites.status[site.data.status]}
                 summary={site.data.summary}
                 image={site.data.photo}
                 imagePosition={site.data.photoPosition}
