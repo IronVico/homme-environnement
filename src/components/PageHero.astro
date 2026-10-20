@@ -50,7 +50,6 @@ const { titleStrong, titleLight, lead, image, imageAlt, imagePosition = '50% 50%
 <style>
   .page-hero {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 40px 64px;
     padding-top: clamp(24px, 4vw, 48px);
@@ -100,5 +99,28 @@ const { titleStrong, titleLight, lead, image, imageAlt, imagePosition = '50% 50%
     aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: var(--radius-arch) var(--radius-arch) 20px 20px;
+  }
+
+  /* Empilé : la photo passe sous le texte et prend toute la largeur. */
+  @media (max-width: 1080px) {
+    .page-hero {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .page-hero__text {
+      flex: none;
+    }
+
+    .page-hero :global(.page-hero__photo) {
+      flex: none;
+    }
+  }
+
+  /* Tablette : photo pleine largeur moins haute, pour ne pas occuper tout l'écran. */
+  @media (min-width: 600px) and (max-width: 1080px) {
+    .page-hero :global(.page-hero__photo) {
+      aspect-ratio: 16 / 9;
+    }
   }
 </style>
