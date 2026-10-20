@@ -88,28 +88,12 @@ const isCurrent = (href: string) => {
 </div>
 
 <script>
-  /*
-   * Header fixé : dès que la page défile, il devient une pilule flottante compacte
-   * (data-scrolled). Il se cache en descendant et revient dès qu'on remonte
-   * (data-hidden), sauf près du haut de page ou quand un menu est ouvert.
-   */
+  // Header fixé : dès que la page défile, il devient une pilule flottante compacte (data-scrolled).
   const bar = document.querySelector<HTMLElement>('[data-header-bar]');
   if (bar) {
-    let lastY = window.scrollY;
-    // Les navigateurs émettent « scroll » au plus une fois par image : pas besoin de requestAnimationFrame.
-    const update = () => {
-      const y = window.scrollY;
-      const menuOpen = bar.querySelector('[data-open], [data-expanded]') !== null;
-      bar.toggleAttribute('data-scrolled', y > 8);
-      if (y < 160 || menuOpen) bar.removeAttribute('data-hidden');
-      else if (y > lastY + 6) bar.setAttribute('data-hidden', '');
-      else if (y < lastY - 6) bar.removeAttribute('data-hidden');
-      if (Math.abs(y - lastY) > 6) lastY = y;
-    };
+    const update = () => bar.toggleAttribute('data-scrolled', window.scrollY > 8);
     update();
     window.addEventListener('scroll', update, { passive: true });
-    // Le focus clavier dans le header le fait réapparaître.
-    bar.addEventListener('focusin', () => bar.removeAttribute('data-hidden'));
   }
 
   const header = document.querySelector<HTMLElement>('.header');
@@ -187,17 +171,11 @@ const isCurrent = (href: string) => {
     right: 0;
     z-index: 30;
     background: var(--blanc);
-    transition:
-      transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
-      background-color var(--transition-ui);
+    transition: background-color var(--transition-ui);
   }
 
   .header-bar[data-scrolled] {
     background: transparent;
-  }
-
-  .header-bar[data-hidden] {
-    transform: translateY(calc(-100% - 16px));
   }
 
   /* Au scroll : pilule flottante blanche translucide, alignée sur la largeur du contenu. */
