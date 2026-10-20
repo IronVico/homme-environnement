@@ -58,7 +58,7 @@ src/
 | Composant           | Rôle |
 | ------------------- | ---- |
 | `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
-| `Header`            | Logo, menu principal, sélecteur FR / EN, bouton Don, burger en dessous de 1080px |
+| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don, burger en dessous de 1080px |
 | `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |

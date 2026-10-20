@@ -13,6 +13,14 @@ const { ui } = t(lang);
 // Version anglaise : logo « Man & the Environment » (LOGO-ENG-2), jamais « Human ».
 const logo = lang === 'en' ? logoEn : logoFr;
 const mainNav = getMainNav(lang);
+
+// Rubrique en cours : le lien est sélectionné sur sa page et ses sous-pages.
+const currentPath = Astro.url.pathname.replace(/\/$/, '');
+const isCurrent = (href: string) => {
+  if (!href.startsWith('/')) return false;
+  const target = href.replace(/\/$/, '');
+  return target !== '' && (currentPath === target || currentPath.startsWith(`${target}/`));
+};
 ---
 
 <header class="header container">
@@ -24,7 +32,7 @@ const mainNav = getMainNav(lang);
     <ul>
       {mainNav.map((link) => (
         <li>
-          <a href={link.href}>{link.label}</a>
+          <a href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>{link.label}</a>
         </li>
       ))}
     </ul>
@@ -94,10 +102,11 @@ const mainNav = getMainNav(lang);
     margin: -14px -38px -14px -20px;
   }
 
+  /* Écart réduit du padding des pastilles : même espacement visuel qu'avant (28px). */
   .header__nav > ul {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 4px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -106,12 +115,24 @@ const mainNav = getMainNav(lang);
   }
 
   .header__nav a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: var(--radius-pill);
     text-decoration: none;
+    transition:
+      background-color var(--transition-ui),
+      color var(--transition-ui);
   }
 
+  /* Survol : pastille vert clair. Sélectionné : pastille basalte, comme le sélecteur de langue. */
   .header__nav a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    background: var(--vert-clair);
+    color: var(--basalte);
+  }
+
+  .header__nav a[aria-current='page'] {
+    background: var(--basalte);
+    color: var(--blanc);
   }
 
   .header__burger {
@@ -161,7 +182,7 @@ const mainNav = getMainNav(lang);
 
     .header__nav > ul {
       flex-wrap: wrap;
-      gap: 8px 20px;
+      gap: 4px 8px;
     }
 
     /* Avec JS : burger et panneau déroulant. */
@@ -188,17 +209,14 @@ const mainNav = getMainNav(lang);
     :global(.js) .header__nav > ul {
       flex-direction: column;
       align-items: stretch;
-      gap: 0;
+      gap: 4px;
       font-size: 19px;
     }
 
-    :global(.js) .header__nav li + li {
-      border-top: 1px solid var(--bordure-douce);
-    }
-
+    /* Dans le panneau, les pastilles deviennent des lignes arrondies pleine largeur. */
     :global(.js) .header__nav li a {
-      display: block;
-      padding: 14px 0;
+      padding: 12px 16px;
+      border-radius: 14px;
     }
   }
 
