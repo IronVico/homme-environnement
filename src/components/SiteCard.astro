@@ -31,7 +31,7 @@ const { name, status, statusLabel, summary, image, imagePosition = '50% 50%', hr
 const StatusIcon = { historique: Flag, transmis: Handshake, 'en-cours': Sprout }[status];
 ---
 
-<a class:list={['site-card', 'card-lift', featured ? 'site-card--featured' : 'site-card--default', className]} href={href}>
+<a class:list={['site-card', 'card-lift', featured ? 'site-card--featured' : 'site-card--default', className]} href={href} data-reveal>
   <Picture
     class="site-card__photo"
     src={image}

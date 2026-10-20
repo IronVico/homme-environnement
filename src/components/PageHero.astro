@@ -24,18 +24,19 @@ const { titleStrong, titleLight, lead, image, imageAlt, imagePosition = '50% 50%
 
 <section class="page-hero container">
   <div class="page-hero__text">
-    <h1 class="page-hero__title">
+    <h1 class="page-hero__title" data-reveal>
       <span class="page-hero__strong">{titleStrong}</span><br />
       <span class="page-hero__light">{titleLight}</span>
     </h1>
-    <p class="page-hero__lead">{lead}</p>
-    <div class="page-hero__ctas">
+    <p class="page-hero__lead" data-reveal>{lead}</p>
+    <div class="page-hero__ctas" data-reveal>
       <Button href={cta.href} variant="secondary" arrow={cta.href.startsWith('#') ? 'down' : 'right'}>{cta.label}</Button>
     </div>
   </div>
 
   <Picture
     class="page-hero__photo"
+    data-reveal
     src={image}
     alt={imageAlt}
     style={`object-position: ${imagePosition}`}

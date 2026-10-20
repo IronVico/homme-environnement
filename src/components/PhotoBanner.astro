@@ -22,7 +22,7 @@ const { id, titleStrong, titleLight, text, image, imagePosition = '50% 40%', spa
 ---
 
 <section class:list={['photo-banner', { 'photo-banner--spaced': spaced }]} aria-labelledby={id}>
-  <div class="photo-banner__card">
+  <div class="photo-banner__card" data-reveal>
     <Picture
       class="photo-banner__photo"
       src={image}

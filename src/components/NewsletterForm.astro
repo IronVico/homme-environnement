@@ -32,7 +32,7 @@ const { ui } = t(getLang(Astro.currentLocale));
     />
     <button class="newsletter-form__btn btn-motion" type="submit">
       {ui.newsletterSubmit}
-      <Send size={18} />
+      <Send class="newsletter-form__icon" size={18} />
     </button>
   </form>
   <p class="newsletter-form__status" id={statusId} role="status" aria-live="polite"></p>
@@ -64,6 +64,33 @@ const { ui } = t(getLang(Astro.currentLocale));
     padding: 6px;
     background: var(--blanc);
     border-radius: var(--radius-pill);
+    transition: box-shadow var(--transition-ui);
+  }
+
+  /* Halo blanc translucide au survol, plus marqué pendant la saisie. */
+  .newsletter-form__pill:hover {
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.25);
+  }
+
+  .newsletter-form__pill:focus-within {
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4);
+  }
+
+  /* L'avion en papier s'envole légèrement au survol du bouton. */
+  .newsletter-form__btn :global(.newsletter-form__icon) {
+    transition: transform var(--transition-ui);
+  }
+
+  .newsletter-form__btn:hover :global(.newsletter-form__icon),
+  .newsletter-form__btn:focus-visible :global(.newsletter-form__icon) {
+    transform: translate(3px, -3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .newsletter-form__btn:hover :global(.newsletter-form__icon),
+    .newsletter-form__btn:focus-visible :global(.newsletter-form__icon) {
+      transform: none;
+    }
   }
 
   .newsletter-form__input {
@@ -137,6 +164,21 @@ const { ui } = t(getLang(Astro.currentLocale));
     .newsletter-form__input {
       padding: 0 20px;
       background: var(--blanc);
+      transition: box-shadow var(--transition-ui);
+    }
+
+    /* Empilés : le halo passe de la pilule (transparente) au champ seul. */
+    .newsletter-form__pill:hover,
+    .newsletter-form__pill:focus-within {
+      box-shadow: none;
+    }
+
+    .newsletter-form__input:hover {
+      box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.25);
+    }
+
+    .newsletter-form__input:focus {
+      box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4);
     }
 
     .newsletter-form__input:focus-visible {

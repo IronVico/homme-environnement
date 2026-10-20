@@ -94,6 +94,7 @@ const breadcrumb = [
       <div class="container method">
         <Picture
           class="method__photo"
+          data-reveal
           src={methodClasse}
           alt={page.method.imageAlt}
           formats={['avif', 'webp']}
@@ -105,7 +106,7 @@ const breadcrumb = [
           <ol class="method__steps">
             {
               page.method.steps.map((step, i) => (
-                <li class="method__step">
+                <li class="method__step" data-reveal>
                   <span class="method__number" aria-hidden="true">
                     {i + 1}
                   </span>
