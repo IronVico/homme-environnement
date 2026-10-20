@@ -82,6 +82,7 @@ Rappels :
 - Sections en aplat (pas de fondu), cartes blanches avec `--shadow-card` et bordure douce.
 - Focus visible partout : contour 2px basalte décalé de 2px.
 - Cartes cliquables (classe `card-lift`) : légère élévation au survol et au focus (`--lift-card-hover`, `--shadow-card-hover`), sans soulignement ; sans déplacement avec `prefers-reduced-motion`.
+- Boutons (classe `btn-motion`) : couleurs fondues et léger soulèvement au survol (`--transition-ui`, `--lift-button-hover`), retour en place au clic ; sans déplacement avec `prefers-reduced-motion`.
 
 ## Langues (i18n)
 

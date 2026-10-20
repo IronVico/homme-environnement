@@ -49,6 +49,9 @@ const codes = Object.keys(languages) as Lang[];
     border-radius: var(--radius-pill);
     color: var(--basalte);
     text-decoration: none;
+    transition:
+      background-color var(--transition-ui),
+      color var(--transition-ui);
   }
 
   .lang-switcher a:hover {

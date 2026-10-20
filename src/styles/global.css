@@ -70,8 +70,8 @@ input {
 /* Cartes cliquables : légère élévation au survol et au focus clavier. */
 .card-lift {
   transition:
-    transform 200ms ease-out,
-    box-shadow 200ms ease-out;
+    transform var(--transition-ui),
+    box-shadow var(--transition-ui);
 }
 
 a.card-lift:hover,
@@ -87,6 +87,34 @@ a.card-lift:focus-visible {
 
   a.card-lift:hover,
   a.card-lift:focus-visible {
+    transform: none;
+  }
+}
+
+/*
+ * Boutons en pilule (Button, bouton newsletter) : couleurs fondues,
+ * léger soulèvement au survol, retour en place au clic.
+ */
+.btn-motion {
+  transition:
+    background-color var(--transition-ui),
+    color var(--transition-ui),
+    border-color var(--transition-ui),
+    transform var(--transition-ui);
+}
+
+.btn-motion:hover {
+  transform: translateY(var(--lift-button-hover));
+}
+
+.btn-motion:active {
+  transform: translateY(0);
+  transition-duration: 80ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-motion:hover,
+  .btn-motion:active {
     transform: none;
   }
 }
