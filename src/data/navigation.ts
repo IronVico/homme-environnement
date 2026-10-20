@@ -11,6 +11,8 @@ export type MainSection = (typeof MAIN_SECTIONS)[number];
 
 export interface MainNavLink extends NavLink {
   section: MainSection;
+  /** Sous-pages affichées dans le sous-menu déroulant (vide : lien direct). */
+  children: NavLink[];
 }
 
 export interface NavColumn {
@@ -49,13 +51,31 @@ const FOOTER_HREFS = [
 ];
 const LEGAL_HREFS = ['#', '#'];
 
+/**
+ * Sous-menus du header : les sous-pages de chaque rubrique sont celles de la
+ * colonne correspondante du footer (column), éventuellement tronquée (count) :
+ * « Contact » est déjà une entrée du menu, on ne la répète pas sous Ressources.
+ */
+const SUBMENUS: Partial<Record<MainSection, { column: number; count?: number }>> = {
+  ong: { column: 0 },
+  actions: { column: 1 },
+  engager: { column: 2 },
+  ressources: { column: 3, count: 2 },
+};
+
 const resolve = (lang: Lang, href: string | undefined) => (!href || href.startsWith('#') ? '#' : localeUrl(lang, href));
 
 const zip = (lang: Lang, labels: string[], hrefs: string[]): NavLink[] =>
   labels.map((label, i) => ({ label, href: resolve(lang, hrefs[i]) }));
 
 export function getMainNav(lang: Lang): MainNavLink[] {
-  return zip(lang, t(lang).nav.main, MAIN_HREFS).map((link, i) => ({ ...link, section: MAIN_SECTIONS[i]! }));
+  const footer = getFooterNav(lang);
+  return zip(lang, t(lang).nav.main, MAIN_HREFS).map((link, i) => {
+    const section = MAIN_SECTIONS[i]!;
+    const submenu = SUBMENUS[section];
+    const children = submenu ? (footer[submenu.column]?.links ?? []).slice(0, submenu.count) : [];
+    return { ...link, section, children };
+  });
 }
 
 export function getFooterNav(lang: Lang): NavColumn[] {

@@ -67,7 +67,7 @@ src/
 | `PageHero`          | Hero des pages internes : H1 en deux temps, chapeau, bouton secondaire, photo en arche |
 | `SiteCard`          | Carte d'un site : grande carte photo (`featured`) ou carte blanche, statut en pastille |
 | `PhotoBanner`       | Carte sur photo assombrie (titre + phrase) avec contenu libre : newsletter, boutons d'appel |
-| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don, burger en dessous de 1080px |
+| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don ; sous-menus déroulants (accordéon dans le burger) ; fixé en haut au scroll ; burger en dessous de 1180px |
 | `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
