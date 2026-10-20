@@ -94,10 +94,11 @@ Rappels :
 
 ## Animations et accessibilité
 
+- Apparition au scroll (`src/scripts/reveal.ts`, attribut `data-reveal`) : titres, cartes, bande des logos et bloc newsletter apparaissent en fondu en remontant de 24px, une seule fois, en cascade quand ils entrent ensemble ; le hero s'anime au chargement. Masqués seulement avec JS ; si le script ne s'exécute pas, tout s'affiche au bout de 3s.
 - Chiffres clés : au premier passage dans l'écran (IntersectionObserver, une seule fois), compteur de 0 à la valeur, traits de l'anneau dans le sens horaire, barres qui poussent, pastilles une à une.
 - Logos partenaires : défilement continu en dessous de 900px.
 - Hero : le contour organique de la photo ondule (14 s) et l'isotype flotte (11 s), en boucle lente.
-- Indication « Faire défiler » du hero : la flèche monte et descend doucement en boucle (1,8 s). Ces deux animations du hero sont des exceptions à la règle « pas d'autre animation décorative » du design system, à y reporter.
+- Indication « Faire défiler » du hero : la flèche monte et descend doucement en boucle (1,8 s). Ces animations du hero et l'apparition au scroll sont des exceptions à la règle « pas d'autre animation décorative » du design system, à y reporter.
 - Avec `prefers-reduced-motion: reduce`, tout est désactivé (valeurs finales affichées, logos en défilement manuel).
 - **Sans JavaScript**, la page est complète : chiffres et illustrations affichés en entier, liens du menu visibles sous le logo en mobile.
 

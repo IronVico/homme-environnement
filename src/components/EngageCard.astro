@@ -22,7 +22,7 @@ interface Props {
 const { title, text, href, image, imageAlt = '', imagePosition = '50% 50%', eyebrow, cta, variant = 'engage' } = Astro.props;
 ---
 
-<a class:list={['engage-card', 'card-lift', `engage-card--${variant}`]} href={href}>
+<a class:list={['engage-card', 'card-lift', `engage-card--${variant}`]} href={href} data-reveal>
   <Picture
     class="engage-card__photo"
     src={image}

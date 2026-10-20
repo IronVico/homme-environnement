@@ -23,19 +23,19 @@ const { ui } = t(getLang(Astro.currentLocale));
 
 <section class="hero container">
   <div class="hero__text">
-    <p class="eyebrow">{eyebrow}</p>
-    <h1 class="hero__title">
+    <p class="eyebrow" data-reveal>{eyebrow}</p>
+    <h1 class="hero__title" data-reveal>
       <span class="hero__title-strong">{titleStrong}</span><br />
       <span class="hero__title-light">{titleLight}</span>
     </h1>
-    <p class="hero__lead">{lead}</p>
-    <div class="hero__ctas">
+    <p class="hero__lead" data-reveal>{lead}</p>
+    <div class="hero__ctas" data-reveal>
       <Button href={DON_URL} variant="don">{ui.donate}</Button>
       <Button href={secondaryCta.href} variant="secondary">{secondaryCta.label}</Button>
     </div>
   </div>
 
-  <div class="hero__media">
+  <div class="hero__media" data-reveal>
     <svg class="hero__isotype" viewBox="34 20 98 126" aria-hidden="true">
       <path
         fill="currentColor"
