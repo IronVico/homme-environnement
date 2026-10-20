@@ -12,7 +12,7 @@ const { stats } = Astro.props;
 const { ui } = t(getLang(Astro.currentLocale));
 ---
 
-<section class="stats" aria-label={ui.statsLabel}>
+<section id="chiffres-cles" class="stats" aria-label={ui.statsLabel}>
   <div class="stats__grid container">
     {stats.map((stat) => <StatCard {...stat} />)}
   </div>

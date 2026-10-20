@@ -11,6 +11,13 @@ html {
   text-size-adjust: 100%;
 }
 
+/* Défilement doux pour les ancres (« Faire défiler », lien d'évitement). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   margin: 0;
   background: var(--blanc);

@@ -27,6 +27,7 @@ const fr = {
     footerPitch: 'Préserver la biodiversité et soutenir le développement des populations locales, depuis 1993.',
     copyright: "© L'Homme & l'Environnement · Photos © Day Nabih, © Marc Gansuana, © Langaha Be",
     statsLabel: 'Chiffres clés',
+    scrollHint: 'Faire défiler',
     newsletterEmailLabel: 'Votre adresse email',
     newsletterPlaceholder: 'Votre adresse email',
     newsletterSubmit: "Je m'inscris",

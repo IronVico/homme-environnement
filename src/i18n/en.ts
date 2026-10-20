@@ -31,6 +31,7 @@ const en: Dictionary = {
     footerPitch: 'Preserving biodiversity and supporting the development of local communities since 1993.',
     copyright: '© Man & the Environment · Photos © Day Nabih, © Marc Gansuana, © Langaha Be',
     statsLabel: 'Key figures',
+    scrollHint: 'Scroll down',
     newsletterEmailLabel: 'Your email address',
     newsletterPlaceholder: 'Your email address',
     newsletterSubmit: 'Subscribe',

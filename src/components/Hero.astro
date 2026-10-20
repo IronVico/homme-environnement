@@ -1,4 +1,5 @@
 ---
+import ArrowDown from '@lucide/astro/icons/arrow-down';
 import type { ImageMetadata } from 'astro';
 import { Picture } from 'astro:assets';
 import { DON_URL } from '../data/navigation';
@@ -52,6 +53,12 @@ const { ui } = t(getLang(Astro.currentLocale));
       fetchpriority="high"
     />
   </div>
+
+  <!-- Indication de défilement : visible quand le hero occupe tout l'écran (desktop). -->
+  <a class="hero__scroll" href="#chiffres-cles">
+    <span>{ui.scrollHint}</span>
+    <ArrowDown class="hero__scroll-icon" size={18} />
+  </a>
 </section>
 
 <style>
@@ -61,6 +68,7 @@ const { ui } = t(getLang(Astro.currentLocale));
    * au lieu d'apparaître en liseré en bas de l'écran.
    */
   .hero {
+    position: relative;
     --header-h: 88px;
     --hero-pt: clamp(24px, 6vw, 72px);
     --hero-pb: clamp(64px, 8vw, 104px);
@@ -138,6 +146,55 @@ const { ui } = t(getLang(Astro.currentLocale));
     object-fit: cover;
     object-position: 62% 40%;
     border-radius: 46% 54% 42% 58% / 52% 40% 60% 48%;
+  }
+
+  .hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-eyebrow);
+    font-weight: 600;
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--ardoise);
+    text-decoration: none;
+  }
+
+  .hero__scroll:hover {
+    color: var(--basalte);
+  }
+
+  .hero__scroll :global(.hero__scroll-icon) {
+    transition: transform var(--transition-ui);
+  }
+
+  .hero__scroll:hover :global(.hero__scroll-icon),
+  .hero__scroll:focus-visible :global(.hero__scroll-icon) {
+    transform: translateY(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__scroll:hover :global(.hero__scroll-icon),
+    .hero__scroll:focus-visible :global(.hero__scroll-icon) {
+      transform: none;
+    }
+  }
+
+  /*
+   * Sous 1200px, la photo passe sous le texte et le hero dépasse l'écran :
+   * l'indication tomberait sous la ligne de flottaison. Idem sur un écran très bas.
+   */
+  @media (max-width: 1199px), (max-height: 640px) {
+    .hero__scroll {
+      display: none;
+    }
   }
 
   @media (max-width: 900px) {
