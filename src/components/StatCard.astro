@@ -49,7 +49,7 @@ const dots = [
 ];
 ---
 
-<div class="stat-card" data-stat>
+<div class="stat-card" data-stat data-reveal>
   <svg class="stat-card__illu" viewBox="0 0 100 100" role="img" aria-label={illustrationLabel}>
     {
       illustration === 'ring' && (
@@ -109,6 +109,24 @@ const dots = [
     flex-shrink: 0;
     width: 96px;
     height: 96px;
+  }
+
+  /*
+   * Cartes non cliquables : pas d'élévation (qui suggérerait un clic),
+   * seulement l'illustration qui grossit légèrement, avec un petit rebond.
+   */
+  .stat-card__illu {
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .stat-card:hover .stat-card__illu {
+    transform: scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stat-card:hover .stat-card__illu {
+      transform: none;
+    }
   }
 
   .stat-card__body {

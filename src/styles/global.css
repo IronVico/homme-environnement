@@ -11,6 +11,13 @@ html {
   text-size-adjust: 100%;
 }
 
+/* Défilement doux pour les ancres (« Faire défiler », lien d'évitement). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   margin: 0;
   background: var(--blanc);
@@ -65,6 +72,84 @@ a:hover {
 button,
 input {
   font: inherit;
+}
+
+/* Cartes cliquables : légère élévation au survol et au focus clavier. */
+.card-lift {
+  transition:
+    transform var(--transition-ui),
+    box-shadow var(--transition-ui);
+}
+
+a.card-lift:hover,
+a.card-lift:focus-visible {
+  transform: translateY(var(--lift-card-hover));
+  box-shadow: var(--shadow-card-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-lift {
+    transition: none;
+  }
+
+  a.card-lift:hover,
+  a.card-lift:focus-visible {
+    transform: none;
+  }
+}
+
+/*
+ * Boutons en pilule (Button, bouton newsletter) : couleurs fondues,
+ * léger soulèvement au survol, retour en place au clic.
+ */
+.btn-motion {
+  transition:
+    background-color var(--transition-ui),
+    color var(--transition-ui),
+    border-color var(--transition-ui),
+    transform var(--transition-ui);
+}
+
+.btn-motion:hover {
+  transform: translateY(var(--lift-button-hover));
+}
+
+.btn-motion:active {
+  transform: translateY(0);
+  transition-duration: 80ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-motion:hover,
+  .btn-motion:active {
+    transform: none;
+  }
+}
+
+/*
+ * Apparition au scroll (voir src/scripts/reveal.ts) : fondu + montée de 24px,
+ * une fois. Animation sur la propriété « translate » pour ne pas gêner les
+ * « transform » des survols. Masqué seulement avec JS et sans mouvement réduit.
+ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.reveal-off) [data-reveal]:not(.is-revealed) {
+    opacity: 0;
+  }
+
+  .js:not(.reveal-off) [data-reveal].is-revealed {
+    animation: reveal-up 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms) both;
+  }
 }
 
 /* Conteneur : contenu centré à 1312px, gouttières latérales. */

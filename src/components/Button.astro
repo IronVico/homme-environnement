@@ -14,7 +14,7 @@ interface Props {
 const { href, variant = 'secondary', size = 'md', class: className } = Astro.props;
 ---
 
-<a href={href} class:list={['btn', `btn--${variant}`, `btn--${size}`, className]}>
+<a href={href} class:list={['btn', 'btn-motion', `btn--${variant}`, `btn--${size}`, className]}>
   {variant === 'don' && <Heart size={18} />}
   <slot />
   {variant !== 'don' && <ArrowRight size={20} />}

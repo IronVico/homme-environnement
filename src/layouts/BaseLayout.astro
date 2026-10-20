@@ -36,7 +36,13 @@ const ogUrl = new URL(og.src, Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      // Filet de sécurité : si le script d'apparition ne s'exécute pas, tout s'affiche.
+      setTimeout(() => {
+        if (!document.documentElement.dataset.revealReady) document.documentElement.classList.add('reveal-off');
+      }, 3000);
+    </script>
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
@@ -64,5 +70,9 @@ const ogUrl = new URL(og.src, Astro.site);
     <div class="site">
       <slot />
     </div>
+    <script>
+      import { initReveal } from '../scripts/reveal';
+      initReveal();
+    </script>
   </body>
 </html>

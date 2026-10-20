@@ -58,8 +58,8 @@ src/
 | Composant           | Rôle |
 | ------------------- | ---- |
 | `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
-| `Header`            | Logo, menu principal, sélecteur FR / EN, bouton Don, burger en dessous de 900px |
-| `LangSwitcher`      | Sélecteur FR / EN discret (header et footer), lien vers la même page dans l'autre langue |
+| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don, burger en dessous de 1080px |
+| `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
 | `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles) |
@@ -69,7 +69,7 @@ src/
 | `EngageCard`        | Carte blanche cliquable ; variante `country` pour les pays secondaires |
 | `PartnersStrip`     | Logos partenaires ; défilement en boucle en mobile |
 | `NewsletterSection` / `NewsletterForm` | Bloc newsletter sur photo, champ + bouton en une pilule |
-| `Footer`            | Pitch, bouton Don, LinkedIn et Facebook, plan du site, mentions, sélecteur FR / EN |
+| `Footer`            | Pitch, bouton Don, LinkedIn et Facebook, plan du site, mentions, lien « English version » / « Version française » |
 
 ## Design system
 
@@ -81,6 +81,8 @@ Rappels :
 - **Pêche** réservée au bouton « Faire un don » et aux points d'arrivée des illustrations (10 % max).
 - Sections en aplat (pas de fondu), cartes blanches avec `--shadow-card` et bordure douce.
 - Focus visible partout : contour 2px basalte décalé de 2px.
+- Cartes cliquables (classe `card-lift`) : légère élévation au survol et au focus (`--lift-card-hover`, `--shadow-card-hover`) et flèche qui glisse vers la droite (`--nudge-arrow-hover`), sans soulignement ; sans déplacement avec `prefers-reduced-motion`.
+- Boutons (classe `btn-motion`) : couleurs fondues et léger soulèvement au survol (`--transition-ui`, `--lift-button-hover`), retour en place au clic ; sans déplacement avec `prefers-reduced-motion`.
 
 ## Langues (i18n)
 
@@ -92,8 +94,11 @@ Rappels :
 
 ## Animations et accessibilité
 
+- Apparition au scroll (`src/scripts/reveal.ts`, attribut `data-reveal`) : titres, cartes, bande des logos et bloc newsletter apparaissent en fondu en remontant de 24px, une seule fois, en cascade quand ils entrent ensemble ; le hero s'anime au chargement. Masqués seulement avec JS ; si le script ne s'exécute pas, tout s'affiche au bout de 3s.
 - Chiffres clés : au premier passage dans l'écran (IntersectionObserver, une seule fois), compteur de 0 à la valeur, traits de l'anneau dans le sens horaire, barres qui poussent, pastilles une à une.
 - Logos partenaires : défilement continu en dessous de 900px.
+- Hero : le contour organique de la photo ondule (14 s) et l'isotype flotte (11 s), en boucle lente.
+- Indication « Faire défiler » du hero : la flèche monte et descend doucement en boucle (1,8 s). Ces animations du hero et l'apparition au scroll sont des exceptions à la règle « pas d'autre animation décorative » du design system, à y reporter.
 - Avec `prefers-reduced-motion: reduce`, tout est désactivé (valeurs finales affichées, logos en défilement manuel).
 - **Sans JavaScript**, la page est complète : chiffres et illustrations affichés en entier, liens du menu visibles sous le logo en mobile.
 

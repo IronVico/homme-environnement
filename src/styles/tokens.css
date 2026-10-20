@@ -82,6 +82,14 @@
 
   /* Ombres */
   --shadow-card: 0 1px 2px rgba(67, 72, 64, 0.06), 0 10px 28px rgba(67, 72, 64, 0.1);
+  /* Survol des cartes cliquables : même ombre teintée, plus diffuse (à ajouter au design system). */
+  --shadow-card-hover: 0 2px 4px rgba(67, 72, 64, 0.06), 0 18px 40px rgba(67, 72, 64, 0.16);
+  --lift-card-hover: -4px;
+
+  /* Transitions des éléments interactifs (boutons, cartes). */
+  --transition-ui: 200ms ease-out;
+  --lift-button-hover: -2px;
+  --nudge-arrow-hover: 4px; /* décalage des flèches au survol des cartes */
 
   /* Voiles sur photo */
   --voile: rgba(35, 31, 32, 0.55);

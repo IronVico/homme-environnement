@@ -33,8 +33,8 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
 
 <section class="partners" aria-labelledby="partenaires-titre">
   <div class="partners__inner container">
-    <h2 id="partenaires-titre" class="partners__title eyebrow">{title}</h2>
-    <div class="partners__marquee">
+    <h2 id="partenaires-titre" class="partners__title eyebrow" data-reveal>{title}</h2>
+    <div class="partners__marquee" data-reveal>
       <ul class="partners__track">
         {
           track.map((p) => (

@@ -2,15 +2,17 @@
 import logoEn from '../assets/logos/logo-couleur-en.svg';
 import logoFr from '../assets/logos/logo-couleur.svg';
 import { DON_URL, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
-import { getLang, t } from '../i18n';
+import { getLang, localeUrl, pathWithoutLocale, t } from '../i18n';
 import Button from './Button.astro';
-import LangSwitcher from './LangSwitcher.astro';
 
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
 const logo = lang === 'en' ? logoEn : logoFr;
 const footerNav = getFooterNav(lang);
 const legalNav = getLegalNav(lang);
+// Lien vers la même page dans l'autre langue (« English version » / « Version française »).
+const otherLang = lang === 'en' ? 'fr' : 'en';
+const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname));
 ---
 
 <footer class="footer">
@@ -22,7 +24,7 @@ const legalNav = getLegalNav(lang);
         <Button href={DON_URL} variant="don" size="sm" class="footer__don">{ui.donate}</Button>
         <ul class="footer__social" aria-label={ui.social}>
           <li>
-            <a href={SOCIAL_URLS.linkedin} aria-label={ui.socialLinkedin} rel="noopener">
+            <a class="btn-motion" href={SOCIAL_URLS.linkedin} aria-label={ui.socialLinkedin} rel="noopener">
               <!-- Tracé de l'ancienne icône Lucide « linkedin » (ISC) : Lucide 1.x n'a plus d'icônes de marques. -->
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -32,7 +34,7 @@ const legalNav = getLegalNav(lang);
             </a>
           </li>
           <li>
-            <a href={SOCIAL_URLS.facebook} aria-label={ui.socialFacebook} rel="noopener">
+            <a class="btn-motion" href={SOCIAL_URLS.facebook} aria-label={ui.socialFacebook} rel="noopener">
               <!-- Tracé de l'ancienne icône Lucide « facebook » (ISC). -->
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
@@ -62,18 +64,18 @@ const legalNav = getLegalNav(lang);
 
     <div class="footer__bottom">
       <p>{ui.copyright}</p>
-      <div class="footer__bottom-links">
-        <ul class="footer__legal">
-          {
-            legalNav.map((link) => (
-              <li>
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))
-          }
-        </ul>
-        <LangSwitcher />
-      </div>
+      <ul class="footer__legal">
+        {
+          legalNav.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={otherLangUrl} lang={otherLang} hreflang={otherLang}>{ui.otherLanguage}</a>
+        </li>
+      </ul>
     </div>
   </div>
 </footer>
@@ -181,8 +183,12 @@ const legalNav = getLegalNav(lang);
     background: var(--blanc);
   }
 
-  .footer__social a:hover {
+  /* Survol : le disque se remplit en basalte et se soulève (classe btn-motion). */
+  .footer__social a:hover,
+  .footer__social a:focus-visible {
     border-color: var(--basalte);
+    background: var(--basalte);
+    color: var(--blanc);
   }
 
   .footer__bottom {
@@ -193,13 +199,6 @@ const legalNav = getLegalNav(lang);
     padding-top: var(--space-6);
     border-top: 1px solid var(--bordure);
     font-size: 14px;
-  }
-
-  .footer__bottom-links {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px var(--space-6);
   }
 
   .footer__legal {

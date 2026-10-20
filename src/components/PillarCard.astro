@@ -12,15 +12,17 @@ interface Props {
 const { title, text, image, imageAlt } = Astro.props;
 ---
 
-<article class="pillar">
-  <Picture
-    class="pillar__photo"
-    src={image}
-    alt={imageAlt}
-    formats={['avif', 'webp']}
-    widths={[360, 540, 820]}
-    sizes="(max-width: 960px) 100vw, 420px"
-  />
+<article class="pillar" data-reveal>
+  <div class="pillar__media">
+    <Picture
+      class="pillar__photo"
+      src={image}
+      alt={imageAlt}
+      formats={['avif', 'webp']}
+      widths={[360, 540, 820]}
+      sizes="(max-width: 960px) 100vw, 420px"
+    />
+  </div>
   <h3 class="pillar__title">{title}</h3>
   <p class="pillar__text">{text}</p>
 </article>
@@ -32,13 +34,32 @@ const { title, text, image, imageAlt } = Astro.props;
     gap: var(--space-5);
   }
 
-  /* Photo en arche : 120px en haut, 20px en bas. */
+  /* Photo en arche : 120px en haut, 20px en bas. Le cadre coupe la photo zoomée. */
+  .pillar__media {
+    overflow: hidden;
+    border-radius: var(--radius-arch) var(--radius-arch) 20px 20px;
+  }
+
   .pillar :global(.pillar__photo) {
     width: 100%;
     height: auto;
     aspect-ratio: 3 / 2;
     object-fit: cover;
-    border-radius: var(--radius-arch) var(--radius-arch) 20px 20px;
+    transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /*
+   * Les piliers ne sont pas des liens : pas d'élévation (qui suggérerait un clic),
+   * seulement un lent zoom de la photo dans son arche.
+   */
+  .pillar:hover :global(.pillar__photo) {
+    transform: scale(1.05);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pillar:hover :global(.pillar__photo) {
+      transform: none;
+    }
   }
 
   .pillar__title {

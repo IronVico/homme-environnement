@@ -1,4 +1,8 @@
 ---
+/**
+ * Sélecteur de langue du header : pilule segmentée FR / EN (maquette V1).
+ * Chaque segment mène à la même page dans l'autre langue.
+ */
 import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
 
 interface Props {
@@ -11,59 +15,52 @@ const path = pathWithoutLocale(Astro.url.pathname);
 const codes = Object.keys(languages) as Lang[];
 ---
 
-<ul class:list={['lang-switcher', className]} aria-label={t(lang).ui.langSwitcher}>
+<div class:list={['lang-switcher', className]} role="group" aria-label={t(lang).ui.langSwitcher}>
   {
     codes.map((code) => (
-      <li>
-        <a
-          href={localeUrl(code, path)}
-          hreflang={code}
-          lang={code}
-          aria-current={code === lang ? 'true' : undefined}
-          title={languages[code].name}
-        >
-          {languages[code].label}
-        </a>
-      </li>
+      <a
+        href={localeUrl(code, path)}
+        hreflang={code}
+        lang={code}
+        aria-current={code === lang ? 'true' : undefined}
+        title={languages[code].name}
+      >
+        {languages[code].label}
+      </a>
     ))
   }
-</ul>
+</div>
 
 <style>
   .lang-switcher {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 2px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    padding: 3px;
+    border: 1.5px solid var(--bordure);
+    border-radius: var(--radius-pill);
     font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-  }
-
-  .lang-switcher li + li::before {
-    content: '/';
-    margin-right: 2px;
-    color: var(--basalte);
+    font-weight: 600;
+    line-height: 1.2;
   }
 
   .lang-switcher a {
-    display: inline-block;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 6px 10px;
+    border-radius: var(--radius-pill);
+    color: var(--basalte);
     text-decoration: none;
+    transition:
+      background-color var(--transition-ui),
+      color var(--transition-ui);
   }
 
   .lang-switcher a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    background: var(--vert-clair);
+    color: var(--basalte);
   }
 
   .lang-switcher a[aria-current] {
-    font-weight: 700;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
+    background: var(--basalte);
+    color: var(--blanc);
   }
 </style>

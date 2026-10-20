@@ -1,4 +1,6 @@
 ---
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+
 interface Props {
   /** Titre en deux temps : partie forte (h2, ExtraBold)… */
   strong: string;
@@ -13,7 +15,7 @@ interface Props {
 const { strong, light, eyebrow, link, id } = Astro.props;
 ---
 
-<div class:list={['section-heading', { 'section-heading--with-link': link }]}>
+<div class:list={['section-heading', { 'section-heading--with-link': link }]} data-reveal>
   <div class="section-heading__titles">
     {eyebrow && <p class="section-heading__eyebrow eyebrow">{eyebrow}</p>}
     <h2 class="section-heading__title" id={id}>
@@ -25,7 +27,8 @@ const { strong, light, eyebrow, link, id } = Astro.props;
   {
     link && (
       <a class="section-heading__link" href={link.href}>
-        {link.label} <span aria-hidden="true">→</span>
+        <span class="section-heading__link-label">{link.label}</span>
+        <ArrowRight class="section-heading__link-icon" size={18} />
       </a>
     )
   }
@@ -69,8 +72,58 @@ const { strong, light, eyebrow, link, id } = Astro.props;
     font-weight: 300;
   }
 
+  /*
+   * Lien d'action : trait fin sauge au repos sous le libellé ; au survol,
+   * un trait basalte se trace de gauche à droite et la flèche glisse.
+   */
   .section-heading__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-block: 4px;
     font-size: var(--fs-body);
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--basalte);
+    text-decoration: none;
+  }
+
+  .section-heading__link:hover {
+    color: var(--basalte);
+  }
+
+  .section-heading__link-label {
+    padding-bottom: 4px;
+    background:
+      linear-gradient(var(--basalte), var(--basalte)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .section-heading__link:hover .section-heading__link-label,
+  .section-heading__link:focus-visible .section-heading__link-label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  .section-heading__link :global(.section-heading__link-icon) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .section-heading__link:hover :global(.section-heading__link-icon),
+  .section-heading__link:focus-visible :global(.section-heading__link-icon) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-heading__link-label {
+      transition: none;
+    }
+
+    .section-heading__link:hover :global(.section-heading__link-icon),
+    .section-heading__link:focus-visible :global(.section-heading__link-icon) {
+      transform: none;
+    }
   }
 </style>
