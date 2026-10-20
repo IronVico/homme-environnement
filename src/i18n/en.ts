@@ -23,6 +23,7 @@ const en: Dictionary = {
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     langSwitcher: 'Language',
+    otherLanguage: 'Version française',
     sitemap: 'Site map',
     social: 'Social media',
     socialLinkedin: 'Man & the Environment on LinkedIn',

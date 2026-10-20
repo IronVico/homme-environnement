@@ -2,15 +2,17 @@
 import logoEn from '../assets/logos/logo-couleur-en.svg';
 import logoFr from '../assets/logos/logo-couleur.svg';
 import { DON_URL, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
-import { getLang, t } from '../i18n';
+import { getLang, localeUrl, pathWithoutLocale, t } from '../i18n';
 import Button from './Button.astro';
-import LangSwitcher from './LangSwitcher.astro';
 
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
 const logo = lang === 'en' ? logoEn : logoFr;
 const footerNav = getFooterNav(lang);
 const legalNav = getLegalNav(lang);
+// Lien vers la même page dans l'autre langue (« English version » / « Version française »).
+const otherLang = lang === 'en' ? 'fr' : 'en';
+const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname));
 ---
 
 <footer class="footer">
@@ -62,18 +64,18 @@ const legalNav = getLegalNav(lang);
 
     <div class="footer__bottom">
       <p>{ui.copyright}</p>
-      <div class="footer__bottom-links">
-        <ul class="footer__legal">
-          {
-            legalNav.map((link) => (
-              <li>
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))
-          }
-        </ul>
-        <LangSwitcher />
-      </div>
+      <ul class="footer__legal">
+        {
+          legalNav.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={otherLangUrl} lang={otherLang} hreflang={otherLang}>{ui.otherLanguage}</a>
+        </li>
+      </ul>
     </div>
   </div>
 </footer>
@@ -193,13 +195,6 @@ const legalNav = getLegalNav(lang);
     padding-top: var(--space-6);
     border-top: 1px solid var(--bordure);
     font-size: 14px;
-  }
-
-  .footer__bottom-links {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px var(--space-6);
   }
 
   .footer__legal {

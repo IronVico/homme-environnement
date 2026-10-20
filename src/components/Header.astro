@@ -28,8 +28,9 @@ const mainNav = getMainNav(lang);
         </li>
       ))}
     </ul>
-    <LangSwitcher class="header__lang" />
   </nav>
+
+  <LangSwitcher class="header__lang" />
 
   <Button href={DON_URL} variant="don" size="sm" class="header__don">{ui.donate}</Button>
 
@@ -93,12 +94,6 @@ const mainNav = getMainNav(lang);
     margin: -14px -38px -14px -20px;
   }
 
-  .header__nav {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-  }
-
   .header__nav > ul {
     display: flex;
     align-items: center;
@@ -151,8 +146,11 @@ const mainNav = getMainNav(lang);
     .header__nav {
       order: 10;
       flex-basis: 100%;
-      flex-wrap: wrap;
-      gap: 8px 20px;
+    }
+
+    /* Comme la maquette : en mobile, la langue se change depuis le lien du footer. */
+    .header :global(.header__lang) {
+      display: none;
     }
 
     .header__nav > ul {
@@ -195,13 +193,6 @@ const mainNav = getMainNav(lang);
     :global(.js) .header__nav li a {
       display: block;
       padding: 14px 0;
-    }
-
-    :global(.js) .header__nav :global(.header__lang) {
-      margin-top: 8px;
-      padding-top: 16px;
-      border-top: 1px solid var(--bordure-douce);
-      font-size: 16px;
     }
   }
 

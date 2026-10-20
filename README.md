@@ -59,7 +59,7 @@ src/
 | ------------------- | ---- |
 | `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
 | `Header`            | Logo, menu principal, sélecteur FR / EN, bouton Don, burger en dessous de 900px |
-| `LangSwitcher`      | Sélecteur FR / EN discret (header et footer), lien vers la même page dans l'autre langue |
+| `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
 | `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles) |
@@ -69,7 +69,7 @@ src/
 | `EngageCard`        | Carte blanche cliquable ; variante `country` pour les pays secondaires |
 | `PartnersStrip`     | Logos partenaires ; défilement en boucle en mobile |
 | `NewsletterSection` / `NewsletterForm` | Bloc newsletter sur photo, champ + bouton en une pilule |
-| `Footer`            | Pitch, bouton Don, LinkedIn et Facebook, plan du site, mentions, sélecteur FR / EN |
+| `Footer`            | Pitch, bouton Don, LinkedIn et Facebook, plan du site, mentions, lien « English version » / « Version française » |
 
 ## Design system
 
@@ -81,6 +81,7 @@ Rappels :
 - **Pêche** réservée au bouton « Faire un don » et aux points d'arrivée des illustrations (10 % max).
 - Sections en aplat (pas de fondu), cartes blanches avec `--shadow-card` et bordure douce.
 - Focus visible partout : contour 2px basalte décalé de 2px.
+- Cartes cliquables (classe `card-lift`) : légère élévation au survol et au focus (`--lift-card-hover`, `--shadow-card-hover`), sans soulignement ; sans déplacement avec `prefers-reduced-motion`.
 
 ## Langues (i18n)
 

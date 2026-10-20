@@ -19,6 +19,7 @@ const fr = {
     openMenu: 'Ouvrir le menu',
     closeMenu: 'Fermer le menu',
     langSwitcher: 'Choix de la langue',
+    otherLanguage: 'English version',
     sitemap: 'Plan du site',
     social: 'Réseaux sociaux',
     socialLinkedin: "L'Homme & l'Environnement sur LinkedIn",

@@ -67,6 +67,30 @@ input {
   font: inherit;
 }
 
+/* Cartes cliquables : légère élévation au survol et au focus clavier. */
+.card-lift {
+  transition:
+    transform 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+
+a.card-lift:hover,
+a.card-lift:focus-visible {
+  transform: translateY(var(--lift-card-hover));
+  box-shadow: var(--shadow-card-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-lift {
+    transition: none;
+  }
+
+  a.card-lift:hover,
+  a.card-lift:focus-visible {
+    transform: none;
+  }
+}
+
 /* Conteneur : contenu centré à 1312px, gouttières latérales. */
 .container {
   box-sizing: content-box;

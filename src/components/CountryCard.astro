@@ -15,7 +15,7 @@ interface Props {
 const { name, description, sites, href, image, class: className } = Astro.props;
 ---
 
-<a class:list={['country-card', className]} href={href}>
+<a class:list={['country-card', 'card-lift', className]} href={href}>
   <Picture
     class="country-card__photo"
     src={image}
