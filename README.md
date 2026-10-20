@@ -96,6 +96,7 @@ Rappels :
 
 - Chiffres clés : au premier passage dans l'écran (IntersectionObserver, une seule fois), compteur de 0 à la valeur, traits de l'anneau dans le sens horaire, barres qui poussent, pastilles une à une.
 - Logos partenaires : défilement continu en dessous de 900px.
+- Indication « Faire défiler » du hero : la flèche monte et descend doucement en boucle (1,8 s). Exception à la règle « pas d'autre animation décorative » du design system, à y reporter.
 - Avec `prefers-reduced-motion: reduce`, tout est désactivé (valeurs finales affichées, logos en défilement manuel).
 - **Sans JavaScript**, la page est complète : chiffres et illustrations affichés en entier, liens du menu visibles sous le logo en mobile.
 
