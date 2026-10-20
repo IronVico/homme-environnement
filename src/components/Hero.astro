@@ -136,6 +136,43 @@ const { ui } = t(getLang(Astro.currentLocale));
     color: var(--sauge);
   }
 
+  /*
+   * Forme vivante : le contour de la photo ondule et l'isotype flotte, lentement
+   * et sur des durées différentes pour que le mouvement ne se répète pas à l'identique.
+   */
+  @keyframes hero-blob {
+    0%,
+    100% {
+      border-radius: 46% 54% 42% 58% / 52% 40% 60% 48%;
+    }
+    33% {
+      border-radius: 54% 46% 50% 50% / 44% 50% 50% 56%;
+    }
+    66% {
+      border-radius: 42% 58% 56% 44% / 56% 46% 54% 44%;
+    }
+  }
+
+  @keyframes hero-isotype-float {
+    0%,
+    100% {
+      transform: rotate(14deg) translate(0, 0);
+    }
+    50% {
+      transform: rotate(19deg) translate(-6px, 8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__media :global(.hero__photo) {
+      animation: hero-blob 14s ease-in-out infinite;
+    }
+
+    .hero__isotype {
+      animation: hero-isotype-float 11s ease-in-out infinite;
+    }
+  }
+
   /* Forme organique : rayons asymétriques. */
   .hero__media :global(.hero__photo) {
     position: relative;
