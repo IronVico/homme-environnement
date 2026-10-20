@@ -1,0 +1,161 @@
+---
+/**
+ * Bande des partenaires et bailleurs.
+ * Les logos sont des PLACEHOLDERS de la maquette (fictifs) : à remplacer par
+ * les vrais logos (SVG, version monochrome) dès qu'ils sont validés par l'ONG.
+ * En mobile (≤ 900px), la liste défile en boucle ; avec prefers-reduced-motion,
+ * elle devient un défilement manuel.
+ */
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+type Partner = {
+  name: string;
+  shape: 'globe' | 'triangle' | 'square' | 'arc' | 'circles';
+  style: string;
+};
+
+const partners: Partner[] = [
+  { name: 'Fondation', shape: 'globe', style: 'font-size: 20px; font-weight: 700; letter-spacing: -0.01em' },
+  { name: 'Agence', shape: 'triangle', style: 'font-size: 18px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase' },
+  { name: 'collectif', shape: 'square', style: 'font-size: 21px; font-weight: 300' },
+  { name: 'Région', shape: 'arc', style: 'font-size: 20px; font-weight: 600; font-style: italic' },
+  { name: 'ENTREPRISE', shape: 'circles', style: 'font-size: 19px; font-weight: 900; letter-spacing: -0.02em' },
+];
+
+// La seconde série sert uniquement à boucler le défilement : masquée aux lecteurs d'écran.
+const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((p) => ({ ...p, dup: true }))];
+---
+
+<section class="partners" aria-labelledby="partenaires-titre">
+  <div class="partners__inner container">
+    <h2 id="partenaires-titre" class="partners__title eyebrow">{title}</h2>
+    <div class="partners__marquee">
+      <ul class="partners__track">
+        {
+          track.map((p) => (
+            <li class:list={['partners__logo', { 'partners__logo--dup': p.dup }]} aria-hidden={p.dup ? 'true' : undefined} style={p.style}>
+              {p.shape === 'globe' && (
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M3 12h18" />
+                </svg>
+              )}
+              {p.shape === 'triangle' && (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 3l9 16H3z" />
+                </svg>
+              )}
+              {p.shape === 'square' && (
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="4" y="4" width="16" height="16" rx="5" />
+                </svg>
+              )}
+              {p.shape === 'arc' && (
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <path d="M4 16c4-8 12-8 16 0" />
+                  <path d="M8 16c2-4 6-4 8 0" />
+                </svg>
+              )}
+              {p.shape === 'circles' && (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="8" cy="12" r="5" />
+                  <circle cx="16" cy="12" r="5" fill-opacity="0.5" />
+                </svg>
+              )}
+              {p.name}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .partners__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-top: var(--space-12);
+    padding-bottom: 64px;
+  }
+
+  .partners__title {
+    text-align: center;
+  }
+
+  .partners__marquee {
+    overflow: hidden;
+  }
+
+  .partners__track {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .partners__logo {
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    /* Gris des logos placeholders de la maquette (pas un token : à retirer avec les vrais logos). */
+    color: #8a9199;
+    line-height: 1;
+  }
+
+  .partners__logo svg {
+    flex-shrink: 0;
+  }
+
+  .partners__logo--dup {
+    display: none;
+  }
+
+  @keyframes partners-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .partners__track {
+      display: flex;
+      width: max-content;
+      gap: 0;
+    }
+
+    .partners__logo {
+      flex: 0 0 auto;
+      width: 180px;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .partners__track {
+        animation: partners-scroll 20s linear infinite;
+      }
+
+      .partners__logo--dup {
+        display: flex;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .partners__marquee {
+        overflow-x: auto;
+      }
+    }
+  }
+</style>

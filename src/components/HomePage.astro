@@ -1,0 +1,201 @@
+---
+/**
+ * Page d'accueil, commune aux deux langues : les textes viennent de src/i18n,
+ * la langue de Astro.currentLocale (/ = français, /en/ = anglais).
+ */
+import { DON_URL } from '../data/navigation';
+import { getLang, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CountryCard from './CountryCard.astro';
+import EngageCard from './EngageCard.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import NewsletterSection from './NewsletterSection.astro';
+import PartnersStrip from './PartnersStrip.astro';
+import PillarCard from './PillarCard.astro';
+import SectionHeading from './SectionHeading.astro';
+import StatsBand from './StatsBand.astro';
+
+import engagerDonner from '../assets/photos/engager-donner.jpg';
+import engagerEntreprises from '../assets/photos/engager-entreprises.jpg';
+import engagerTerrain from '../assets/photos/engager-terrain.jpg';
+import heroArtisane from '../assets/photos/hero-artisane-vohimana.jpg';
+import paysBurkina from '../assets/photos/pays-burkina-elephants.jpg';
+import paysMadagascar from '../assets/photos/pays-madagascar.jpg';
+import pilierBiodiversite from '../assets/photos/pilier-biodiversite-souimanga.jpg';
+import pilierEconomie from '../assets/photos/pilier-economie-fete-ambohidravy.jpg';
+import pilierResponsabilisation from '../assets/photos/pilier-responsabilisation-classe.jpg';
+import projetsSoutenus from '../assets/photos/projets-soutenus-nicaragua.jpg';
+
+const dict = t(getLang(Astro.currentLocale));
+const { home } = dict;
+
+// Chiffres (identiques dans toutes les langues). 400 000 arbres : À CONFIRMER avec l'ONG.
+const statValues = [
+  { value: 30, illustration: 'ring' },
+  { value: 400000, illustration: 'bars' },
+  { value: 5000, illustration: 'dots' },
+] as const;
+
+const stats = statValues.map((stat, i) => {
+  const text = home.stats[i]!;
+  return { ...stat, unit: text.unit, text: text.text, illustrationLabel: text.illustrationLabel };
+});
+
+const pillarImages = [pilierBiodiversite, pilierEconomie, pilierResponsabilisation];
+const pillars = home.approach.pillars.map((pillar, i) => ({ ...pillar, image: pillarImages[i]! }));
+
+const engageMedia = [
+  { href: DON_URL, image: engagerDonner, imagePosition: '40% 60%' },
+  { href: '#', image: engagerTerrain, imagePosition: '50% 30%' },
+  { href: '#', image: engagerEntreprises, imagePosition: '50% 40%' },
+];
+const engagements = home.engage.cards.map((card, i) => ({ ...card, ...engageMedia[i]! }));
+
+const madagascarSites = ['Vohimana', 'Vohibola', 'Ambohidravy', 'Mont Passot', 'Fohisokina'];
+---
+
+<BaseLayout title={dict.meta.siteName} description={dict.meta.homeDescription}>
+  <Header />
+
+  <main id="contenu">
+    <Hero
+      eyebrow={home.hero.eyebrow}
+      titleStrong={home.hero.titleStrong}
+      titleLight={home.hero.titleLight}
+      lead={home.hero.lead}
+      image={heroArtisane}
+      imageAlt={home.hero.imageAlt}
+      secondaryCta={{ label: home.hero.secondaryCta, href: '#' }}
+    />
+
+    <StatsBand stats={stats} />
+
+    <section class="section" aria-labelledby="approche-titre">
+      <div class="container stack stack--56">
+        <SectionHeading
+          id="approche-titre"
+          strong={home.approach.titleStrong}
+          light={home.approach.titleLight}
+          link={{ label: home.approach.link, href: '#' }}
+        />
+        <div class="grid grid--pillars">
+          {pillars.map((pillar) => <PillarCard {...pillar} />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="actions-titre">
+      <div class="container stack">
+        <SectionHeading id="actions-titre" strong={home.actions.title} link={{ label: home.actions.link, href: '#' }} />
+        <div class="countries">
+          <CountryCard
+            class="countries__main"
+            name={home.actions.madagascar.name}
+            description={home.actions.madagascar.description}
+            sites={madagascarSites}
+            href="#"
+            image={paysMadagascar}
+          />
+          <div class="countries__side">
+            <EngageCard
+              variant="country"
+              title={home.actions.burkina.title}
+              text={home.actions.burkina.text}
+              href="#"
+              image={paysBurkina}
+              imageAlt={home.actions.burkina.imageAlt}
+              imagePosition="50% 60%"
+            />
+            <EngageCard
+              variant="country"
+              title={home.actions.supported.title}
+              text={home.actions.supported.text}
+              href="#"
+              image={projetsSoutenus}
+              imageAlt={home.actions.supported.imageAlt}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="engager-titre">
+      <div class="container stack">
+        <SectionHeading
+          id="engager-titre"
+          eyebrow={home.engage.eyebrow}
+          strong={home.engage.titleStrong}
+          light={home.engage.titleLight}
+        />
+        <div class="grid grid--engage">
+          {engagements.map((item) => <EngageCard {...item} />)}
+        </div>
+      </div>
+    </section>
+
+    <PartnersStrip title={home.partners.title} />
+
+    <NewsletterSection
+      titleStrong={home.newsletter.titleStrong}
+      titleLight={home.newsletter.titleLight}
+      text={home.newsletter.text}
+      image={paysMadagascar}
+    />
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .section--tinted {
+    background: var(--vert-clair);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .stack--56 {
+    gap: 56px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  }
+
+  .grid--pillars {
+    gap: var(--space-8);
+  }
+
+  .grid--engage {
+    gap: var(--space-6);
+  }
+
+  .countries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+  }
+
+  .countries :global(.countries__main) {
+    flex: 2 1 560px;
+    min-width: 0;
+  }
+
+  .countries__side {
+    flex: 1 1 320px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .countries__side > :global(*) {
+    flex: 1 1 auto;
+  }
+</style>

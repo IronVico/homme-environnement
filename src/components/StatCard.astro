@@ -1,0 +1,170 @@
+---
+import { getLang } from '../i18n';
+
+interface Props {
+  /** Valeur finale du compteur (affichée telle quelle sans JS). */
+  value: number;
+  /** Unité accolée au chiffre : « ans », « ha »… */
+  unit?: string;
+  text: string;
+  /** ring : 30 traits (années). bars : barres croissantes. dots : pastilles (1 = 1 000 ha). */
+  illustration: 'ring' | 'bars' | 'dots';
+  illustrationLabel: string;
+}
+
+const { value, unit, text, illustration, illustrationLabel } = Astro.props;
+
+const NBSP = '\u00a0';
+const numberLocale = getLang(Astro.currentLocale) === 'en' ? 'en-GB' : 'fr-FR';
+const formatted = value.toLocaleString(numberLocale).replace(/\s/g, NBSP) + (unit ? NBSP + unit : '');
+
+// Anneau : 30 traits, un par année depuis 1993, dans le sens horaire depuis midi.
+const ringTicks = Array.from({ length: 30 }, (_, i) => {
+  const angle = (i * 12 * Math.PI) / 180;
+  const sin = Math.sin(angle);
+  const cos = Math.cos(angle);
+  return {
+    x1: (50 + 34 * sin).toFixed(1),
+    y1: (50 - 34 * cos).toFixed(1),
+    x2: (50 + 44 * sin).toFixed(1),
+    y2: (50 - 44 * cos).toFixed(1),
+    last: i === 29,
+  };
+});
+
+const bars = [
+  { x: 10, y: 70, h: 22, fill: 'var(--sauge)' },
+  { x: 27, y: 58, h: 34, fill: 'var(--sauge)' },
+  { x: 44, y: 44, h: 48, fill: 'var(--basalte)' },
+  { x: 61, y: 28, h: 64, fill: 'var(--basalte)' },
+  { x: 78, y: 8, h: 84, fill: 'var(--peche)' },
+];
+
+const dots = [
+  { cx: 24, cy: 36 },
+  { cx: 50, cy: 36 },
+  { cx: 76, cy: 36 },
+  { cx: 37, cy: 64 },
+  { cx: 63, cy: 64 },
+];
+---
+
+<div class="stat-card" data-stat>
+  <svg class="stat-card__illu" viewBox="0 0 100 100" role="img" aria-label={illustrationLabel}>
+    {
+      illustration === 'ring' && (
+        <>
+          <circle cx="50" cy="50" r="26" style="fill: var(--sauge)" fill-opacity="0.3" />
+          {ringTicks.map((t, i) => (
+            <line
+              class="stat-card__step"
+              style={`--i: ${i}; stroke: ${t.last ? 'var(--peche)' : 'var(--basalte)'}`}
+              x1={t.x1}
+              y1={t.y1}
+              x2={t.x2}
+              y2={t.y2}
+              stroke-width="3.5"
+              stroke-linecap="round"
+            />
+          ))}
+        </>
+      )
+    }
+    {
+      illustration === 'bars' && (
+        <>
+          <line x1="6" y1="94" x2="94" y2="94" style="stroke: var(--grille)" stroke-width="2" stroke-linecap="round" />
+          {bars.map((b, i) => (
+            <rect class="stat-card__step stat-card__bar" style={`--i: ${i}; fill: ${b.fill}`} x={b.x} y={b.y} width="12" height={b.h} rx="6" />
+          ))}
+        </>
+      )
+    }
+    {
+      illustration === 'dots' &&
+        dots.map((d, i) => (
+          <circle class="stat-card__step stat-card__dot" style={`--i: ${i}; fill: var(--sauge)`} cx={d.cx} cy={d.cy} r="11" />
+        ))
+    }
+  </svg>
+  <div class="stat-card__body">
+    <span class="stat-card__value" data-count-to={value} data-unit={unit} data-locale={numberLocale}>{formatted}</span>
+    <p class="stat-card__text">{text}</p>
+  </div>
+</div>
+
+<style>
+  .stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    background: var(--blanc);
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .stat-card__illu {
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+  }
+
+  .stat-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .stat-card__value {
+    font-size: var(--fs-stat);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: var(--ls-stat);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-card__text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /*
+   * Animation au scroll (une fois) : uniquement avec JS et sans préférence
+   * de mouvement réduit. Sans JS, l'illustration est affichée complète.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .stat-card__step {
+      transition:
+        opacity 240ms ease-out,
+        transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+      transition-delay: calc(var(--i) * 60ms);
+    }
+
+    :global(.js) .stat-card__bar {
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      transition-delay: calc(var(--i) * 120ms);
+    }
+
+    :global(.js) .stat-card__dot {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+    }
+
+    :global(.js) [data-stat]:not(.is-visible) line.stat-card__step {
+      opacity: 0.15;
+    }
+
+    :global(.js) [data-stat]:not(.is-visible) .stat-card__bar {
+      transform: scaleY(0);
+    }
+
+    :global(.js) [data-stat]:not(.is-visible) .stat-card__dot {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+  }
+</style>
