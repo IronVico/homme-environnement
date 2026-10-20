@@ -38,7 +38,7 @@ const { title, text, href, image, imageAlt = '', imagePosition = '50% 50%', eyeb
     {
       cta && (
         <span class="engage-card__cta">
-          {cta} <span aria-hidden="true">→</span>
+          {cta} <span class="engage-card__arrow" aria-hidden="true">→</span>
         </span>
       )
     }
@@ -98,6 +98,24 @@ const { title, text, href, image, imageAlt = '', imagePosition = '50% 50%', eyeb
     margin-top: var(--space-2);
     font-size: 16px;
     font-weight: 600;
+  }
+
+  /* La flèche glisse vers la droite quand la carte s'élève. */
+  .engage-card__arrow {
+    display: inline-block;
+    transition: transform var(--transition-ui);
+  }
+
+  .engage-card:hover .engage-card__arrow,
+  .engage-card:focus-visible .engage-card__arrow {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .engage-card:hover .engage-card__arrow,
+    .engage-card:focus-visible .engage-card__arrow {
+      transform: none;
+    }
   }
 
   /* Variante pays secondaire : photo plus basse, titre plus fort. */

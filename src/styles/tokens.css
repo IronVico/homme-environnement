@@ -89,6 +89,7 @@
   /* Transitions des éléments interactifs (boutons, cartes). */
   --transition-ui: 200ms ease-out;
   --lift-button-hover: -2px;
+  --nudge-arrow-hover: 4px; /* décalage des flèches au survol des cartes */
 
   /* Voiles sur photo */
   --voile: rgba(35, 31, 32, 0.55);
