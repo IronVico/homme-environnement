@@ -55,13 +55,24 @@ const { ui } = t(getLang(Astro.currentLocale));
 </section>
 
 <style>
+  /*
+   * Le hero occupe tout le premier écran sous le header (88px, 84px en mobile) :
+   * la bande sauge des chiffres clés commence sous la ligne de flottaison
+   * au lieu d'apparaître en liseré en bas de l'écran.
+   */
   .hero {
+    --header-h: 88px;
+    --hero-pt: clamp(24px, 6vw, 72px);
+    --hero-pb: clamp(64px, 8vw, 104px);
+    /* .container est en content-box : on retire aussi les paddings verticaux. */
+    min-height: calc(100svh - var(--header-h) - var(--hero-pt) - var(--hero-pb));
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    align-content: center;
     gap: 56px;
-    padding-top: clamp(24px, 6vw, 72px);
-    padding-bottom: clamp(64px, 8vw, 104px);
+    padding-top: var(--hero-pt);
+    padding-bottom: var(--hero-pb);
   }
 
   .hero__text {
@@ -130,6 +141,10 @@ const { ui } = t(getLang(Astro.currentLocale));
   }
 
   @media (max-width: 900px) {
+    .hero {
+      --header-h: 84px;
+    }
+
     .hero__title-strong {
       white-space: normal;
     }
