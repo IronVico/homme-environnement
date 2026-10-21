@@ -118,12 +118,29 @@ const {
     right: auto;
   }
 
+  /*
+   * Comme l'accueil, le hero occupe tout le premier écran sous le header (88px, 84px en
+   * mobile) et le fil d'Ariane (une ligne, 26px) : la bande suivante commence sous la
+   * ligne de flottaison au lieu d'apparaître en liseré vide en bas de l'écran.
+   */
   .page-hero {
+    --header-h: 88px;
+    --crumb-h: 26px;
+    --hero-pt: clamp(24px, 4vw, 48px);
+    --hero-pb: clamp(48px, 6vw, 72px);
+    /* .container est en content-box : on retire aussi les paddings verticaux. */
+    min-height: calc(100svh - var(--header-h) - var(--crumb-h) - var(--hero-pt) - var(--hero-pb));
     display: flex;
     align-items: center;
     gap: 40px 64px;
-    padding-top: clamp(24px, 4vw, 48px);
-    padding-bottom: clamp(48px, 6vw, 72px);
+    padding-top: var(--hero-pt);
+    padding-bottom: var(--hero-pb);
+  }
+
+  @media (max-width: 900px) {
+    .page-hero {
+      --header-h: 84px;
+    }
   }
 
   .page-hero__text {
