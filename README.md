@@ -98,6 +98,7 @@ Rappels :
 - Sections en aplat (pas de fondu), cartes blanches avec `--shadow-card` et bordure douce.
 - Focus visible partout : contour 2px basalte décalé de 2px.
 - Cartes cliquables (classe `card-lift`) : légère élévation au survol et au focus (`--lift-card-hover`, `--shadow-card-hover`) et flèche qui glisse vers la droite (`--nudge-arrow-hover`), sans soulignement ; sans déplacement avec `prefers-reduced-motion`.
+- Éléments graphiques nature : courbes de niveau (`ContourPattern`) en haut des pages pays, fiches site et Nos projets et dans le footer, avec un fondu vers le haut ; tampon circulaire (`FooterStamp`) en bas du footer ; lavis aquarelle sous l'île (`MadagascarMap`). Ils sont décoratifs (`aria-hidden` ou `role="img"` pour le tampon), ne prennent pas les clics et ne passent jamais derrière du texte.
 - Boutons (classe `btn-motion`) : couleurs fondues et léger soulèvement au survol (`--transition-ui`, `--lift-button-hover`), retour en place au clic ; sans déplacement avec `prefers-reduced-motion`.
 
 ## Langues (i18n)
@@ -114,6 +115,7 @@ Rappels :
 - Chiffres clés : au premier passage dans l'écran (IntersectionObserver, une seule fois), compteur de 0 à la valeur, traits de l'anneau dans le sens horaire, barres qui poussent, pastilles une à une.
 - Logos partenaires : défilement continu en dessous de 900px.
 - Hero : le contour organique de la photo ondule (14 s) et l'isotype flotte (11 s), en boucle lente.
+- Courbes de niveau (`ContourPattern.astro`, hero des pages internes et footer) : chaque courbe « respire » (échelle 0,985 → 1,015, 18 s, aller-retour), décalée de 1,6 s de la suivante, comme une onde lente. Validée par Victor le 2026-10-21.
 - Indication « Faire défiler » du hero : la flèche monte et descend doucement en boucle (1,8 s). Ces animations du hero et l'apparition au scroll sont des exceptions à la règle « pas d'autre animation décorative » du design system, à y reporter.
 - Avec `prefers-reduced-motion: reduce`, tout est désactivé (valeurs finales affichées, logos en défilement manuel).
 - **Sans JavaScript**, la page est complète : chiffres et illustrations affichés en entier, liens du menu visibles sous le logo en mobile.
