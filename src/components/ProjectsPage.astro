@@ -1,0 +1,308 @@
+---
+/**
+ * Page « Nos projets », commune aux deux langues (/projets et /en/projets).
+ * Textes dans src/i18n (clé projets), projets dans src/content/projets.
+ * Filtres par thème et par pays côté client ; sans JS, tous les projets
+ * s'affichent et les filtres restent masqués.
+ */
+import { getCollection } from 'astro:content';
+import { COUNTRIES, PROJECT_THEMES } from '../data/projets';
+import { DON_URL } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import CountryFlag from './CountryFlag.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import ProjectPhotoCard from './ProjectPhotoCard.astro';
+import SectionHeading from './SectionHeading.astro';
+
+import heroKollo from '../assets/photos/engager-donner.jpg';
+import ctaVolontaires from '../assets/photos/engager-entreprises.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.projets;
+
+const sites = await getCollection('sites');
+const siteNames = new Map(sites.map((site) => [site.id, site.data.name]));
+
+const projects = (await getCollection('projets')).sort((a, b) => a.data.order - b.data.order);
+
+const countLabel = (count: number) => (count > 1 ? page.list.countMany : page.list.countOne).replace('{count}', String(count));
+
+const filters = [
+  {
+    name: 'theme',
+    label: page.list.filterTheme,
+    options: [
+      { value: 'all', label: page.list.allThemes, country: undefined },
+      ...PROJECT_THEMES.map((theme) => ({ value: theme, label: page.themes[theme], country: undefined })),
+    ],
+  },
+  {
+    name: 'pays',
+    label: page.list.filterCountry,
+    options: [
+      { value: 'all', label: page.list.allCountries, country: undefined },
+      ...COUNTRIES.map((country) => ({ value: country, label: page.countries[country], country })),
+    ],
+  },
+];
+
+const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={heroKollo} ogImageAlt={page.hero.imageAlt}>
+  <Header />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <main id="contenu">
+    <PageHero
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      image={heroKollo}
+      imageAlt={page.hero.imageAlt}
+      caption={page.hero.caption}
+    />
+
+    <section class="section section--tinted" aria-labelledby="liste-titre">
+      <div
+        class="container stack"
+        data-projects
+        data-count-one={page.list.countOne}
+        data-count-many={page.list.countMany}
+      >
+        <div class="list-head">
+          <SectionHeading id="liste-titre" strong={page.list.titleStrong} light={page.list.titleLight} />
+          <p class="list-count" aria-live="polite" data-count>{countLabel(projects.length)}</p>
+        </div>
+
+        <div class="filters" data-filters hidden>
+          {
+            filters.map((filter) => (
+              <div class="filters__group" role="group" aria-label={filter.label}>
+                {filter.options.map((option) => (
+                  <button
+                    class="filters__pill"
+                    type="button"
+                    aria-pressed={option.value === 'all' ? 'true' : 'false'}
+                    data-filter={filter.name}
+                    data-value={option.value}
+                  >
+                    {option.country && <CountryFlag country={option.country} />}
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+
+        <ul class="projects-grid">
+          {
+            projects.map((project) => {
+              const { data } = project;
+              return (
+                <ProjectPhotoCard
+                  id={project.id}
+                  title={data.title}
+                  summary={data.summary}
+                  theme={data.theme}
+                  themeLabel={page.themes[data.theme]}
+                  countries={data.countries.map((country) => ({ id: country, label: page.countries[country] }))}
+                  sites={[...data.sites.map((ref) => siteNames.get(ref.id) ?? ref.id), ...data.otherSites]}
+                  sitesLabel={page.list.sitesLabel}
+                  image={data.photo}
+                  imagePosition={data.photoPosition}
+                  href="#"
+                />
+              );
+            })
+          }
+        </ul>
+        <p class="list-empty" data-empty hidden>{page.list.empty}</p>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="terrain-titre"
+      titleStrong={page.cta.titleStrong}
+      titleLight={page.cta.titleLight}
+      text={page.cta.text}
+      image={ctaVolontaires}
+      imagePosition="50% 45%"
+      spaced
+    >
+      <div class="cta__buttons">
+        <Button href={DON_URL} variant="don">{dict.ui.donate}</Button>
+        <Button href="#" variant="on-dark">{page.cta.field}</Button>
+      </div>
+    </PhotoBanner>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  /*
+   * Filtre des projets : un thème et un pays à la fois (« all » : pas de filtre).
+   * Le filtre se lit et s'écrit dans l'URL (?theme=sante&pays=burkina-faso),
+   * ce qui permet aux liens du footer d'ouvrir la page déjà filtrée.
+   */
+  document.querySelectorAll<HTMLElement>('[data-projects]').forEach((root) => {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-theme]')];
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    const { countOne = '', countMany = '' } = root.dataset;
+
+    const params = new URLSearchParams(window.location.search);
+    const isOption = (name: string, value: string | null) =>
+      buttons.some((button) => button.dataset.filter === name && button.dataset.value === value);
+    const state: Record<string, string> = { theme: 'all', pays: 'all' };
+    for (const name of Object.keys(state)) {
+      const value = params.get(name);
+      if (isOption(name, value)) state[name] = value!;
+    }
+
+    const render = () => {
+      buttons.forEach((button) => {
+        button.setAttribute('aria-pressed', String(state[button.dataset.filter!] === button.dataset.value));
+      });
+      let shown = 0;
+      cards.forEach((card) => {
+        const visible =
+          (state.theme === 'all' || card.dataset.theme === state.theme) &&
+          (state.pays === 'all' || (card.dataset.countries ?? '').split(' ').includes(state.pays!));
+        card.hidden = !visible;
+        if (visible) shown += 1;
+      });
+      if (count) count.textContent = (shown > 1 ? countMany : countOne).replace('{count}', String(shown));
+      if (empty) empty.hidden = shown > 0;
+    };
+
+    const updateUrl = () => {
+      const url = new URL(window.location.href);
+      for (const [name, value] of Object.entries(state)) {
+        if (value === 'all') url.searchParams.delete(name);
+        else url.searchParams.set(name, value);
+      }
+      history.replaceState(history.state, '', url);
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        state[button.dataset.filter!] = button.dataset.value!;
+        render();
+        updateUrl();
+      });
+    });
+
+    root.querySelector<HTMLElement>('[data-filters]')?.removeAttribute('hidden');
+    render();
+  });
+</script>
+
+<style>
+  .section--tinted {
+    background: var(--vert-clair);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .list-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px 32px;
+  }
+
+  .list-count {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filters__group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filters__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 0 18px;
+    border: 2px solid var(--blanc);
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    color: var(--basalte);
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui),
+      color var(--transition-ui);
+  }
+
+  .filters__pill:hover {
+    border-color: var(--basalte);
+  }
+
+  .filters__pill[aria-pressed='true'] {
+    background: var(--basalte);
+    border-color: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .list-empty {
+    font-size: 16px;
+  }
+
+  .list-empty[hidden] {
+    display: none;
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filters__pill {
+      transition: none;
+    }
+  }
+</style>

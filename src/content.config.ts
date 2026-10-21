@@ -1,6 +1,7 @@
 import { defineCollection, reference } from 'astro:content';
-import { file, glob } from 'astro/loaders';
+import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { COUNTRIES, PROJECT_THEMES } from './data/projets';
 
 /** Statut UICN d'une espèce, ou « endemique » pour une espèce non évaluée mais endémique. */
 const speciesStatus = z.enum(['CR', 'EN', 'VU', 'NT', 'LC', 'endemique']);
@@ -20,7 +21,7 @@ const sites = defineCollection({
   schema: ({ image }) =>
     z.object({
       name: z.string(),
-      country: z.enum(['madagascar', 'burkina-faso']),
+      country: z.enum(COUNTRIES),
       /** Région affichée en pastille : « Centre-Est », « Nosy Be »… */
       region: z.string(),
       photo: image(),
@@ -121,15 +122,31 @@ const sites = defineCollection({
     }),
 });
 
-/** Projets : une entrée par projet, reliée aux sites où il est mené (src/content/projets.json). */
+/**
+ * Projets : un fichier Markdown par projet (src/content/projets/), relié aux sites
+ * où il est mené. Le frontmatter alimente les cartes de la page « Nos projets »
+ * et de la page pays ; le corps servira à la future fiche projet.
+ */
 const projets = defineCollection({
-  loader: file('./src/content/projets.json'),
-  schema: z.object({
-    title: z.string(),
-    country: z.enum(['madagascar', 'burkina-faso']),
-    sites: z.array(reference('sites')),
-    order: z.number(),
-  }),
+  loader: glob({ pattern: '**/*.md', base: './src/content/projets' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      theme: z.enum(PROJECT_THEMES),
+      /** Un ou deux pays ; un projet mené dans les deux pays apparaît sous chacun des filtres. */
+      countries: z.array(z.enum(COUNTRIES)).min(1),
+      /** Sites qui ont une fiche (collection sites). */
+      sites: z.array(reference('sites')).default([]),
+      /** Lieux sans fiche pour l'instant (« Kollo et Guiaro »), affichés après les sites. */
+      otherSites: z.array(z.string()).default([]),
+      /** Texte court des cartes. */
+      summary: z.string(),
+      photo: image(),
+      /** Cadrage de la photo dans la carte (object-position). */
+      photoPosition: z.string().default('50% 50%'),
+      /** Ordre d'affichage dans les listes. */
+      order: z.number(),
+    }),
 });
 
 export const collections = { sites, projets };

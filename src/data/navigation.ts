@@ -23,6 +23,7 @@ export interface NavColumn {
 /** Chemins des pages existantes, sans préfixe de langue (voir pagePath). */
 export const PAGES = {
   madagascar: 'sites/madagascar',
+  projets: 'projets',
 } as const;
 
 /** URL d'une page dans une langue : « sites/madagascar » → « /en/sites/madagascar ». */
@@ -34,6 +35,17 @@ export function pagePath(lang: Lang, page: keyof typeof PAGES): string {
 export function sitePath(lang: Lang, site: string): string {
   return localeUrl(lang, `${PAGES.madagascar}/${site}`);
 }
+
+/**
+ * Lien vers un projet : sa carte dans la page « Nos projets ».
+ * TODO fiche projet : renvoyer vers localeUrl(lang, `projets/${project}`).
+ */
+export function projectPath(lang: Lang, project: string): string {
+  return `${pagePath(lang, 'projets')}#projet-${project}`;
+}
+
+/** Page « Nos projets » filtrée sur un thème (paramètre lu par le filtre de la page). */
+const projectsByTheme = (theme: string) => `${PAGES.projets}?theme=${theme}`;
 
 /**
  * Destinations des menus. « # » : page pas encore créée. Les autres valeurs sont
@@ -56,11 +68,18 @@ export const SOCIAL_URLS = {
   facebook: '#', // TODO URL de la page Facebook de l'ONG
 };
 
-const MAIN_HREFS = ['#', '#', '#', '#', '#', '#'];
+const MAIN_HREFS = ['#', '#', PAGES.projets, '#', '#', '#'];
 const FOOTER_HREFS = [
   ['#', '#', '#'],
   [PAGES.madagascar, '#'],
-  ['#', '#', '#', '#', '#'],
+  // « Plantes aromatiques » : thème Filières durables (ylang-ylang), en attendant d'aligner le libellé.
+  [
+    projectsByTheme('conservation'),
+    projectsByTheme('reboisement'),
+    projectsByTheme('sante'),
+    projectsByTheme('filieres'),
+    PAGES.projets,
+  ],
   ['#', '#', '#'],
   ['#', '#', '#'],
 ];
@@ -79,7 +98,11 @@ const SUBMENUS: Partial<Record<MainSection, { column: number; count?: number }>>
   ressources: { column: 4, count: 2 },
 };
 
-const resolve = (lang: Lang, href: string | undefined) => (!href || href.startsWith('#') ? '#' : localeUrl(lang, href));
+const resolve = (lang: Lang, href: string | undefined) => {
+  if (!href || href.startsWith('#')) return '#';
+  const [path = '', query] = href.split('?');
+  return query ? `${localeUrl(lang, path)}?${query}` : localeUrl(lang, path);
+};
 
 const zip = (lang: Lang, labels: string[], hrefs: string[]): NavLink[] =>
   labels.map((label, i) => ({ label, href: resolve(lang, hrefs[i]) }));

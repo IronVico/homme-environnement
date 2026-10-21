@@ -283,6 +283,51 @@ const fr = {
       next: 'Site suivant : {name}',
     },
   },
+  // Page « Nos projets » (maquette NosProjets). Les projets sont dans src/content/projets.
+  projets: {
+    title: 'Nos projets',
+    description:
+      'Protection de la nature et revenus pour les habitants : les projets de L\'Homme & l\'Environnement, menés avec les communautés locales à Madagascar et au Burkina Faso.',
+    hero: {
+      titleStrong: 'Nos projets,',
+      titleLight: 'au service du vivant et des communautés.',
+      lead: 'Chaque projet allie protection de la nature et revenus pour les habitants. Ils sont menés avec les communautés locales, sur nos sites à Madagascar et au Burkina Faso.',
+      imageAlt: 'Réunion des habitants sous un arbre, village de Kollo, Burkina Faso',
+      caption: 'Kollo, Burkina Faso — [crédit photo]',
+    },
+    list: {
+      titleStrong: 'Tous nos projets',
+      titleLight: 'sur le terrain',
+      /** {count} : nombre de projets affichés. */
+      countOne: '{count} projet',
+      countMany: '{count} projets',
+      filterTheme: 'Filtrer par thème',
+      filterCountry: 'Filtrer par pays',
+      allThemes: 'Tous les projets',
+      allCountries: 'Tous les pays',
+      empty: 'Aucun projet pour ce filtre.',
+      sitesLabel: 'Sites',
+    },
+    /** Libellés des thèmes (src/content.config.ts, PROJECT_THEMES). */
+    themes: {
+      conservation: 'Conservation',
+      reboisement: 'Reboisement',
+      sante: 'Santé',
+      filieres: 'Filières durables',
+      education: 'Éducation',
+    },
+    /** Libellés des pays (src/content.config.ts, COUNTRIES). */
+    countries: {
+      madagascar: 'Madagascar',
+      'burkina-faso': 'Burkina Faso',
+    },
+    cta: {
+      titleStrong: 'Venez voir nos projets',
+      titleLight: 'sur le terrain.',
+      text: 'Écovolontariat, séjours et visites : découvrez les projets avec les équipes locales, ou soutenez-les par un don.',
+      field: 'Venir sur le terrain',
+    },
+  },
 };
 
 export default fr;
