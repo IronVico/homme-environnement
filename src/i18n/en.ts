@@ -29,6 +29,8 @@ const en: Dictionary = {
     socialLinkedin: 'Man & the Environment on LinkedIn',
     socialFacebook: 'Man & the Environment on Facebook',
     footerPitch: 'Preserving biodiversity and supporting the development of local communities since 1993.',
+    stampText: 'SINCE 1993 · MADAGASCAR · BURKINA FASO · ',
+    stampLabel: 'Man & the Environment, since 1993, Madagascar and Burkina Faso',
     copyright: '© Man & the Environment · Photos © Day Nabih, © Marc Gansuana, © Langaha Be',
     statsLabel: 'Key figures',
     scrollHint: 'Scroll down',

@@ -72,8 +72,13 @@ const { ui } = t(getLang(Astro.currentLocale));
     --header-h: 88px;
     --hero-pt: clamp(24px, 6vw, 72px);
     --hero-pb: clamp(64px, 8vw, 104px);
-    /* .container est en content-box : on retire aussi les paddings verticaux. */
-    min-height: calc(100svh - var(--header-h) - var(--hero-pt) - var(--hero-pb));
+    /* Hauteur disponible sous le header. .container est en content-box : on retire aussi
+       les paddings verticaux. */
+    --hero-avail: calc(100svh - var(--header-h) - var(--hero-pt) - var(--hero-pb));
+    /* La photo (ratio 5:5,4) tient dans cette hauteur, pour que le hero ne dépasse pas
+       l'écran et que « Faire défiler » reste visible ; 360px minimum, 600px maximum. */
+    --hero-photo-max: clamp(360px, calc(var(--hero-avail) / 1.08), 600px);
+    min-height: var(--hero-avail);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -125,6 +130,13 @@ const { ui } = t(getLang(Astro.currentLocale));
     position: relative;
     display: flex;
     justify-content: center;
+  }
+
+  /* Desktop (photo à côté du texte) : la photo et l'isotype suivent la hauteur d'écran. */
+  @media (min-width: 1200px) {
+    .hero__media {
+      max-width: var(--hero-photo-max);
+    }
   }
 
   .hero__isotype {
