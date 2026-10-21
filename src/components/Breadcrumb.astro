@@ -1,0 +1,60 @@
+---
+import { getLang, t } from '../i18n';
+import type { NavLink } from '../data/navigation';
+
+interface Props {
+  /** Pages parentes, de l'accueil à la rubrique ; la page courante est `current`. */
+  items: NavLink[];
+  current: string;
+}
+
+const { items, current } = Astro.props;
+const { ui } = t(getLang(Astro.currentLocale));
+---
+
+<nav class="breadcrumb container" aria-label={ui.breadcrumb}>
+  <ol>
+    {
+      items.map((item) => (
+        <li>
+          <a href={item.href}>{item.label}</a>
+          <span class="breadcrumb__sep" aria-hidden="true">/</span>
+        </li>
+      ))
+    }
+    <li aria-current="page">{current}</li>
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb {
+    padding-top: var(--space-2);
+    font-size: 14px;
+    line-height: 1.25;
+    color: var(--ardoise);
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.3em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: inline-flex;
+    gap: 0.3em;
+  }
+
+  a,
+  a:hover {
+    color: var(--ardoise);
+  }
+
+  [aria-current] {
+    color: var(--basalte);
+    font-weight: 500;
+  }
+</style>

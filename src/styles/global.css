@@ -9,6 +9,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Header fixé en pilule compacte (~76px) : les ancres ne passent pas dessous. */
+  scroll-padding-top: 88px;
 }
 
 /* Défilement doux pour les ancres (« Faire défiler », lien d'évitement). */

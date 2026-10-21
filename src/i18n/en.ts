@@ -32,6 +32,8 @@ const en: Dictionary = {
     copyright: '© Man & the Environment · Photos © Day Nabih, © Marc Gansuana, © Langaha Be',
     statsLabel: 'Key figures',
     scrollHint: 'Scroll down',
+    breadcrumb: 'Breadcrumb',
+    breadcrumbHome: 'Home',
     newsletterEmailLabel: 'Your email address',
     newsletterPlaceholder: 'Your email address',
     newsletterSubmit: 'Subscribe',
@@ -39,10 +41,11 @@ const en: Dictionary = {
   },
 
   nav: {
-    main: ['The NGO', 'Our work', 'Get involved', 'Resources', 'Contact'],
+    main: ['The NGO', 'Our sites', 'Our projects', 'Get involved', 'Resources', 'Contact'],
     footer: [
       { title: 'The NGO', links: ['Our approach', 'Our history', 'Partners and funders'] },
-      { title: 'Our work', links: ['Madagascar', 'Burkina Faso', 'Supported projects', 'Empowerment'] },
+      { title: 'Our sites', links: ['Madagascar', 'Burkina Faso'] },
+      { title: 'Our projects', links: ['Conservation', 'Reforestation', 'Health', 'Aromatic plants', 'All projects'] },
       { title: 'Get involved', links: ['Individuals', 'Come to the field', 'Companies'] },
       { title: 'Resources', links: ['Reports and studies', 'Photo gallery', 'Contact'] },
     ],
@@ -51,6 +54,9 @@ const en: Dictionary = {
 
   // TODO traduction : contenu de la home encore en français (copie de fr.ts).
   home: structuredClone(fr.home),
+
+  // TODO traduction : contenu de la page Madagascar encore en français (copie de fr.ts).
+  madagascar: structuredClone(fr.madagascar),
 };
 
 export default en;

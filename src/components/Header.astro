@@ -1,13 +1,20 @@
 ---
+import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Menu from '@lucide/astro/icons/menu';
 import X from '@lucide/astro/icons/x';
 import logoEn from '../assets/logos/logo-couleur-en.svg';
 import logoFr from '../assets/logos/logo-couleur.svg';
-import { DON_URL, getMainNav } from '../data/navigation';
+import { DON_URL, getMainNav, type MainSection } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import Button from './Button.astro';
 import LangSwitcher from './LangSwitcher.astro';
 
+interface Props {
+  /** Rubrique de la page courante (sous-page sans lien direct dans le menu), sélectionnée dans le menu. */
+  current?: MainSection;
+}
+
+const { current } = Astro.props;
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
 // Version anglaise : logo « Man & the Environment » (LOGO-ENG-2), jamais « Human ».
@@ -23,6 +30,9 @@ const isCurrent = (href: string) => {
 };
 ---
 
+<!-- La place du header est réservée dans le flux : le passage en pilule compacte ne décale pas la page. -->
+<div class="header-slot">
+<div class="header-bar" data-header-bar>
 <header class="header container">
   <a class="header__home" href={localeUrl(lang)} aria-label={ui.homeLink}>
     <img class="header__logo" src={logo.src} width={logo.width} height={logo.height} alt={ui.logoAlt} />
@@ -30,11 +40,44 @@ const isCurrent = (href: string) => {
 
   <nav id="menu-principal" class="header__nav" aria-label={ui.mainNav}>
     <ul>
-      {mainNav.map((link) => (
-        <li>
-          <a href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>{link.label}</a>
-        </li>
-      ))}
+      {
+        mainNav.map((link) => {
+          const sectionCurrent = link.section === current || link.children.some((child) => isCurrent(child.href));
+          if (link.children.length === 0) {
+            return (
+              <li>
+                <a href={link.href} aria-current={isCurrent(link.href) ? 'page' : sectionCurrent ? 'true' : undefined}>
+                  {link.label}
+                </a>
+              </li>
+            );
+          }
+          const id = `sous-menu-${link.section}`;
+          return (
+            <li class="header__item" data-submenu>
+              <button
+                class="header__toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls={id}
+                aria-current={sectionCurrent ? 'true' : undefined}
+              >
+                {link.label}
+                <ChevronDown class="header__chevron" size={16} />
+              </button>
+              <ul id={id} class="header__submenu">
+                {link.children.map((child) => (
+                  <li>
+                    <a href={child.href} aria-current={isCurrent(child.href) ? 'page' : undefined}>
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          );
+        })
+      }
     </ul>
   </nav>
 
@@ -47,8 +90,18 @@ const isCurrent = (href: string) => {
     <X class="header__icon-close" size={28} />
   </button>
 </header>
+</div>
+</div>
 
 <script>
+  // Header fixé : dès que la page défile, il devient une pilule flottante compacte (data-scrolled).
+  const bar = document.querySelector<HTMLElement>('[data-header-bar]');
+  if (bar) {
+    const update = () => bar.toggleAttribute('data-scrolled', window.scrollY > 8);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+  }
+
   const header = document.querySelector<HTMLElement>('.header');
   const burger = header?.querySelector<HTMLButtonElement>('.header__burger');
   const nav = header?.querySelector<HTMLElement>('.header__nav');
@@ -63,21 +116,141 @@ const isCurrent = (href: string) => {
 
     burger.addEventListener('click', () => setOpen(!header.hasAttribute('data-open')));
 
+    // Sous-menus : bouton à bascule (un seul ouvert à la fois en desktop).
+    const items = [...nav.querySelectorAll<HTMLElement>('[data-submenu]')];
+    const desktop = window.matchMedia('(min-width: 1281px)');
+    const toggleOf = (item: HTMLElement) => item.querySelector<HTMLButtonElement>('.header__toggle');
+    const setSubmenu = (item: HTMLElement, open: boolean) => {
+      item.toggleAttribute('data-expanded', open);
+      toggleOf(item)?.setAttribute('aria-expanded', String(open));
+    };
+    const closeSubmenus = (except?: HTMLElement) => items.forEach((item) => item !== except && setSubmenu(item, false));
+
+    // Survol (souris, desktop) : ouverture immédiate, fermeture après un court délai
+    // pour pouvoir traverser l'écart entre la rubrique et la carte.
+    const hover = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const CLOSE_DELAY = 180;
+    let closeTimer: number | undefined;
+    let hoverOpenedAt = 0;
+
+    items.forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        if (!desktop.matches || !hover.matches) return;
+        window.clearTimeout(closeTimer);
+        if (!item.hasAttribute('data-expanded')) hoverOpenedAt = performance.now();
+        closeSubmenus(item);
+        setSubmenu(item, true);
+      });
+
+      item.addEventListener('mouseleave', () => {
+        if (!desktop.matches || !hover.matches) return;
+        window.clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(() => setSubmenu(item, false), CLOSE_DELAY);
+      });
+
+      toggleOf(item)?.addEventListener('click', () => {
+        // Clic juste après l'ouverture au survol : on garde le sous-menu ouvert.
+        if (desktop.matches && hover.matches && performance.now() - hoverOpenedAt < 400) return;
+        const open = !item.hasAttribute('data-expanded');
+        if (desktop.matches) closeSubmenus(item);
+        setSubmenu(item, open);
+      });
+      // Desktop : la sortie du focus (Tab) referme le sous-menu.
+      item.addEventListener('focusout', (event) => {
+        if (desktop.matches && !item.contains(event.relatedTarget as Node | null)) setSubmenu(item, false);
+      });
+    });
+
+    // Clic en dehors du menu : on referme les sous-menus desktop.
+    document.addEventListener('click', (event) => {
+      if (desktop.matches && !nav.contains(event.target as Node)) closeSubmenus();
+    });
+
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && header.hasAttribute('data-open')) {
+      if (event.key !== 'Escape') return;
+      const openItem = items.find((item) => item.hasAttribute('data-expanded'));
+      if (desktop.matches && openItem) {
+        setSubmenu(openItem, false);
+        toggleOf(openItem)?.focus();
+      } else if (header.hasAttribute('data-open')) {
         setOpen(false);
         burger.focus();
       }
     });
 
-    // Repasser en desktop referme le menu mobile.
-    window.matchMedia('(min-width: 1081px)').addEventListener('change', (event) => {
-      if (event.matches) setOpen(false);
+    // Changer de mode (desktop / burger) referme tout.
+    desktop.addEventListener('change', () => {
+      setOpen(false);
+      closeSubmenus();
     });
   }
 </script>
 
 <style>
+  /* Place réservée dans le flux : hauteur du header en haut de page. */
+  .header-slot {
+    height: 88px;
+  }
+
+  /* Barre fixée en haut de l'écran, sur toute la largeur. */
+  .header-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    background: var(--blanc);
+    transition: background-color var(--transition-ui);
+  }
+
+  .header-bar[data-scrolled] {
+    background: transparent;
+  }
+
+  /* Au scroll : pilule flottante blanche translucide, alignée sur la largeur du contenu. */
+  .header {
+    transition:
+      margin-top 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      padding 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-color var(--transition-ui),
+      box-shadow var(--transition-ui);
+  }
+
+  .header-bar[data-scrolled] .header {
+    box-sizing: border-box;
+    width: min(100% - 2 * max(var(--gutter) - 20px, 8px), var(--content-max) + 40px);
+    max-width: none;
+    margin-top: 10px;
+    padding: 10px 12px 10px 20px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.86);
+    /* Liseré bordure-douce dessiné dans l'ombre : pas de bordure qui changerait la hauteur. */
+    box-shadow:
+      inset 0 0 0 1px var(--bordure-douce),
+      var(--shadow-card);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+
+  .header__logo {
+    transition:
+      height 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      margin 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .header-bar[data-scrolled] .header__logo {
+    height: 56px;
+    margin: -10px -28px -10px -15px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header-bar,
+    .header,
+    .header__logo {
+      transition: none;
+    }
+  }
+
   .header {
     position: relative;
     z-index: 10;
@@ -114,7 +287,8 @@ const isCurrent = (href: string) => {
     font-weight: 500;
   }
 
-  .header__nav a {
+  .header__nav a,
+  .header__toggle {
     display: block;
     padding: 8px 12px;
     border-radius: var(--radius-pill);
@@ -124,15 +298,101 @@ const isCurrent = (href: string) => {
       color var(--transition-ui);
   }
 
-  /* Survol : pastille vert clair. Sélectionné : pastille basalte, comme le sélecteur de langue. */
-  .header__nav a:hover {
+  /* Rubriques à sous-menu : bouton qui reprend l'apparence des liens. */
+  .header__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    color: var(--basalte);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .header__toggle :global(.header__chevron) {
+    transition: transform var(--transition-ui);
+  }
+
+  .header__item[data-expanded] :global(.header__chevron) {
+    transform: rotate(180deg);
+  }
+
+  /* Survol : pastille vert clair. Rubrique en cours : soulignée (2px, décalage 6px), comme la maquette. */
+  .header__nav a:hover,
+  .header__toggle:hover,
+  .header__item[data-expanded] > .header__toggle {
     background: var(--vert-clair);
     color: var(--basalte);
   }
 
-  .header__nav a[aria-current='page'] {
-    background: var(--basalte);
-    color: var(--blanc);
+  .header__nav > ul > li > a[aria-current],
+  .header__toggle[aria-current] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  /* Sous-menu desktop : carte blanche sous la rubrique. */
+  .header__item {
+    position: relative;
+  }
+
+  .header__submenu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    min-width: 240px;
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+    background: var(--blanc);
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-sm);
+    box-shadow: var(--shadow-card);
+    font-size: 15px;
+  }
+
+  /* Pont invisible entre la rubrique et la carte : le survol ne se perd pas dans l'écart. */
+  .header__submenu::before {
+    content: '';
+    position: absolute;
+    inset: -9px 0 auto;
+    height: 9px;
+  }
+
+  .header__submenu a {
+    padding: 10px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .header__submenu a[aria-current] {
+    font-weight: 600;
+    background: var(--vert-clair);
+  }
+
+  .header__item[data-expanded] > .header__submenu {
+    display: block;
+  }
+
+  /*
+   * Sans JS : ouverture au survol et au focus clavier. Avec JS, c'est le script
+   * qui gère survol, clic et clavier, pour n'avoir qu'un sous-menu ouvert à la fois.
+   */
+  @media (min-width: 1281px) {
+    :global(html:not(.js)) .header__item:hover > .header__submenu,
+    :global(html:not(.js)) .header__item:focus-within > .header__submenu {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header__toggle :global(.header__chevron) {
+      transition: none;
+    }
   }
 
   .header__burger {
@@ -159,16 +419,25 @@ const isCurrent = (href: string) => {
   }
 
   @media (max-width: 900px) {
+    .header-slot {
+      height: 84px;
+    }
+
     .header__logo {
       height: 60px;
+    }
+
+    .header-bar[data-scrolled] .header__logo {
+      height: 48px;
+      margin: -9px -24px -9px -13px;
     }
   }
 
   /*
    * Menu, sélecteur de langue et bouton Don ne tiennent sur une ligne qu'au-delà
-   * de ~1030px : en dessous de 1080px, on passe au burger.
+   * de ~1270px (6 rubriques avec chevrons) : en dessous de 1280px, on passe au burger.
    */
-  @media (max-width: 1080px) {
+  @media (max-width: 1280px) {
     /* Sans JS : les liens restent visibles, sur une ligne sous le logo. */
     .header__nav {
       order: 10;
@@ -196,6 +465,10 @@ const isCurrent = (href: string) => {
       top: 100%;
       left: 0;
       right: 0;
+      /* Le header est fixé : un panneau plus haut que l'écran défile sur lui-même. */
+      max-height: calc(100svh - 84px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
       padding: 8px var(--gutter) 24px;
       background: var(--blanc);
       border-top: 1px solid var(--bordure-douce);
@@ -206,6 +479,14 @@ const isCurrent = (href: string) => {
       display: block;
     }
 
+    /* Header en pilule : le panneau devient une carte arrondie détachée. */
+    :global(.js) .header-bar[data-scrolled] .header__nav {
+      top: calc(100% + 8px);
+      padding-inline: 16px;
+      border: 1px solid var(--bordure-douce);
+      border-radius: 24px;
+    }
+
     :global(.js) .header__nav > ul {
       flex-direction: column;
       align-items: stretch;
@@ -214,9 +495,43 @@ const isCurrent = (href: string) => {
     }
 
     /* Dans le panneau, les pastilles deviennent des lignes arrondies pleine largeur. */
-    :global(.js) .header__nav li a {
+    :global(.js) .header__nav li a,
+    :global(.js) .header__toggle {
+      width: 100%;
       padding: 12px 16px;
       border-radius: 14px;
+      text-align: left;
+    }
+
+    :global(.js) .header__toggle {
+      justify-content: space-between;
+    }
+
+    /* Sous-menus en accordéon dans le panneau. Sans JS, ils restent dépliés. */
+    .header__submenu {
+      position: static;
+      min-width: 0;
+      padding: 0 0 0 12px;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .header__submenu::before {
+      display: none;
+    }
+
+    :global(html:not(.js)) .header__submenu {
+      display: block;
+    }
+
+    :global(.js) .header__submenu {
+      padding: 4px 0 8px 16px;
+      font-size: 17px;
+    }
+
+    :global(.js) .header__submenu a {
+      padding: 10px 16px;
     }
   }
 

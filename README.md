@@ -25,6 +25,8 @@ Le site tourne sur <http://localhost:4321> (version anglaise : <http://localhost
 | `npm run preview` | Sert le build de `dist/` en local pour le tester            |
 | `npm run check`   | Vérification des types seule                                |
 
+Redirections 301 (anciennes URL, dont celles du site WordPress) : [`vercel.json`](vercel.json), à compléter à mesure que les pages cibles existent.
+
 Le dossier `dist/` est un site statique prêt à déposer sur Netlify, Vercel ou Cloudflare Pages (commande de build `npm run build`, dossier publié `dist`).
 
 ## Organisation
@@ -47,6 +49,12 @@ src/
   pages/
     index.astro       accueil en français (/)
     en/index.astro    accueil en anglais (/en/)
+    sites/madagascar.astro     page pays Madagascar (/sites/madagascar)
+    en/sites/madagascar.astro  page pays en anglais (/en/sites/madagascar)
+  content/sites/      un fichier Markdown par site (nom, pays, région, photo, résumé, espèces)
+  content/projets.json  projets, reliés aux sites où ils sont menés
+  content.config.ts   schémas des collections « sites » et « projets »
+  data/chiffres.ts    chiffres de Madagascar et de chaque site (un seul endroit à modifier)
   scripts/stats.ts    animation des chiffres clés
   styles/
     tokens.css        tokens du design system en variables CSS
@@ -58,17 +66,25 @@ src/
 | Composant           | Rôle |
 | ------------------- | ---- |
 | `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
-| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don, burger en dessous de 1080px |
+| `MadagascarPage`    | Page pays Madagascar commune aux deux langues ; sites et projets lus dans les collections, chiffres dans `data/chiffres.ts` |
+| `Breadcrumb`        | Fil d'Ariane des pages internes |
+| `PageHero`          | Hero des pages internes : H1 en deux temps, chapeau, bouton secondaire, photo en arche |
+| `SitesExplorer`     | Carte du pays avec repères numérotés + liste des sites, liés (clic sur un repère, survol ou focus d'une carte) |
+| `MadagascarMap`     | Carte SVG de Madagascar (courbes de niveau, capitale, mers), libellés traduisibles |
+| `SiteCard`          | Carte compacte d'un site, toute cliquable : numéro et nom, accroche sur 2 lignes, surface protégée |
+| `ProjectCard`       | Carte compacte d'un projet et des sites où il est mené |
+| `PhotoBanner`       | Carte sur photo assombrie (titre + phrase) avec contenu libre : newsletter, boutons d'appel |
+| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don ; sous-menus déroulants (accordéon dans le burger) ; fixé en haut au scroll ; burger en dessous de 1280px |
 | `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
-| `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles) |
-| `SectionHeading`    | Titre de section en deux temps (fort + doux), sur-titre et lien facultatifs |
+| `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles, sites, part, familles) ; valeur texte (« [X] ») affichée sans compteur |
+| `SectionHeading`    | Titre de section en deux temps (fort + doux), sur-titre, chapeau (toujours dessous) et lien facultatifs |
 | `PillarCard`        | Pilier de l'approche, photo en arche |
 | `CountryCard`       | Grande carte photo (pays mis en avant) avec pastilles de sites (`Chip`) |
 | `EngageCard`        | Carte blanche cliquable ; variante `country` pour les pays secondaires |
 | `PartnersStrip`     | Logos partenaires ; défilement en boucle en mobile |
-| `NewsletterSection` / `NewsletterForm` | Bloc newsletter sur photo, champ + bouton en une pilule |
+| `NewsletterSection` / `NewsletterForm` | Bloc newsletter (`PhotoBanner`), champ + bouton en une pilule |
 | `Footer`            | Pitch, bouton Don, LinkedIn et Facebook, plan du site, mentions, lien « English version » / « Version française » |
 
 ## Design system

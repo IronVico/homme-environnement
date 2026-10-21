@@ -1,0 +1,233 @@
+---
+/**
+ * Carte du pays avec un repère numéroté par site, et la liste des sites à côté.
+ * Repère et carte de site sont liés : cliquer un repère, survoler ou parcourir
+ * au clavier une carte de site met ce site en avant des deux côtés.
+ * Sans JS : le premier site est mis en avant, la liste reste complète.
+ */
+import type { ComponentProps } from 'astro/types';
+import MadagascarMap from './MadagascarMap.astro';
+import SiteCard from './SiteCard.astro';
+
+type Site = Omit<ComponentProps<typeof SiteCard>, 'selected'> & {
+  /** Région, lue avec le numéro sur le repère (« 1. Vohimana, Centre-Est »). */
+  region: string;
+  /** Position du repère, en % de la carte. */
+  mapPosition: { x: number; y: number };
+};
+
+interface Props {
+  sites: Site[];
+  map: { label: string; capital: string; channel: string; ocean: string; north: string };
+}
+
+const { sites, map } = Astro.props;
+const selectedId = sites[0]?.id;
+---
+
+<div class="sites-explorer" data-sites-explorer>
+  <div class="sites-explorer__map">
+    <div class="sites-explorer__panel" role="group" aria-label={map.label}>
+      <MadagascarMap labels={map}>
+        {
+          sites.map((site) => (
+            <button
+              type="button"
+              class="sites-explorer__pin"
+              style={`left: ${site.mapPosition.x}%; top: ${site.mapPosition.y}%`}
+              aria-label={`${site.num}. ${site.name}, ${site.region}`}
+              aria-pressed={site.id === selectedId ? 'true' : 'false'}
+              aria-controls={`site-${site.id}`}
+              data-pin={site.id}
+            >
+              <span class="sites-explorer__drop">
+                <span class="sites-explorer__num">{site.num}</span>
+              </span>
+            </button>
+          ))
+        }
+      </MadagascarMap>
+    </div>
+  </div>
+
+  <ol class="sites-explorer__list">
+    {sites.map(({ mapPosition: _, region: __, ...site }) => <SiteCard {...site} selected={site.id === selectedId} />)}
+  </ol>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-sites-explorer]').forEach((root) => {
+    const pins = [...root.querySelectorAll<HTMLButtonElement>('[data-pin]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-site]')];
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const select = (id: string) => {
+      pins.forEach((pin) => pin.setAttribute('aria-pressed', String(pin.dataset.pin === id)));
+      cards.forEach((card) => card.toggleAttribute('data-selected', card.dataset.site === id));
+    };
+
+    pins.forEach((pin) => {
+      pin.addEventListener('click', () => {
+        const id = pin.dataset.pin;
+        if (!id) return;
+        select(id);
+        // Mobile (carte au-dessus de la liste) : on amène la carte du site à l'écran.
+        root
+          .querySelector(`[data-site="${id}"]`)
+          ?.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      });
+    });
+
+    cards.forEach((card) => {
+      const pick = () => card.dataset.site && select(card.dataset.site);
+      card.addEventListener('mouseenter', pick);
+      card.addEventListener('focusin', pick);
+    });
+  });
+</script>
+
+<style>
+  /*
+   * Desktop : colonne de la carte à la largeur de la carte, la liste prend le reste.
+   * --map-top : distance sous le header fixé ; --panel-pad : marge intérieure du fond vert.
+   */
+  .sites-explorer {
+    --map-top: 96px;
+    --panel-pad: clamp(20px, 2.5vw, 32px);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-8);
+  }
+
+  /* La carte reste visible pendant qu'on parcourt la liste (sous le header fixé). */
+  .sites-explorer__map {
+    position: sticky;
+    top: var(--map-top);
+  }
+
+  .sites-explorer__panel {
+    display: flex;
+    justify-content: center;
+    padding: var(--panel-pad);
+    overflow: hidden;
+    border-radius: var(--radius-block);
+    background: var(--vert-clair);
+  }
+
+  /*
+   * La carte tient toujours en entier à l'écran : sa largeur découle de la hauteur
+   * disponible (écran - header - marges), dans le rapport 399 / 772 de l'île.
+   */
+  .sites-explorer__panel :global(.mg-map) {
+    width: clamp(
+      260px,
+      calc((100svh - var(--map-top) - 24px - 2 * var(--panel-pad)) * 399 / 772),
+      440px
+    );
+  }
+
+  .sites-explorer__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Repère en goutte : pointe sur le site, numéro dedans. */
+  .sites-explorer__pin {
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 44px;
+    height: 48px;
+    margin: -46px 0 0 -22px;
+    padding: 0 0 6px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    filter: drop-shadow(0 3px 4px rgba(35, 31, 32, 0.25));
+  }
+
+  .sites-explorer__pin[aria-pressed='true'] {
+    z-index: 3;
+  }
+
+  .sites-explorer__drop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--basalte);
+    border-radius: 50% 50% 50% 0;
+    background: var(--blanc);
+    transform: rotate(-45deg);
+    transition:
+      width var(--transition-ui),
+      height var(--transition-ui),
+      background-color var(--transition-ui);
+  }
+
+  .sites-explorer__num {
+    transform: rotate(45deg);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--basalte);
+  }
+
+  .sites-explorer__pin:hover .sites-explorer__drop {
+    background: var(--vert-clair);
+  }
+
+  .sites-explorer__pin[aria-pressed='true'] .sites-explorer__drop {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--blanc);
+    background: var(--basalte);
+  }
+
+  .sites-explorer__pin[aria-pressed='true'] .sites-explorer__num {
+    font-size: 14px;
+    color: var(--blanc);
+  }
+
+  .sites-explorer__pin:focus-visible {
+    outline: none;
+  }
+
+  .sites-explorer__pin:focus-visible .sites-explorer__drop {
+    outline: 2px solid var(--basalte);
+    outline-offset: 3px;
+  }
+
+  /*
+   * Empilé (tablette, mobile) : la carte passe au-dessus de la liste, sur toute la
+   * largeur, et ne reste pas collée (elle masquerait la liste).
+   */
+  @media (max-width: 900px) {
+    .sites-explorer {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sites-explorer__map {
+      position: static;
+    }
+
+    .sites-explorer__panel :global(.mg-map) {
+      width: min(100%, 400px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sites-explorer__drop {
+      transition: none;
+    }
+  }
+</style>
