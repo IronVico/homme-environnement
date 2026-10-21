@@ -103,14 +103,6 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     bottom: calc(100% + 12px);
   }
 
-  /* Très petits écrans (< 340px) : tampon réduit, la dernière colonne est plus large. */
-  @media (max-width: 339px) {
-    .footer :global(.footer__stamp) {
-      width: 88px;
-      height: 88px;
-    }
-  }
-
   /* Vers 970-990px, la colonne « Ressources » descend jusqu'à la barre du bas : tampon
      réduit et plus bas, pour rester dans l'espace libre. */
   @media (min-width: 960px) and (max-width: 999px) {
@@ -243,5 +235,24 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-5);
+  }
+
+  /* Mobile (maquette v124) : le tampon passe dans le flux, tout en bas du footer, sous la
+     barre du bas, aligné à droite (20px du bord), 112px. La barre est déjà sur deux lignes
+     à cette largeur : en colonne, le rendu ne change pas. */
+  @media (max-width: 700px) {
+    .footer__bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer :global(.footer__stamp) {
+      position: static;
+      order: 2;
+      align-self: flex-end;
+      width: 112px;
+      height: 112px;
+      margin-right: calc(20px - var(--gutter));
+    }
   }
 </style>

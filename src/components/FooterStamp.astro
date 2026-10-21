@@ -3,7 +3,7 @@
  * Tampon circulaire du footer (éléments graphiques nature, canvas v116) : sceau blanc,
  * isotype sauge et texte en cercle, incliné de -10° avec une ombre papier nette.
  * Le texte en cercle est décoratif : le SVG porte un nom lisible (role="img").
- * La position est gérée par le footer.
+ * La position et la taille selon l'écran sont gérées par le footer.
  */
 import { getLang, t } from '../i18n';
 
@@ -39,12 +39,5 @@ const { ui } = t(getLang(Astro.currentLocale));
     transform: rotate(-10deg);
     filter: drop-shadow(3px 5px 0 rgba(67, 72, 64, 0.14));
     pointer-events: none;
-  }
-
-  @media (max-width: 700px) {
-    .stamp {
-      width: 104px;
-      height: 104px;
-    }
   }
 </style>
