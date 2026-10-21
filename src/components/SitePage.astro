@@ -13,8 +13,13 @@ import Droplets from '@lucide/astro/icons/droplets';
 import GraduationCap from '@lucide/astro/icons/graduation-cap';
 import HandHeart from '@lucide/astro/icons/hand-heart';
 import Scissors from '@lucide/astro/icons/scissors';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import Sprout from '@lucide/astro/icons/sprout';
+import TreePalm from '@lucide/astro/icons/tree-palm';
+import TriangleAlert from '@lucide/astro/icons/triangle-alert';
 import UsersRound from '@lucide/astro/icons/users-round';
 import Calendar from '@lucide/astro/icons/calendar';
+import Droplet from '@lucide/astro/icons/droplet';
 import ExternalLink from '@lucide/astro/icons/external-link';
 import Leaf from '@lucide/astro/icons/leaf';
 import MapIcon from '@lucide/astro/icons/map';
@@ -78,13 +83,23 @@ const complete = Boolean(
 );
 
 // Bande de chiffres : valeurs dans src/data/chiffres.ts, texte dans le frontmatter du site.
+// Pas de grenouille chez Lucide : `null` affiche le pictogramme de la maquette, dessiné plus bas.
 const FIGURE_ICONS = {
   hectares: MapIcon,
+  naturalForest: Trees,
+  mangrove: TreePalm,
+  conservationArea: ShieldCheck,
+  reforested: Sprout,
   years: Calendar,
   beneficiaries: Users,
+  animalSpecies: PawPrint,
+  vertebrateSpecies: PawPrint,
+  threatenedSpecies: TriangleAlert,
   lemurSpecies: PawPrint,
-  frogSpecies: null, // pas de grenouille chez Lucide : pictogramme de la maquette, dessiné plus bas
+  frogSpecies: null,
+  frogsCounted: null,
   medicinalPlants: Leaf,
+  lakes: Droplet,
 };
 type FigureKey = keyof typeof FIGURE_ICONS & keyof SiteFigures;
 
@@ -93,10 +108,19 @@ const figureList = (data.figures ?? (page.defaultFigures as { key: FigureKey; te
   ({ key, text, ...rest }) => {
     const value = siteFigures[key];
     const atLeast = 'atLeast' in rest && rest.atLeast;
+    const approx = 'approx' in rest && rest.approx;
     // Chiffre manquant : texte « [à fournir] », affiché sans compteur ni unité.
     return value === undefined
       ? { key, value: page.missing, text, Icon: FIGURE_ICONS[key] }
-      : { key, value, unit: page.units[key], suffix: atLeast ? '+' : undefined, text, Icon: FIGURE_ICONS[key] };
+      : {
+          key,
+          value,
+          prefix: approx ? '≈' : undefined,
+          unit: page.units[key],
+          suffix: atLeast ? '+' : undefined,
+          text,
+          Icon: FIGURE_ICONS[key],
+        };
   },
 );
 

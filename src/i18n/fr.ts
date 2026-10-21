@@ -230,7 +230,14 @@ const fr = {
     field: 'Venir sur le terrain',
     statsLabel: '{name} en chiffres',
     /** Unités accolées aux chiffres (les autres chiffres n'en ont pas). */
-    units: { hectares: 'ha', years: 'ans' } as Partial<Record<string, string>>,
+    units: {
+      hectares: 'ha',
+      naturalForest: 'ha',
+      mangrove: 'ha',
+      conservationArea: 'ha',
+      reforested: 'ha',
+      years: 'ans',
+    } as Partial<Record<string, string>>,
     /** Texte des chiffres par défaut (site sans champ `figures`). */
     defaultFigures: [
       { key: 'hectares', text: 'protégés sur le site.' },
