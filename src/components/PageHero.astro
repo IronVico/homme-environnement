@@ -98,12 +98,15 @@ const {
 </div>
 
 <style>
-  /* Repère du motif ; il déborde à droite (coupé sans scroll horizontal) et vers le haut.
+  /* Repère du motif. Il est coupé au bord du hero : à droite (pas de scroll horizontal) et
+     en bas, sinon il passerait par-dessus la section suivante quand elle n'est pas
+     positionnée (Nos projets). En haut, rien de visible n'est perdu : le masque rend les
+     70 premiers px du motif transparents.
      isolation : le motif (z-index -1) passe sous tout le contenu du hero. */
   .page-hero-wrap {
     position: relative;
     isolation: isolate;
-    overflow-x: clip;
+    overflow: clip;
   }
 
   /* Motif en haut à droite, derrière la photo. Ancré sur le centre de la page (et non sur
