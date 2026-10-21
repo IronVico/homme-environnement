@@ -9,6 +9,7 @@
 import ArrowLeft from '@lucide/astro/icons/arrow-left';
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Calendar from '@lucide/astro/icons/calendar';
+import ExternalLink from '@lucide/astro/icons/external-link';
 import Leaf from '@lucide/astro/icons/leaf';
 import MapIcon from '@lucide/astro/icons/map';
 import MapPin from '@lucide/astro/icons/map-pin';
@@ -315,7 +316,17 @@ const breadcrumb = [
             data.partners?.length ? (
               <ul class="partners__list">
                 {data.partners.map((partner) => (
-                  <li class="partner">{partner}</li>
+                  <li>
+                    {partner.url ? (
+                      <a class="partner partner--link" href={partner.url} rel="noopener" target="_blank">
+                        {partner.name}
+                        <ExternalLink class="partner__icon" size={14} />
+                        <span class="visually-hidden"> {page.people.newTab}</span>
+                      </a>
+                    ) : (
+                      <span class="partner">{partner.name}</span>
+                    )}
+                  </li>
                 ))}
               </ul>
             ) : (
@@ -633,11 +644,44 @@ const breadcrumb = [
   }
 
   .partner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 10px 18px;
+    border: 1px solid var(--blanc);
     border-radius: var(--radius-pill);
     background: var(--blanc);
     font-size: var(--fs-body-sm);
     font-weight: 500;
+  }
+
+  /* Partenaire avec site : même survol que les boutons secondaires (fond vert clair, contour basalte). */
+  .partner--link {
+    color: var(--basalte);
+    text-decoration: none;
+    transition:
+      border-color var(--transition-ui),
+      transform var(--transition-ui);
+  }
+
+  .partner--link:hover {
+    color: var(--noir-95);
+    border-color: var(--basalte);
+    transform: translateY(var(--lift-button-hover));
+  }
+
+  .partner :global(.partner__icon) {
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner--link {
+      transition: none;
+    }
+
+    .partner--link:hover {
+      transform: none;
+    }
   }
 
   .cta__buttons {

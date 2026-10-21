@@ -105,14 +105,15 @@ groups:
     - { name: Manarapenitra, role: Huiles essentielles }
     - { name: Kanto, role: Artisanat }
     - { name: MERCIE Vohimana, role: Tourisme }
+# Partenaires : l'URL est facultative (sans URL, la pastille n'est pas un lien).
 partners:
-  - Rainforest Trust
-  - Pure Trade
-  - Caméléon Center Conservation
-  - Muséum national d'Histoire naturelle
-  - La Guilde
-  - Tam Tam Phyto Aroma
-  - Bourrelier Group
+  - { name: Rainforest Trust, url: "https://www.rainforesttrust.org/" }
+  - { name: Pure Trade } # URL à fournir
+  - { name: Caméléon Center Conservation } # URL à fournir
+  - { name: Muséum national d'Histoire naturelle, url: "https://www.mnhn.fr/fr" }
+  - { name: La Guilde, url: "https://la-guilde.org/" }
+  - { name: Tam Tam Phyto Aroma } # URL à fournir
+  - { name: Bourrelier Group, url: "https://www.bourrelier-group.com/" }
 cta:
   titleStrong: Visitez Vohimana,
   titleLight: votre séjour protège la forêt.

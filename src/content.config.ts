@@ -97,7 +97,8 @@ const sites = defineCollection({
           items: z.array(z.object({ name: z.string(), role: z.string() })).min(1),
         })
         .optional(),
-      partners: z.array(z.string()).optional(),
+      /** Partenaires du site ; `url` (facultative) fait de la pastille un lien vers leur site. */
+      partners: z.array(z.object({ name: z.string(), url: z.url().optional() })).optional(),
       /** Carte d'appel en bas de fiche (sinon, texte générique « Soutenir <site> »). */
       cta: z.object({ titleStrong: z.string(), titleLight: z.string(), text: z.string() }).optional(),
       /** Position du repère sur la carte du pays, en % (x : largeur, y : hauteur). */

@@ -267,6 +267,8 @@ const fr = {
       /** {name} : nom du site. */
       titleLight: 'vivre {name}',
       partners: 'Partenaires du site',
+      /** Lu par les lecteurs d'écran après le nom d'un partenaire avec lien. */
+      newTab: '(nouvel onglet)',
     },
     /** Carte d'appel par défaut (site sans champ `cta`). */
     cta: {
