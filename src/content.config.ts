@@ -27,7 +27,9 @@ const sites = defineCollection({
           type: z.enum(['animal', 'oiseau', 'poisson', 'plante']).default('animal'),
         }),
       ),
-      /** Ordre d'affichage dans la page pays. */
+      /** Position du repère sur la carte du pays, en % (x : largeur, y : hauteur). */
+      mapPosition: z.object({ x: z.number(), y: z.number() }),
+      /** Ordre d'affichage dans la page pays ; c'est aussi le numéro du repère. */
       order: z.number(),
     }),
 });

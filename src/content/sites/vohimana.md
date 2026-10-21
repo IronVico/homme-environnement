@@ -7,5 +7,7 @@ summary: "Le site historique de l'ONG, ouvert à la visite. Un sanctuaire écoto
 species:
   - { name: Indri indri, type: animal }
   - { name: Varecia variegata, type: animal }
+# Position du repère sur la carte du pays, en % de sa largeur (x) et de sa hauteur (y).
+mapPosition: { x: 70.72, y: 51.2 }
 order: 1
 ---

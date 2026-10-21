@@ -69,7 +69,9 @@ src/
 | `MadagascarPage`    | Page pays Madagascar commune aux deux langues ; sites et projets lus dans les collections, chiffres dans `data/chiffres.ts` |
 | `Breadcrumb`        | Fil d'Ariane des pages internes |
 | `PageHero`          | Hero des pages internes : H1 en deux temps, chapeau, bouton secondaire, photo en arche |
-| `SiteCard`          | Carte blanche d'un site : région, texte, espèces emblématiques (icône par type), chiffres clés |
+| `SitesExplorer`     | Carte du pays avec repères numérotés + liste des sites, liés (clic sur un repère, survol ou focus d'une carte) |
+| `MadagascarMap`     | Carte SVG de Madagascar (courbes de niveau, capitale, mers), libellés traduisibles |
+| `SiteCard`          | Carte compacte d'un site : numéro du repère, région, texte sur 3 lignes, chiffres clés, lien vers la fiche |
 | `ProjectCard`       | Carte compacte d'un projet et des sites où il est mené |
 | `PhotoBanner`       | Carte sur photo assombrie (titre + phrase) avec contenu libre : newsletter, boutons d'appel |
 | `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don ; sous-menus déroulants (accordéon dans le burger) ; fixé en haut au scroll ; burger en dessous de 1280px |

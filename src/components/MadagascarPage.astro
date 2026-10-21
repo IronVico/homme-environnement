@@ -17,7 +17,7 @@ import PageHero from './PageHero.astro';
 import PhotoBanner from './PhotoBanner.astro';
 import ProjectCard from './ProjectCard.astro';
 import SectionHeading from './SectionHeading.astro';
-import SiteCard from './SiteCard.astro';
+import SitesExplorer from './SitesExplorer.astro';
 import StatsBand from './StatsBand.astro';
 
 import heroMadagascar from '../assets/photos/pays-madagascar.jpg';
@@ -102,25 +102,23 @@ const breadcrumb = [
           light={page.sites.titleLight}
           lead={page.sites.lead}
         />
-        <div class="sites-grid">
-          {
-            sites.map((site) => (
-              <SiteCard
-                name={site.data.name}
-                region={site.data.region}
-                summary={site.data.summary}
-                image={site.data.photo}
-                imagePosition={site.data.photoPosition}
-                species={site.data.species}
-                speciesTitle={page.sites.speciesTitle}
-                figures={siteFigures(site.id)}
-                figuresMissing={page.sites.figuresMissing}
-                href="#"
-                linkLabel={page.sites.link}
-              />
-            ))
-          }
-        </div>
+        <SitesExplorer
+          map={page.sites.map}
+          sites={sites.map((site) => ({
+            id: site.id,
+            num: site.data.order,
+            name: site.data.name,
+            region: site.data.region,
+            summary: site.data.summary,
+            image: site.data.photo,
+            imagePosition: site.data.photoPosition,
+            mapPosition: site.data.mapPosition,
+            figures: siteFigures(site.id),
+            figuresMissing: page.sites.figuresMissing,
+            href: '#', // TODO fiches site
+            linkLabel: page.sites.link,
+          }))}
+        />
       </div>
     </section>
 
@@ -179,25 +177,6 @@ const breadcrumb = [
 
   .stack--40 {
     gap: 40px;
-  }
-
-  /* 3 colonnes ; 2 en tablette, 1 en mobile. */
-  .sites-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-6);
-  }
-
-  @media (max-width: 1000px) {
-    .sites-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 700px) {
-    .sites-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
   }
 
   .projects-grid {

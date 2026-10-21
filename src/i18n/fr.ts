@@ -187,13 +187,20 @@ const fr = {
       /** {count} : nombre de sites. */
       titleStrong: 'Nos {count} sites',
       titleLight: 'à Madagascar',
-      lead: 'Des forêts uniques au monde, protégées avec les communautés locales qui en vivent.',
-      speciesTitle: 'Espèces emblématiques',
+      lead: 'Des forêts uniques au monde, protégées avec les communautés locales qui en vivent. Choisissez un site sur la carte.',
       figuresMissing: '[Chiffres à fournir]',
       hectares: 'ha',
       years: 'ans',
       beneficiaries: 'bénéficiaires',
-      link: 'Voir la fiche du site',
+      link: 'Voir la fiche',
+      /** Libellés de la carte du pays. */
+      map: {
+        label: 'Carte des sites à Madagascar',
+        capital: 'Antananarivo',
+        channel: 'Canal du Mozambique',
+        ocean: 'Océan Indien',
+        north: 'N',
+      },
     },
     projects: {
       titleStrong: 'Nos projets',

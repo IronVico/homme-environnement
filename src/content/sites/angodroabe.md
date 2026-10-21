@@ -7,5 +7,7 @@ photo: ../../assets/photos/site-angodroabe.jpg
 summary: "[Texte à fournir : forêt voisine d'Ambalakalanoro, gérée par les communautés.]"
 species:
   - { name: "[À compléter]", type: animal }
+# Position du repère sur la carte du pays, en % de sa largeur (x) et de sa hauteur (y).
+mapPosition: { x: 53.17, y: 31.13 }
 order: 6
 ---
