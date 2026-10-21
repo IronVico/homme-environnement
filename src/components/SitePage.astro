@@ -188,16 +188,28 @@ const breadcrumb = [
         </div>
 
         <div class="locator" data-reveal>
-          <div class="locator__map" role="img" aria-label={withName(page.mapLabel)}>
+          <div class="locator__map" role="group" aria-label={withName(page.mapLabel)}>
             <MadagascarMap labels={madagascarMap} compact>
               {
+                // Autres sites : liens vers leur fiche, nom affiché au survol et au focus.
                 sites
                   .filter((other) => other.id !== site.id)
                   .map((other) => (
-                    <span
-                      class="locator__dot"
+                    <a
+                      class="locator__site"
+                      href={sitePath(lang, other.id)}
                       style={`left: ${other.data.mapPosition.x}%; top: ${other.data.mapPosition.y}%`}
-                    />
+                    >
+                      <span class="locator__dot" />
+                      <span
+                        class:list={[
+                          'locator__label locator__label--tip',
+                          `locator__label--${other.data.mapPosition.x > 50 ? 'left' : 'right'}`,
+                        ]}
+                      >
+                        {other.data.name}
+                      </span>
+                    </a>
                   ))
               }
               <span
@@ -508,19 +520,82 @@ const breadcrumb = [
     width: min(100%, 300px);
   }
 
-  .locator__dot,
   .locator__current {
     position: absolute;
     box-sizing: border-box;
     border-radius: var(--radius-pill);
   }
 
+  /* Autre site : zone cliquable de 44px centrée sur un point de 12px. */
+  .locator__site {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+    border-radius: var(--radius-pill);
+    color: var(--basalte);
+    text-decoration: none;
+  }
+
   .locator__dot {
+    box-sizing: border-box;
     width: 12px;
     height: 12px;
-    margin: -6px 0 0 -6px;
     border: 2px solid var(--basalte);
+    border-radius: var(--radius-pill);
     background: var(--blanc);
+    transition:
+      transform var(--transition-ui),
+      background-color var(--transition-ui);
+  }
+
+  .locator__site:hover .locator__dot,
+  .locator__site:focus-visible .locator__dot {
+    transform: scale(1.5);
+    background: var(--basalte);
+  }
+
+  .locator__site:focus-visible {
+    outline: none;
+  }
+
+  .locator__site:focus-visible .locator__dot {
+    outline: 2px solid var(--basalte);
+    outline-offset: 3px;
+  }
+
+  /* Nom du site, visible seulement au survol et au focus. */
+  .locator__label--tip {
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-ui);
+  }
+
+  .locator__site:hover .locator__label--tip,
+  .locator__site:focus-visible .locator__label--tip {
+    opacity: 1;
+  }
+
+  /* Repère : le point est au centre de la zone de 44px, l'étiquette s'en écarte de 20px. */
+  .locator__label--tip.locator__label--left {
+    transform: translate(calc(-100% - 16px), -50%);
+  }
+
+  .locator__label--tip.locator__label--right {
+    transform: translate(16px, -50%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .locator__dot,
+    .locator__label--tip {
+      transition: none;
+    }
   }
 
   .locator__current {
