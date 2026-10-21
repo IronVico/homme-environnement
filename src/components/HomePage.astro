@@ -93,12 +93,12 @@ const madagascarSites = (await getCollection('sites', ({ data }) => data.country
 
     <section class="section section--tinted" aria-labelledby="actions-titre">
       <div class="container stack">
-        <SectionHeading id="actions-titre" strong={home.actions.title} link={{ label: home.actions.link, href: '#' }} />
+        <SectionHeading id="actions-titre" strong={home.actions.title} link={{ label: home.actions.link, href: '#' }} /> {/* TODO page « Nos sites » */}
         <div class="countries">
           <CountryCard
             class="countries__main"
             name={home.actions.madagascar.name}
-            description={home.actions.madagascar.description}
+            description={home.actions.madagascar.description.replace('{count}', String(madagascarSites.length))}
             sites={madagascarSites}
             href={pagePath(lang, 'madagascar')}
             image={paysMadagascar}

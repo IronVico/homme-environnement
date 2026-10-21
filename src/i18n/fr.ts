@@ -102,10 +102,11 @@ const fr = {
     },
     actions: {
       title: 'Où nous agissons',
-      link: 'Toutes nos actions',
+      link: 'Tous nos sites',
       madagascar: {
         name: 'Madagascar',
-        description: "À l'origine de plusieurs zones protégées, d'une richesse exceptionnelle en espèces endémiques.",
+        /** {count} : nombre de sites (collection « sites »). */
+        description: "{count} sites protégés avec les communautés locales, d'une richesse exceptionnelle en espèces endémiques.",
       },
       burkina: {
         title: 'Burkina Faso',
