@@ -19,7 +19,6 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
 
 <footer class="footer">
   <ContourPattern variant="footer" />
-  <FooterStamp class="footer__stamp" />
   <div class="footer__inner container">
     <div class="footer__top">
       <div class="footer__brand">
@@ -67,6 +66,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     </div>
 
     <div class="footer__bottom">
+      <FooterStamp class="footer__stamp" />
       <p>{ui.copyright}</p>
       <ul class="footer__legal">
         {
@@ -85,29 +85,39 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
 </footer>
 
 <style>
-  /* Bande haute de 112px : place du motif et, en mobile, du tampon (maquette). */
+  /* Le motif et le tampon se posent dans le footer sans l'agrandir (maquette v119). */
   .footer {
     position: relative;
     overflow: hidden;
-    padding-top: 112px;
     background: var(--menthe);
     color: var(--basalte);
   }
 
-  /* Tampon en bas à droite, à la place choisie dans la maquette : sous la dernière
-     colonne de liens, au-dessus de la ligne du bas. Sous 1100px, les colonnes de liens
-     se réorganisent et viendraient sous le tampon : il remonte dans la bande haute, où
-     il ne recouvre jamais un lien (vérifié de 300 à 2560px). */
+  /* Tampon en bas à droite, juste au-dessus de la barre du bas (maquette v119), dans
+     l'espace libre sous la dernière colonne de liens. Repère : la barre du bas ; à 1440px,
+     47px du bord droit comme dans la maquette. Vérifié sans recouvrement de 300 à 2560px. */
   .footer :global(.footer__stamp) {
     position: absolute;
     z-index: 2;
-    top: 371px;
-    right: 47px;
+    right: calc(47px - var(--gutter));
+    bottom: calc(100% + 12px);
   }
 
-  @media (max-width: 1099px) {
+  /* Très petits écrans (< 340px) : tampon réduit, la dernière colonne est plus large. */
+  @media (max-width: 339px) {
     .footer :global(.footer__stamp) {
-      top: 16px;
+      width: 88px;
+      height: 88px;
+    }
+  }
+
+  /* Vers 970-990px, la colonne « Ressources » descend jusqu'à la barre du bas : tampon
+     réduit et plus bas, pour rester dans l'espace libre. */
+  @media (min-width: 960px) and (max-width: 999px) {
+    .footer :global(.footer__stamp) {
+      width: 104px;
+      height: 104px;
+      bottom: calc(100% + 4px);
     }
   }
 
@@ -116,9 +126,9 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 56px;
-    padding-top: 72px;
-    padding-bottom: var(--space-8);
+    gap: 40px;
+    padding-top: 56px;
+    padding-bottom: var(--space-7);
   }
 
   .footer__top {
@@ -219,6 +229,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
   }
 
   .footer__bottom {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
