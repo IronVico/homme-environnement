@@ -115,7 +115,7 @@ Rappels :
 - Chiffres clés : au premier passage dans l'écran (IntersectionObserver, une seule fois), compteur de 0 à la valeur, traits de l'anneau dans le sens horaire, barres qui poussent, pastilles une à une.
 - Logos partenaires : défilement continu en dessous de 900px.
 - Hero : le contour organique de la photo ondule (14 s) et l'isotype flotte (11 s), en boucle lente.
-- Courbes de niveau (`ContourPattern.astro`, hero des pages internes et footer) : chaque courbe « respire » (échelle 0,985 → 1,015, 18 s, aller-retour), décalée de 1,6 s de la suivante, comme une onde lente. Validée par Victor le 2026-10-21.
+- Courbes de niveau (`ContourPattern.astro`, hero des pages internes et footer) : chaque courbe « respire » (échelle 0,96 → 1,04 et rotation -1,5° → 1,5°, 10 s, aller-retour), décalée de 1,1 s de la suivante : les lignes glissent les unes par rapport aux autres, comme une onde lente. Validée par Victor le 2026-10-21.
 - Indication « Faire défiler » du hero : la flèche monte et descend doucement en boucle (1,8 s). Ces animations du hero et l'apparition au scroll sont des exceptions à la règle « pas d'autre animation décorative » du design system, à y reporter.
 - Avec `prefers-reduced-motion: reduce`, tout est désactivé (valeurs finales affichées, logos en défilement manuel).
 - **Sans JavaScript**, la page est complète : chiffres et illustrations affichés en entier, liens du menu visibles sous le logo en mobile.

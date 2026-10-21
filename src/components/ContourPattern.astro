@@ -68,13 +68,14 @@ const pattern = PATTERNS[variant];
     stroke-width: 1.3;
   }
 
-  /* Respiration : chaque courbe grossit d'environ 1,5 % puis revient, en décalé
-     de l'extérieur vers le centre, comme une onde lente. */
+  /* Respiration : chaque courbe grossit de 4 % et pivote de 1,5° puis revient (10 s),
+     décalée de la suivante : les lignes glissent les unes par rapport aux autres,
+     comme une onde lente. */
   .contours path {
     transform-box: view-box;
     transform-origin: 470px 330px; /* centre des courbes du hero (viewBox) */
-    animation: contours-breathe 18s ease-in-out infinite alternate;
-    animation-delay: calc(var(--i) * -1.6s);
+    animation: contours-breathe 10s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -1.1s);
   }
 
   .contours--footer path {
@@ -83,10 +84,10 @@ const pattern = PATTERNS[variant];
 
   @keyframes contours-breathe {
     from {
-      transform: scale(0.985);
+      transform: scale(0.96) rotate(-1.5deg);
     }
     to {
-      transform: scale(1.015);
+      transform: scale(1.04) rotate(1.5deg);
     }
   }
 
