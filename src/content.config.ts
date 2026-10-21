@@ -145,7 +145,16 @@ const sites = defineCollection({
       /** Site ouvert à la visite : affiche les boutons « Venir sur le terrain » de la fiche. */
       visitable: z.boolean().default(false),
       /** Carte d'appel en bas de fiche (sinon, texte générique « Soutenir <site> »). */
-      cta: z.object({ titleStrong: z.string(), titleLight: z.string(), text: z.string() }).optional(),
+      cta: z
+        .object({
+          titleStrong: z.string(),
+          titleLight: z.string(),
+          text: z.string(),
+          /** Photo de fond propre au site (sinon, la photo commune du gabarit). */
+          photo: image().optional(),
+          photoPosition: z.string().default('50% 45%'),
+        })
+        .optional(),
       /** Position du repère sur la carte du pays, en % (x : largeur, y : hauteur). */
       mapPosition: z.object({ x: z.number(), y: z.number() }),
       /** Ordre d'affichage dans la page pays ; c'est aussi le numéro du repère. */

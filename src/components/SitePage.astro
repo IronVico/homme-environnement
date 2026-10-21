@@ -393,8 +393,8 @@ const breadcrumb = [
       titleStrong={cta.titleStrong}
       titleLight={cta.titleLight}
       text={cta.text}
-      image={ctaPhoto}
-      imagePosition="50% 45%"
+      image={data.cta?.photo ?? ctaPhoto}
+      imagePosition={data.cta?.photoPosition ?? '50% 45%'}
       spaced
     >
       <div class="cta__buttons">

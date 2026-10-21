@@ -30,6 +30,10 @@ species:
     type: animal
     status: EN
     text: "La grenouille arlequin des Hautes Terres. Classée En danger depuis 2014, sans réévaluation : sa menace est sans doute sous-estimée."
+    # Photo de la présentation PDF de l'ONG : crédit à fournir.
+    photo: ../../assets/photos/especes/mantella-cowanii.jpg
+    photoAlt: Une grenouille arlequin noire et orange sur une roche mouillée
+    photoPosition: 50% 65%
 actionsLead: "Protéger la grenouille, en protégeant d'abord son habitat."
 actions:
   - icon: surveillance
@@ -53,6 +57,9 @@ cta:
   titleStrong: Soutenir Fohisokina,
   titleLight: c'est sauver l'une des grenouilles les plus rares au monde.
   text: "Votre don protège un habitat unique des Hautes Terres et soutient les habitants qui en sont les premiers gardiens."
+  # Photo de la présentation PDF de l'ONG : crédit à fournir.
+  photo: ../../assets/photos/cta-mantella-fohisokina.jpg
+  photoPosition: 70% 40%
 
 # Position du repère sur la carte du pays, en % de sa largeur (x) et de sa hauteur (y).
 mapPosition: { x: 53.81, y: 63.09 }
