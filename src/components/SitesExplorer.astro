@@ -10,6 +10,8 @@ import MadagascarMap from './MadagascarMap.astro';
 import SiteCard from './SiteCard.astro';
 
 type Site = Omit<ComponentProps<typeof SiteCard>, 'selected'> & {
+  /** Région, lue avec le numéro sur le repère (« 1. Vohimana, Centre-Est »). */
+  region: string;
   /** Position du repère, en % de la carte. */
   mapPosition: { x: number; y: number };
 };
@@ -49,7 +51,7 @@ const selectedId = sites[0]?.id;
   </div>
 
   <ol class="sites-explorer__list">
-    {sites.map(({ mapPosition: _, ...site }) => <SiteCard {...site} selected={site.id === selectedId} />)}
+    {sites.map(({ mapPosition: _, region: __, ...site }) => <SiteCard {...site} selected={site.id === selectedId} />)}
   </ol>
 </div>
 

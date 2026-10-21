@@ -191,8 +191,6 @@ const fr = {
       lead: 'Des forêts uniques au monde, protégées avec les communautés locales qui en vivent. Choisissez un site sur la carte.',
       figuresMissing: '[Chiffres à fournir]',
       hectares: 'ha',
-      years: 'ans',
-      beneficiaries: 'bénéficiaires',
       link: 'Voir la fiche',
       /** Libellés de la carte du pays. */
       map: {

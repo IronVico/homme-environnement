@@ -58,17 +58,10 @@ const stats = statValues.map((stat, i) => {
   return { ...stat, unit: text.unit, text: text.text, illustrationLabel: text.illustrationLabel };
 });
 
-// Chiffres de chaque site, formatés dans la langue de la page.
-const siteFigures = (id: string) => {
-  const figures = SITE_FIGURES[id];
-  if (!figures) return [];
-  const list: { kind: 'hectares' | 'years' | 'beneficiaries'; label: string }[] = [];
-  if (figures.hectares !== undefined)
-    list.push({ kind: 'hectares', label: `${formatNumber(figures.hectares)}${NBSP}${page.sites.hectares}` });
-  if (figures.years !== undefined) list.push({ kind: 'years', label: `${formatNumber(figures.years)}${NBSP}${page.sites.years}` });
-  if (figures.beneficiaries !== undefined)
-    list.push({ kind: 'beneficiaries', label: `${formatNumber(figures.beneficiaries)} ${page.sites.beneficiaries}` });
-  return list;
+// Surface protégée de chaque site, formatée dans la langue de la page (les autres chiffres iront sur les fiches).
+const siteHectares = (id: string) => {
+  const hectares = SITE_FIGURES[id]?.hectares;
+  return hectares === undefined ? undefined : `${formatNumber(hectares)}${NBSP}${page.sites.hectares}`;
 };
 
 const breadcrumb = [
@@ -113,8 +106,8 @@ const breadcrumb = [
             image: site.data.photo,
             imagePosition: site.data.photoPosition,
             mapPosition: site.data.mapPosition,
-            figures: siteFigures(site.id),
-            figuresMissing: page.sites.figuresMissing,
+            figure: siteHectares(site.id),
+            figureMissing: page.sites.figuresMissing,
             href: '#', // TODO fiches site
             linkLabel: page.sites.link,
           }))}
