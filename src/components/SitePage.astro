@@ -31,6 +31,7 @@ import PageHero from './PageHero.astro';
 import PhotoBanner from './PhotoBanner.astro';
 import SectionHeading from './SectionHeading.astro';
 import SpeciesCard from './SpeciesCard.astro';
+import StatCard from './StatCard.astro';
 
 import ctaPhoto from '../assets/photos/pilier-biodiversite-souimanga.jpg';
 
@@ -44,9 +45,6 @@ const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const page = dict.site;
 
-const NBSP = ' ';
-const numberLocale = lang === 'en' ? 'en-GB' : 'fr-FR';
-const formatNumber = (value: number) => value.toLocaleString(numberLocale).replace(/\s/g, NBSP);
 const fill = (text: string, values: Record<string, string>) =>
   text.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
 const withName = (text: string) => fill(text, { name: data.name, region: data.region });
@@ -89,12 +87,10 @@ const figureList = (data.figures ?? (page.defaultFigures as { key: FigureKey; te
   ({ key, text, ...rest }) => {
     const value = siteFigures[key];
     const atLeast = 'atLeast' in rest && rest.atLeast;
-    const unit = page.units[key];
-    const formatted =
-      value === undefined
-        ? page.missing
-        : `${formatNumber(value)}${atLeast ? '+' : ''}${unit ? NBSP + unit : ''}`;
-    return { key, value: formatted, text, Icon: FIGURE_ICONS[key] };
+    // Chiffre manquant : texte « [à fournir] », affiché sans compteur ni unité.
+    return value === undefined
+      ? { key, value: page.missing, text, Icon: FIGURE_ICONS[key] }
+      : { key, value, unit: page.units[key], suffix: atLeast ? '+' : undefined, text, Icon: FIGURE_ICONS[key] };
   },
 );
 
@@ -141,40 +137,34 @@ const breadcrumb = [
     />
 
     <section class="figures" aria-label={withName(page.statsLabel)}>
-      <ul class="figures__grid container">
+      <div class="figures__grid container">
         {
-          figureList.map(({ key, value, text, Icon }) => (
-            <li class="figure" data-reveal>
-              <span class="figure__icon">
-                {Icon ? (
-                  <Icon size={22} />
-                ) : (
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 14c-4 0-8 2-8 5h16c0-3-4-5-8-5Z" />
-                    <circle cx="8" cy="7" r="3" />
-                    <circle cx="16" cy="7" r="3" />
-                    <path d="M5 10c0 2 3 4 7 4s7-2 7-4" />
-                  </svg>
-                )}
-              </span>
-              <span class="figure__body">
-                <span class="figure__value" data-figure={key}>{value}</span>
-                <span class="figure__text">{text}</span>
-              </span>
-            </li>
+          figureList.map(({ key: _, Icon, ...stat }) => (
+            <StatCard {...stat}>
+              {Icon ? (
+                <Icon slot="icon" size={28} />
+              ) : (
+                <svg
+                  slot="icon"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 14c-4 0-8 2-8 5h16c0-3-4-5-8-5Z" />
+                  <circle cx="8" cy="7" r="3" />
+                  <circle cx="16" cy="7" r="3" />
+                  <path d="M5 10c0 2 3 4 7 4s7-2 7-4" />
+                </svg>
+              )}
+            </StatCard>
           ))
         }
-      </ul>
+      </div>
     </section>
 
     <section class="section" aria-labelledby="histoire-titre">
@@ -383,6 +373,11 @@ const breadcrumb = [
   <Footer />
 </BaseLayout>
 
+<script>
+  import { initStats } from '../scripts/stats';
+  initStats();
+</script>
+
 <style>
   .section--tinted {
     background: var(--vert-clair);
@@ -435,59 +430,16 @@ const breadcrumb = [
     list-style: none;
   }
 
-  /* Bande sauge des chiffres : cartes blanches, pastille d'icône menthe. */
+  /* Bande sauge des chiffres : cartes chiffre, variante icône (StatCard). */
   .figures {
     background: var(--sauge);
   }
 
   .figures__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
-    gap: 16px;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: var(--space-5);
     padding-block: clamp(40px, 5vw, 56px);
-    list-style: none;
-  }
-
-  .figure {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 22px 24px;
-    border: 1px solid var(--bordure-douce);
-    border-radius: var(--radius-card);
-    background: var(--blanc);
-    box-shadow: var(--shadow-card);
-  }
-
-  .figure__icon {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-pill);
-    background: var(--menthe);
-  }
-
-  .figure__body {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .figure__value {
-    font-size: 30px;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: var(--ls-stat);
-  }
-
-  .figure__text {
-    font-size: 14px;
-    line-height: 1.45;
   }
 
   /* Histoire du site. */

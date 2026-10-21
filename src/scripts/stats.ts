@@ -7,8 +7,8 @@
 const DURATION = 1400;
 const NBSP = '\u00a0';
 
-const format = (value: number, unit: string | undefined, locale = 'fr-FR', prefix?: string) =>
-  (prefix ? prefix + NBSP : '') + value.toLocaleString(locale).replace(/\s/g, NBSP) + (unit ? NBSP + unit : '');
+const format = (value: number, unit: string | undefined, locale = 'fr-FR', prefix?: string, suffix = '') =>
+  (prefix ? prefix + NBSP : '') + value.toLocaleString(locale).replace(/\s/g, NBSP) + suffix + (unit ? NBSP + unit : '');
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
@@ -20,7 +20,7 @@ function countUp(el: HTMLElement) {
   const start = performance.now();
   const tick = (now: number) => {
     const progress = Math.min((now - start) / DURATION, 1);
-    el.textContent = format(Math.round(target * easeOutCubic(progress)), unit, el.dataset.locale, el.dataset.prefix);
+    el.textContent = format(Math.round(target * easeOutCubic(progress)), unit, el.dataset.locale, el.dataset.prefix, el.dataset.suffix);
     if (progress < 1) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -51,7 +51,7 @@ export function initStats() {
 
   cards.forEach((card) => {
     const value = card.querySelector<HTMLElement>('[data-count-to]');
-    if (value) value.textContent = format(0, value.dataset.unit, value.dataset.locale, value.dataset.prefix);
+    if (value) value.textContent = format(0, value.dataset.unit, value.dataset.locale, value.dataset.prefix, value.dataset.suffix);
     observer.observe(card);
   });
 }
