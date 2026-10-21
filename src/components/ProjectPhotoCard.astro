@@ -1,0 +1,185 @@
+---
+/**
+ * Carte d'un projet avec photo (page « Nos projets ») : pastilles thème et pays,
+ * titre, texte court, pied avec les sites et une flèche. Toute la carte est un lien.
+ * Les attributs data-theme et data-countries servent au filtre de la page.
+ */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import MapPin from '@lucide/astro/icons/map-pin';
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+
+interface Props {
+  id: string;
+  title: string;
+  summary: string;
+  theme: string;
+  themeLabel: string;
+  countries: string[];
+  countriesLabel: string;
+  sites: string[];
+  /** Préfixe lu par les lecteurs d'écran devant la liste des sites (« Sites : »). */
+  sitesLabel: string;
+  image: ImageMetadata;
+  imagePosition?: string;
+  href: string;
+}
+
+const {
+  id,
+  title,
+  summary,
+  theme,
+  themeLabel,
+  countries,
+  countriesLabel,
+  sites,
+  sitesLabel,
+  image,
+  imagePosition = '50% 50%',
+  href,
+} = Astro.props;
+---
+
+<li class="project-tile" id={`projet-${id}`} data-theme={theme} data-countries={countries.join(' ')} data-reveal>
+  <a class="project-tile__link card-lift" href={href}>
+    <Picture
+      class="project-tile__photo"
+      src={image}
+      alt=""
+      style={`object-position: ${imagePosition}`}
+      formats={['avif', 'webp']}
+      widths={[320, 520, 760]}
+      sizes="(max-width: 700px) 100vw, 420px"
+    />
+    <span class="project-tile__body">
+      <span class="project-tile__tags">
+        <span class="project-tile__tag project-tile__tag--theme">{themeLabel}</span>
+        <span class="project-tile__tag">{countriesLabel}</span>
+      </span>
+      <span class="project-tile__title">{title}</span>
+      <span class="project-tile__text">{summary}</span>
+      <span class="project-tile__foot">
+        <span class="project-tile__sites">
+          <MapPin class="project-tile__pin" size={16} />
+          <span><span class="visually-hidden">{sitesLabel} : </span>{sites.join(', ')}</span>
+        </span>
+        <ArrowRight class="project-tile__arrow" size={18} />
+      </span>
+    </span>
+  </a>
+</li>
+
+<style>
+  .project-tile {
+    display: flex;
+  }
+
+  .project-tile[hidden] {
+    display: none;
+  }
+
+  .project-tile__link {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--blanc);
+    color: var(--basalte);
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-lg);
+    box-shadow: var(--shadow-card);
+    text-decoration: none;
+  }
+
+  .project-tile__link:hover {
+    color: var(--basalte);
+  }
+
+  .project-tile :global(.project-tile__photo) {
+    display: block;
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+  }
+
+  .project-tile__body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 22px 22px;
+  }
+
+  .project-tile__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .project-tile__tag {
+    padding: 4px 12px;
+    border: 1px solid var(--vert-clair);
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+  }
+
+  .project-tile__tag--theme {
+    background: var(--vert-clair);
+    font-weight: 600;
+  }
+
+  .project-tile__title {
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .project-tile__text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .project-tile__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--bordure-douce);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .project-tile__sites {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  /* Icône décorative : la sauge est permise hors texte. */
+  .project-tile :global(.project-tile__pin) {
+    flex-shrink: 0;
+    color: var(--sauge);
+  }
+
+  .project-tile :global(.project-tile__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .project-tile__link:hover :global(.project-tile__arrow),
+  .project-tile__link:focus-visible :global(.project-tile__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-tile__link:hover :global(.project-tile__arrow),
+    .project-tile__link:focus-visible :global(.project-tile__arrow) {
+      transform: none;
+    }
+  }
+</style>

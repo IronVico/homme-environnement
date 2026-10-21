@@ -60,16 +60,18 @@ const {
       <span class="page-hero__light">{titleLight}</span>
     </h1>
     <p class="page-hero__lead" data-reveal>{lead}</p>
-    <div class="page-hero__ctas" data-reveal>
-      {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
-      {
-        cta && (
-          <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
-            {cta.label}
-          </Button>
-        )
-      }
-    </div>
+    {
+      (donate || cta) && (
+        <div class="page-hero__ctas" data-reveal>
+          {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
+          {cta && (
+            <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
+              {cta.label}
+            </Button>
+          )}
+        </div>
+      )
+    }
   </div>
 
   <figure class="page-hero__figure" data-reveal>

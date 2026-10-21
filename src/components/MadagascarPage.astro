@@ -6,7 +6,7 @@
  */
 import { getCollection } from 'astro:content';
 import { MADAGASCAR, SITE_FIGURES } from '../data/chiffres';
-import { DON_URL, sitePath } from '../data/navigation';
+import { DON_URL, projectPath, sitePath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from './Breadcrumb.astro';
@@ -37,7 +37,8 @@ const sites = (await getCollection('sites', ({ data }) => data.country === 'mada
 );
 const siteNames = new Map(sites.map((site) => [site.id, site.data.name]));
 
-const projects = (await getCollection('projets', ({ data }) => data.country === 'madagascar')).sort(
+// Projets menés à Madagascar ; leurs cartes ne citent que les sites malgaches.
+const projects = (await getCollection('projets', ({ data }) => data.countries.includes('madagascar'))).sort(
   (a, b) => a.data.order - b.data.order,
 );
 
@@ -128,9 +129,9 @@ const breadcrumb = [
             projects.map((project) => (
               <ProjectCard
                 title={project.data.title}
-                sites={project.data.sites.map((ref) => siteNames.get(ref.id) ?? ref.id)}
+                sites={project.data.sites.flatMap((ref) => siteNames.get(ref.id) ?? [])}
                 sitesLabel={page.projects.sitesLabel}
-                href="#"
+                href={projectPath(lang, project.id)}
               />
             ))
           }

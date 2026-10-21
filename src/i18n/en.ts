@@ -60,6 +60,9 @@ const en: Dictionary = {
 
   // TODO traduction : fiches site encore en français (copie de fr.ts).
   site: structuredClone(fr.site),
+
+  // TODO traduction : page « Nos projets » encore en français (copie de fr.ts).
+  projets: structuredClone(fr.projets),
 };
 
 export default en;
