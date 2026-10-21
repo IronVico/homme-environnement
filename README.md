@@ -47,8 +47,8 @@ src/
   pages/
     index.astro       accueil en français (/)
     en/index.astro    accueil en anglais (/en/)
-    actions/madagascar.astro     page pays Madagascar (/actions/madagascar)
-    en/actions/madagascar.astro  page pays en anglais (/en/actions/madagascar)
+    sites/madagascar.astro     page pays Madagascar (/sites/madagascar)
+    en/sites/madagascar.astro  page pays en anglais (/en/sites/madagascar)
   content/sites/      un fichier Markdown par site (nom, pays, région, photo, résumé, espèces)
   content/projets.json  projets, reliés aux sites où ils sont menés
   content.config.ts   schémas des collections « sites » et « projets »

@@ -22,10 +22,10 @@ export interface NavColumn {
 
 /** Chemins des pages existantes, sans préfixe de langue (voir pagePath). */
 export const PAGES = {
-  madagascar: 'actions/madagascar',
+  madagascar: 'sites/madagascar',
 } as const;
 
-/** URL d'une page dans une langue : « actions/madagascar » → « /en/actions/madagascar ». */
+/** URL d'une page dans une langue : « sites/madagascar » → « /en/sites/madagascar ». */
 export function pagePath(lang: Lang, page: keyof typeof PAGES): string {
   return localeUrl(lang, PAGES[page]);
 }

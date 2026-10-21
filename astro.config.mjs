@@ -8,6 +8,11 @@ export default defineConfig({
   output: 'static',
   devToolbar: { enabled: false },
   // Français par défaut à la racine, anglais sous /en/.
+  // Anciennes URL de la page Madagascar (rubrique « Nos actions » renommée « Nos sites »).
+  redirects: {
+    '/actions/madagascar': '/sites/madagascar',
+    '/en/actions/madagascar': '/en/sites/madagascar',
+  },
   i18n: {
     defaultLocale: 'fr',
     locales: ['fr', 'en'],
