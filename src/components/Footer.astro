@@ -4,6 +4,8 @@ import logoFr from '../assets/logos/logo-couleur.svg';
 import { DON_URL, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
 import { getLang, localeUrl, pathWithoutLocale, t } from '../i18n';
 import Button from './Button.astro';
+import ContourPattern from './ContourPattern.astro';
+import FooterStamp from './FooterStamp.astro';
 
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
@@ -16,6 +18,8 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
 ---
 
 <footer class="footer">
+  <ContourPattern variant="footer" />
+  <FooterStamp class="footer__stamp" />
   <div class="footer__inner container">
     <div class="footer__top">
       <div class="footer__brand">
@@ -81,12 +85,35 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
 </footer>
 
 <style>
+  /* Bande haute de 112px : place du motif et, en mobile, du tampon (maquette). */
   .footer {
+    position: relative;
+    overflow: hidden;
+    padding-top: 112px;
     background: var(--menthe);
     color: var(--basalte);
   }
 
+  /* Tampon en bas à droite, à la place choisie dans la maquette : sous la dernière
+     colonne de liens, au-dessus de la ligne du bas. Sous 1100px, les colonnes de liens
+     se réorganisent et viendraient sous le tampon : il remonte dans la bande haute, où
+     il ne recouvre jamais un lien (vérifié de 300 à 2560px). */
+  .footer :global(.footer__stamp) {
+    position: absolute;
+    z-index: 2;
+    top: 371px;
+    right: 47px;
+  }
+
+  @media (max-width: 1099px) {
+    .footer :global(.footer__stamp) {
+      top: 16px;
+    }
+  }
+
   .footer__inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: 56px;

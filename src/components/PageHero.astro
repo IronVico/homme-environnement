@@ -4,11 +4,13 @@
  * un bouton secondaire, photo en arche à droite. Plus compact que le hero de l'accueil.
  * Fiche site (`portrait`) : pastille de lieu, bouton Don avant le bouton secondaire,
  * photo verticale plus large avec sa légende.
+ * Le motif « courbes de niveau » passe derrière la photo, ancré en haut à droite.
  */
 import MapPin from '@lucide/astro/icons/map-pin';
 import type { ImageMetadata } from 'astro';
 import { Picture } from 'astro:assets';
 import Button from './Button.astro';
+import ContourPattern from './ContourPattern.astro';
 
 interface Props {
   titleStrong: string;
@@ -45,52 +47,74 @@ const {
 } = Astro.props;
 ---
 
-<section class:list={['page-hero container', { 'page-hero--portrait': portrait }]}>
-  <div class="page-hero__text">
-    {
-      badge && (
-        <p class="page-hero__badge" data-reveal>
-          <MapPin size={16} />
-          {badge}
-        </p>
-      )
-    }
-    <h1 class="page-hero__title" data-reveal>
-      <span class="page-hero__strong">{titleStrong}</span><br />
-      <span class="page-hero__light">{titleLight}</span>
-    </h1>
-    <p class="page-hero__lead" data-reveal>{lead}</p>
-    {
-      (donate || cta) && (
-        <div class="page-hero__ctas" data-reveal>
-          {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
-          {cta && (
-            <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
-              {cta.label}
-            </Button>
-          )}
-        </div>
-      )
-    }
-  </div>
+<div class="page-hero-wrap">
+  <section class:list={['page-hero container', { 'page-hero--portrait': portrait }]}>
+    <div class="page-hero__text">
+      {
+        badge && (
+          <p class="page-hero__badge" data-reveal>
+            <MapPin size={16} />
+            {badge}
+          </p>
+        )
+      }
+      <h1 class="page-hero__title" data-reveal>
+        <span class="page-hero__strong">{titleStrong}</span><br />
+        <span class="page-hero__light">{titleLight}</span>
+      </h1>
+      <p class="page-hero__lead" data-reveal>{lead}</p>
+      {
+        (donate || cta) && (
+          <div class="page-hero__ctas" data-reveal>
+            {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
+            {cta && (
+              <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
+                {cta.label}
+              </Button>
+            )}
+          </div>
+        )
+      }
+    </div>
 
-  <figure class="page-hero__figure" data-reveal>
-    <Picture
-      class="page-hero__photo"
-      src={image}
-      alt={imageAlt}
-      style={`object-position: ${imagePosition}`}
-      formats={['avif', 'webp']}
-      widths={[420, 640, 900, 1260]}
-      sizes={portrait ? '(max-width: 1100px) 100vw, 460px' : '(max-width: 1100px) 100vw, 420px'}
-      loading="eager"
-      fetchpriority="high"
-    />
-    {caption && <figcaption class="page-hero__caption">{caption}</figcaption>}
-  </figure>
-</section>
+    <!-- Pas de data-reveal sur la figure : son animation (transform) déplacerait le repère du motif. -->
+    <figure class="page-hero__figure">
+      <ContourPattern variant="hero" class="page-hero__contours" />
+      <Picture
+        data-reveal
+        class="page-hero__photo"
+        src={image}
+        alt={imageAlt}
+        style={`object-position: ${imagePosition}`}
+        formats={['avif', 'webp']}
+        widths={[420, 640, 900, 1260]}
+        sizes={portrait ? '(max-width: 1100px) 100vw, 460px' : '(max-width: 1100px) 100vw, 420px'}
+        loading="eager"
+        fetchpriority="high"
+      />
+      {caption && <figcaption class="page-hero__caption" data-reveal>{caption}</figcaption>}
+    </figure>
+  </section>
+</div>
 
 <style>
+  /* Repère du motif ; il déborde à droite (coupé sans scroll horizontal) et vers le haut.
+     isolation : le motif (z-index -1) passe sous tout le contenu du hero. */
+  .page-hero-wrap {
+    position: relative;
+    isolation: isolate;
+    overflow-x: clip;
+  }
+
+  /* Motif en haut à droite, derrière la photo. Ancré sur le centre de la page (et non sur
+     le bord droit) pour rester à droite de la colonne de texte à toutes les largeurs :
+     il ne passe jamais derrière le texte. À 1440px, même place que la maquette (±35px). */
+  .page-hero :global(.page-hero__contours) {
+    z-index: -1;
+    left: calc(50% + 60px);
+    right: auto;
+  }
+
   .page-hero {
     display: flex;
     align-items: center;
@@ -191,6 +215,14 @@ const {
 
     .page-hero__figure {
       flex: none;
+      position: relative;
+    }
+
+    /* Empilé : le motif passe derrière la photo, sous le texte et les boutons. */
+    .page-hero :global(.page-hero__contours) {
+      top: -60px;
+      left: auto;
+      right: -220px;
     }
   }
 
