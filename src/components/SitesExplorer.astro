@@ -1,8 +1,9 @@
 ---
 /**
  * Carte du pays avec un repère numéroté par site, et la liste des sites à côté.
- * Repère et carte de site sont liés : cliquer un repère, survoler ou parcourir
- * au clavier une carte de site met ce site en avant des deux côtés.
+ * Repère et carte de site sont liés : survoler ou parcourir au clavier un repère
+ * ou une carte de site met ce site en avant des deux côtés. Repère et carte
+ * mènent tous deux à la fiche du site.
  * Sans JS : le premier site est mis en avant, la liste reste complète.
  */
 import type { ComponentProps } from 'astro/types';
@@ -31,19 +32,18 @@ const selectedId = sites[0]?.id;
       <MadagascarMap labels={map}>
         {
           sites.map((site) => (
-            <button
-              type="button"
+            <a
               class="sites-explorer__pin"
+              href={site.href}
               style={`left: ${site.mapPosition.x}%; top: ${site.mapPosition.y}%`}
-              aria-label={`${site.num}. ${site.name}, ${site.region}`}
-              aria-pressed={site.id === selectedId ? 'true' : 'false'}
-              aria-controls={`site-${site.id}`}
+              aria-label={`${site.num}. ${site.name}, ${site.region} : ${site.linkLabel.toLowerCase()}`}
               data-pin={site.id}
+              data-selected={site.id === selectedId ? '' : undefined}
             >
               <span class="sites-explorer__drop">
                 <span class="sites-explorer__num">{site.num}</span>
               </span>
-            </button>
+            </a>
           ))
         }
       </MadagascarMap>
@@ -57,25 +57,18 @@ const selectedId = sites[0]?.id;
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-sites-explorer]').forEach((root) => {
-    const pins = [...root.querySelectorAll<HTMLButtonElement>('[data-pin]')];
+    const pins = [...root.querySelectorAll<HTMLElement>('[data-pin]')];
     const cards = [...root.querySelectorAll<HTMLElement>('[data-site]')];
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const select = (id: string) => {
-      pins.forEach((pin) => pin.setAttribute('aria-pressed', String(pin.dataset.pin === id)));
+      pins.forEach((pin) => pin.toggleAttribute('data-selected', pin.dataset.pin === id));
       cards.forEach((card) => card.toggleAttribute('data-selected', card.dataset.site === id));
     };
 
     pins.forEach((pin) => {
-      pin.addEventListener('click', () => {
-        const id = pin.dataset.pin;
-        if (!id) return;
-        select(id);
-        // Mobile (carte au-dessus de la liste) : on amène la carte du site à l'écran.
-        root
-          .querySelector(`[data-site="${id}"]`)
-          ?.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-      });
+      const pick = () => pin.dataset.pin && select(pin.dataset.pin);
+      pin.addEventListener('mouseenter', pick);
+      pin.addEventListener('focus', pick);
     });
 
     cards.forEach((card) => {
@@ -154,7 +147,7 @@ const selectedId = sites[0]?.id;
     filter: drop-shadow(0 3px 4px rgba(35, 31, 32, 0.25));
   }
 
-  .sites-explorer__pin[aria-pressed='true'] {
+  .sites-explorer__pin[data-selected] {
     z-index: 3;
   }
 
@@ -186,14 +179,14 @@ const selectedId = sites[0]?.id;
     background: var(--vert-clair);
   }
 
-  .sites-explorer__pin[aria-pressed='true'] .sites-explorer__drop {
+  .sites-explorer__pin[data-selected] .sites-explorer__drop {
     width: 36px;
     height: 36px;
     border: 3px solid var(--blanc);
     background: var(--basalte);
   }
 
-  .sites-explorer__pin[aria-pressed='true'] .sites-explorer__num {
+  .sites-explorer__pin[data-selected] .sites-explorer__num {
     font-size: 14px;
     color: var(--blanc);
   }

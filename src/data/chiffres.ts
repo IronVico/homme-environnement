@@ -2,8 +2,10 @@
  * Chiffres de Madagascar et de ses sites, réunis ici pour être changés en un seul endroit.
  *
  * NON DÉFINITIFS : Paul doit trancher entre le rapport 2025 et les chiffres des sites
- * existants. Un chiffre absent n'est pas affiché ; `null` pour un site affiche
- * « [Chiffres à fournir] ».
+ * existants. Un chiffre absent n'est pas affiché sur la page pays et s'affiche
+ * « [à fournir] » sur la fiche du site ; `null` pour un site affiche « [Chiffres à fournir] »
+ * sur la page pays. Les chiffres affichés sur une fiche sont choisis dans le
+ * frontmatter du site (champ `figures`).
  */
 
 export interface SiteFigures {
@@ -13,6 +15,12 @@ export interface SiteFigures {
   years?: number;
   /** Bénéficiaires directs. */
   beneficiaries?: number;
+  /** Espèces de lémuriens présentes sur le site. */
+  lemurSpecies?: number;
+  /** Espèces de grenouilles. */
+  frogSpecies?: number;
+  /** Plantes médicinales recensées. */
+  medicinalPlants?: number;
 }
 
 export const MADAGASCAR = {
@@ -28,7 +36,7 @@ export const MADAGASCAR = {
 
 /** Par site, clé = nom du fichier dans src/content/sites. */
 export const SITE_FIGURES: Record<string, SiteFigures | null> = {
-  vohimana: { hectares: 2200, years: 30, beneficiaries: 1400 },
+  vohimana: { hectares: 2200, years: 30, beneficiaries: 1400, lemurSpecies: 12, frogSpecies: 70, medicinalPlants: 160 },
   ambalakalanoro: { hectares: 1600, years: 12, beneficiaries: 850 },
   'mont-passot': { hectares: 900, years: 10, beneficiaries: 600 },
   fohisokina: { hectares: 70 },

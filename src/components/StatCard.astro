@@ -11,23 +11,29 @@ interface Props {
   prefix?: string;
   /** Unité accolée au chiffre : « ans », « ha »… */
   unit?: string;
+  /** Signe accolé après le chiffre, sans espace : « + » pour un minimum (« 70+ »). */
+  suffix?: string;
   text: string;
   /**
+   * Variante icône (fiches site) : sans illustration, l'icône passée dans le slot
+   * « icon » (Lucide, 28px) s'affiche dans un disque menthe de 64px.
+   *
    * ring : 30 traits (années). bars : barres croissantes. dots : pastilles (1 = 1 000 ha).
    * sites : 5 pastilles en cercle (un par site). share : anneau rempli à value %. families : deux silhouettes.
    */
-  illustration: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families';
-  illustrationLabel: string;
+  illustration?: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families';
+  /** Nom de l'illustration pour les lecteurs d'écran (l'icône de la variante est décorative). */
+  illustrationLabel?: string;
   /** share : part de l'anneau remplie, entre 0 et 1 (par défaut value / 100). */
   ratio?: number;
 }
 
-const { value, prefix, unit, text, illustration, illustrationLabel, ratio } = Astro.props;
+const { value, prefix, unit, suffix, text, illustration, illustrationLabel, ratio } = Astro.props;
 
 const NBSP = '\u00a0';
 const numberLocale = getLang(Astro.currentLocale) === 'en' ? 'en-GB' : 'fr-FR';
 const number = typeof value === 'number' ? value.toLocaleString(numberLocale).replace(/\s/g, NBSP) : value;
-const formatted = (prefix ? prefix + NBSP : '') + number + (unit ? NBSP + unit : '');
+const formatted = (prefix ? prefix + NBSP : '') + number + (suffix ?? '') + (unit ? NBSP + unit : '');
 
 // Anneau : 30 traits, un par année depuis 1993, dans le sens horaire depuis midi.
 const ringTicks = Array.from({ length: 30 }, (_, i) => {
@@ -74,7 +80,14 @@ const dots = [
 ---
 
 <div class="stat-card" data-stat data-reveal>
-  <svg class="stat-card__illu" viewBox="0 0 100 100" role="img" aria-label={illustrationLabel}>
+  {
+    !illustration && (
+      <span class="stat-card__icon" aria-hidden="true">
+        <slot name="icon" />
+      </span>
+    )
+  }
+  {illustration && <svg class="stat-card__illu" viewBox="0 0 100 100" role="img" aria-label={illustrationLabel}>
     {
       illustration === 'ring' && (
         <>
@@ -149,13 +162,14 @@ const dots = [
         </>
       )
     }
-  </svg>
+  </svg>}
   <div class="stat-card__body">
     <span
       class="stat-card__value"
       data-count-to={typeof value === 'number' ? value : undefined}
       data-prefix={prefix}
       data-unit={unit}
+      data-suffix={suffix}
       data-locale={numberLocale}>{formatted}</span
     >
     <p class="stat-card__text">{text}</p>
@@ -180,6 +194,19 @@ const dots = [
     height: 96px;
   }
 
+  /* Variante icône : disque menthe de 64px, icône basalte de 28px. */
+  .stat-card__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-pill);
+    background: var(--menthe);
+    color: var(--basalte);
+  }
+
   /*
    * Cartes non cliquables : pas d'élévation (qui suggérerait un clic),
    * seulement l'illustration qui grossit légèrement, avec un petit rebond.
@@ -188,12 +215,18 @@ const dots = [
     transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  .stat-card:hover .stat-card__illu {
+  .stat-card__icon {
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .stat-card:hover .stat-card__illu,
+  .stat-card:hover .stat-card__icon {
     transform: scale(1.08);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .stat-card:hover .stat-card__illu {
+    .stat-card:hover .stat-card__illu,
+    .stat-card:hover .stat-card__icon {
       transform: none;
     }
   }

@@ -1,0 +1,169 @@
+---
+/**
+ * Carte d'une espèce sur la fiche site, au gabarit des cartes de site : photo en
+ * haut, nom scientifique, statut UICN, texte, crédit de la photo en légende.
+ * Photos sous licence libre (Wikimedia Commons) : auteur, licence et source restent affichés.
+ */
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+
+interface Props {
+  name: string;
+  /** Statut déjà formulé (« En danger critique · UICN CR ») ; `threatened` : pastille basalte. */
+  status?: { label: string; threatened: boolean };
+  text: string;
+  photo?: ImageMetadata;
+  photoAlt?: string;
+  photoPosition?: string;
+  /** Texte à la place de la photo quand elle manque. */
+  photoMissing: string;
+  credit?: { author: string; license: string; licenseUrl: string; source: string };
+  sourceLabel: string;
+}
+
+const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', photoMissing, credit, sourceLabel } =
+  Astro.props;
+---
+
+<li class="species-card" data-reveal>
+  <div class="species-card__media">
+    {
+      photo ? (
+        <Picture
+          class="species-card__photo"
+          src={photo}
+          alt={photoAlt}
+          style={`object-position: ${photoPosition}`}
+          formats={['avif', 'webp']}
+          widths={[320, 520, 760]}
+          sizes="(max-width: 700px) 100vw, 320px"
+        />
+      ) : (
+        <span class="species-card__photo species-card__photo--missing">{photoMissing}</span>
+      )
+    }
+  </div>
+  <div class="species-card__body">
+    <h3 class="species-card__name" lang="la">{name}</h3>
+    {
+      status && (
+        <span class:list={['species-card__status', { 'species-card__status--threatened': status.threatened }]}>
+          {status.label}
+        </span>
+      )
+    }
+    <p class="species-card__text">{text}</p>
+    {
+      credit && (
+        <p class="species-card__credit">
+          © {credit.author},{' '}
+          <a href={credit.licenseUrl} rel="license noopener" target="_blank">
+            {credit.license}
+          </a>
+          ,{' '}
+          <a href={credit.source} rel="noopener" target="_blank">
+            {sourceLabel}
+          </a>
+        </p>
+      )
+    }
+  </div>
+</li>
+
+<style>
+  .species-card {
+    overflow: hidden;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-lg);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Cadre de la photo : coupe la photo agrandie au survol. */
+  .species-card__media {
+    overflow: hidden;
+  }
+
+  .species-card :global(.species-card__photo) {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 400ms ease-out;
+  }
+
+  /*
+   * Survol : la photo se rapproche légèrement dans son cadre. Pas d'élévation de
+   * la carte, réservée aux cartes cliquables (celle-ci n'est pas un lien).
+   */
+  .species-card:hover :global(.species-card__photo) {
+    transform: scale(1.05);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .species-card :global(.species-card__photo) {
+      transition: none;
+    }
+
+    .species-card:hover :global(.species-card__photo) {
+      transform: none;
+    }
+  }
+
+  .species-card__photo--missing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--vert-clair);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .species-card__body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 24px 24px;
+  }
+
+  .species-card__name {
+    font-size: 20px;
+    font-weight: 700;
+    font-style: italic;
+  }
+
+  .species-card__status {
+    align-self: flex-start;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--vert-clair);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .species-card__status--threatened {
+    background: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .species-card__text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  /* Légende ardoise : la carte est blanche. */
+  .species-card__credit {
+    margin-top: auto;
+    padding-top: 4px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--ardoise);
+  }
+
+  .species-card__credit a,
+  .species-card__credit a:hover {
+    color: var(--ardoise);
+  }
+</style>

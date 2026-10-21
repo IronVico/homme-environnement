@@ -1,0 +1,875 @@
+---
+/**
+ * Fiche d'un site de Madagascar, commune aux deux langues et à tous les sites
+ * (/sites/madagascar/<site> et /en/sites/madagascar/<site>). Contenu du site dans
+ * son fichier src/content/sites/<site>.md, chiffres dans src/data/chiffres.ts,
+ * textes du gabarit dans src/i18n (clé `site`).
+ * Un champ absent du site s'affiche « [à fournir] » et la page n'est pas indexée.
+ */
+import ArrowLeft from '@lucide/astro/icons/arrow-left';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Backpack from '@lucide/astro/icons/backpack';
+import Droplets from '@lucide/astro/icons/droplets';
+import GraduationCap from '@lucide/astro/icons/graduation-cap';
+import HandHeart from '@lucide/astro/icons/hand-heart';
+import Scissors from '@lucide/astro/icons/scissors';
+import UsersRound from '@lucide/astro/icons/users-round';
+import Calendar from '@lucide/astro/icons/calendar';
+import ExternalLink from '@lucide/astro/icons/external-link';
+import Leaf from '@lucide/astro/icons/leaf';
+import MapIcon from '@lucide/astro/icons/map';
+import MapPin from '@lucide/astro/icons/map-pin';
+import PawPrint from '@lucide/astro/icons/paw-print';
+import Trees from '@lucide/astro/icons/trees';
+import Users from '@lucide/astro/icons/users';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { SITE_FIGURES, type SiteFigures } from '../data/chiffres';
+import { DON_URL, fieldPath, pagePath, sitePath } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ActionCard from './ActionCard.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import MadagascarMap from './MadagascarMap.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import SectionHeading from './SectionHeading.astro';
+import SpeciesCard from './SpeciesCard.astro';
+import StatCard from './StatCard.astro';
+
+import ctaPhoto from '../assets/photos/pilier-biodiversite-souimanga.jpg';
+
+interface Props {
+  site: CollectionEntry<'sites'>;
+}
+
+const { site } = Astro.props;
+const { data } = site;
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.site;
+
+const fill = (text: string, values: Record<string, string>) =>
+  text.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
+const withName = (text: string) => fill(text, { name: data.name, region: data.region });
+
+// Autres sites du pays : repères de la carte de localisation et lien « Site suivant ».
+const sites = (await getCollection('sites', ({ data: other }) => other.country === data.country)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const index = sites.findIndex((other) => other.id === site.id);
+const next = sites[(index + 1) % sites.length]!;
+
+// Fiche complète : tous les contenus propres au site sont fournis.
+const complete = Boolean(
+  data.tagline &&
+    data.intro &&
+    data.story &&
+    data.location &&
+    data.habitat &&
+    data.figures &&
+    data.speciesLead &&
+    data.actions?.length &&
+    data.groups &&
+    data.partners?.length &&
+    data.species.every((species) => species.status && species.text && species.photo && species.credit),
+);
+
+// Bande de chiffres : valeurs dans src/data/chiffres.ts, texte dans le frontmatter du site.
+const FIGURE_ICONS = {
+  hectares: MapIcon,
+  years: Calendar,
+  beneficiaries: Users,
+  lemurSpecies: PawPrint,
+  frogSpecies: null, // pas de grenouille chez Lucide : pictogramme de la maquette, dessiné plus bas
+  medicinalPlants: Leaf,
+};
+type FigureKey = keyof typeof FIGURE_ICONS & keyof SiteFigures;
+
+const siteFigures: SiteFigures = SITE_FIGURES[site.id] ?? {};
+const figureList = (data.figures ?? (page.defaultFigures as { key: FigureKey; text: string }[])).map(
+  ({ key, text, ...rest }) => {
+    const value = siteFigures[key];
+    const atLeast = 'atLeast' in rest && rest.atLeast;
+    // Chiffre manquant : texte « [à fournir] », affiché sans compteur ni unité.
+    return value === undefined
+      ? { key, value: page.missing, text, Icon: FIGURE_ICONS[key] }
+      : { key, value, unit: page.units[key], suffix: atLeast ? '+' : undefined, text, Icon: FIGURE_ICONS[key] };
+  },
+);
+
+// Pictogramme de l'activité de chaque groupement local.
+const GROUP_ICONS = {
+  gestion: UsersRound,
+  education: GraduationCap,
+  soins: HandHeart,
+  huiles: Droplets,
+  artisanat: Scissors,
+  tourisme: Backpack,
+};
+
+const speciesStatus = (status: (typeof data.species)[number]['status']) =>
+  status && { label: page.species.status[status], threatened: ['CR', 'EN', 'VU'].includes(status) };
+
+const story = data.story ?? { ...page.storyMissing, paragraphs: [page.missing] };
+const cta = data.cta ?? { ...page.cta, titleStrong: withName(page.cta.titleStrong) };
+const madagascarMap = dict.madagascar.sites.map;
+
+// Étiquette du site sur la carte : à gauche du repère, à droite pour les sites de l'Ouest.
+const labelSide = data.mapPosition.x > 50 ? 'left' : 'right';
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[1]!, href: '#' }, // TODO page « Nos sites »
+  { label: dict.madagascar.title, href: pagePath(lang, 'madagascar') },
+];
+---
+
+<BaseLayout
+  title={withName(page.title)}
+  description={data.summary}
+  ogImage={data.photo}
+  ogImageAlt={data.photoAlt}
+  noindex={!complete}
+>
+  <Header current="sites" />
+  <Breadcrumb items={breadcrumb} current={data.name} />
+
+  <main id="contenu">
+    <PageHero
+      badge={`${page.country} · ${data.region}`}
+      titleStrong={`${data.name},`}
+      titleLight={data.tagline ?? page.missing}
+      lead={data.intro ?? data.summary}
+      image={data.photo}
+      imageAlt={data.photoAlt ?? ''}
+      imagePosition={data.photoPosition}
+      caption={fill(page.photoCaption, { name: data.name, credit: data.photoCredit ?? page.photoCreditMissing })}
+      donate={{ label: withName(page.donate), href: DON_URL }}
+      cta={data.visitable ? { label: page.field, href: fieldPath(lang, site.id) } : undefined}
+      portrait
+    />
+
+    <section class="figures" aria-label={withName(page.statsLabel)}>
+      <div class="figures__grid container">
+        {
+          figureList.map(({ key: _, Icon, ...stat }) => (
+            <StatCard {...stat}>
+              {Icon ? (
+                <Icon slot="icon" size={28} />
+              ) : (
+                <svg
+                  slot="icon"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 14c-4 0-8 2-8 5h16c0-3-4-5-8-5Z" />
+                  <circle cx="8" cy="7" r="3" />
+                  <circle cx="16" cy="7" r="3" />
+                  <path d="M5 10c0 2 3 4 7 4s7-2 7-4" />
+                </svg>
+              )}
+            </StatCard>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="histoire-titre">
+      <div class="container two-cols">
+        <div class="story" data-reveal>
+          <h2 id="histoire-titre" class="title-h2">
+            <span class="title-h2__strong">{story.titleStrong}</span>{' '}
+            <span class="title-h2__light">{story.titleLight}</span>
+          </h2>
+          {story.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+
+        <div class="locator" data-reveal>
+          <div class="locator__map" role="group" aria-label={withName(page.mapLabel)}>
+            <MadagascarMap labels={madagascarMap} compact>
+              {
+                // Autres sites : liens vers leur fiche, nom affiché au survol et au focus.
+                sites
+                  .filter((other) => other.id !== site.id)
+                  .map((other) => (
+                    <a
+                      class="locator__site"
+                      href={sitePath(lang, other.id)}
+                      style={`left: ${other.data.mapPosition.x}%; top: ${other.data.mapPosition.y}%`}
+                    >
+                      <span class="locator__dot" />
+                      <span
+                        class:list={[
+                          'locator__label locator__label--tip',
+                          `locator__label--${other.data.mapPosition.x > 50 ? 'left' : 'right'}`,
+                        ]}
+                      >
+                        {other.data.name}
+                      </span>
+                    </a>
+                  ))
+              }
+              <span
+                class="locator__current"
+                style={`left: ${data.mapPosition.x}%; top: ${data.mapPosition.y}%`}
+              />
+              <span
+                class:list={['locator__label', `locator__label--${labelSide}`]}
+                style={`left: ${data.mapPosition.x}%; top: ${data.mapPosition.y}%`}
+              >
+                {data.name}
+              </span>
+            </MadagascarMap>
+          </div>
+          <dl class="locator__facts">
+            <div class="locator__fact">
+              <span class="locator__fact-icon"><MapPin size={20} /></span>
+              <div>
+                <dt>{page.location}</dt>
+                <dd>{data.location ?? page.missing}</dd>
+              </div>
+            </div>
+            <div class="locator__fact">
+              <span class="locator__fact-icon"><Trees size={20} /></span>
+              <div>
+                <dt>{page.habitat}</dt>
+                <dd>{data.habitat ?? page.missing}</dd>
+              </div>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="especes-titre">
+      <div class="container stack">
+        <SectionHeading
+          id="especes-titre"
+          strong={page.species.titleStrong}
+          light={page.species.titleLight}
+          lead={data.speciesLead ?? page.missing}
+        />
+        <ul class="cards-grid">
+          {
+            data.species.map((species) => (
+              <SpeciesCard
+                name={species.name}
+                status={speciesStatus(species.status)}
+                text={species.text ?? page.missing}
+                photo={species.photo}
+                photoAlt={species.photoAlt}
+                photoPosition={species.photoPosition}
+                photoMissing={page.photoMissing}
+                credit={species.credit}
+                sourceLabel={page.species.source}
+              />
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="actions-titre">
+      <div class="container stack">
+        <SectionHeading
+          id="actions-titre"
+          strong={page.actions.titleStrong}
+          light={page.actions.titleLight}
+          lead={data.actionsLead ?? page.missing}
+        />
+        {
+          // TODO pages projet : lien vers la page de action.project.
+          data.actions?.length ? (
+            <ul class="cards-grid">
+              {data.actions.map((action) => (
+                <ActionCard
+                  icon={action.icon}
+                  title={action.title}
+                  text={action.text}
+                  href="#"
+                  linkLabel={page.actions.link}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p class="missing">{page.missing}</p>
+          )
+        }
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="acteurs-titre">
+      <div class="container two-cols two-cols--top">
+        <div class="people" data-reveal>
+          <h2 id="acteurs-titre" class="title-h2">
+            <span class="title-h2__strong">{page.people.titleStrong}</span>{' '}
+            <span class="title-h2__light">{withName(page.people.titleLight)}</span>
+          </h2>
+          <p>{data.groups?.lead ?? page.missing}</p>
+          {
+            data.groups && (
+              <ul class="groups">
+                {data.groups.items.map((group) => {
+                  const Icon = GROUP_ICONS[group.icon];
+                  return (
+                    <li class="group-item">
+                      <div class="group">
+                        <span class="group__icon">
+                          <Icon size={20} />
+                        </span>
+                        <span class="group__text">
+                          <span class="group__name">{group.name}</span>
+                          <span class="group__role">{group.role}</span>
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )
+          }
+        </div>
+        <div class="partners" data-reveal>
+          <h3 class="partners__title">{page.people.partners}</h3>
+          {
+            data.partners?.length ? (
+              <ul class="partners__list">
+                {data.partners.map((partner) => (
+                  <li>
+                    {partner.url ? (
+                      <a class="partner partner--link" href={partner.url} rel="noopener" target="_blank">
+                        {partner.name}
+                        <ExternalLink class="partner__icon" size={14} />
+                        <span class="visually-hidden"> {page.people.newTab}</span>
+                      </a>
+                    ) : (
+                      <span class="partner">{partner.name}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>{page.missing}</p>
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="soutenir-titre"
+      titleStrong={cta.titleStrong}
+      titleLight={cta.titleLight}
+      text={cta.text}
+      image={ctaPhoto}
+      imagePosition="50% 45%"
+      spaced
+    >
+      <div class="cta__buttons">
+        <Button href={DON_URL} variant="don">{dict.ui.donate}</Button>
+        {data.visitable && <Button href={fieldPath(lang, site.id)} variant="on-dark">{page.field}</Button>}
+      </div>
+    </PhotoBanner>
+
+    <nav class="site-nav container" aria-label={page.nav.label}>
+      <a class="site-nav__link site-nav__link--back" href={pagePath(lang, 'madagascar')}>
+        <ArrowLeft class="site-nav__arrow" size={18} />
+        <span class="site-nav__label">{page.nav.all}</span>
+      </a>
+      {
+        next.id !== site.id && (
+          <a class="site-nav__link" href={sitePath(lang, next.id)}>
+            <span class="site-nav__label">{fill(page.nav.next, { name: next.data.name })}</span>
+            <ArrowRight class="site-nav__arrow" size={18} />
+          </a>
+        )
+      }
+    </nav>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { initStats } from '../scripts/stats';
+  initStats();
+</script>
+
+<style>
+  .section--tinted {
+    background: var(--vert-clair);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* Titres en deux temps hors SectionHeading (colonnes). */
+  .title-h2 {
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+  }
+
+  .title-h2__strong {
+    font-weight: 800;
+  }
+
+  .title-h2__light {
+    font-weight: 300;
+  }
+
+  .two-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 48px 72px;
+  }
+
+  .two-cols--top {
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .two-cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Bande sauge des chiffres : cartes chiffre, variante icône (StatCard). */
+  .figures {
+    background: var(--sauge);
+  }
+
+  .figures__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: var(--space-5);
+    padding-block: clamp(40px, 5vw, 56px);
+  }
+
+  /* Histoire du site. */
+  .story,
+  .people {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  /* Carte de localisation sur fond vert clair. */
+  .locator {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    overflow: hidden;
+    border-radius: var(--radius-block);
+    background: var(--vert-clair);
+  }
+
+  .locator__map {
+    display: flex;
+    justify-content: center;
+  }
+
+  .locator__map :global(.mg-map) {
+    width: min(100%, 300px);
+  }
+
+  .locator__current {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: var(--radius-pill);
+  }
+
+  /* Autre site : zone cliquable de 44px centrée sur un point de 12px. */
+  .locator__site {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+    border-radius: var(--radius-pill);
+    color: var(--basalte);
+    text-decoration: none;
+  }
+
+  .locator__dot {
+    box-sizing: border-box;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--basalte);
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    transition:
+      transform var(--transition-ui),
+      background-color var(--transition-ui);
+  }
+
+  .locator__site:hover .locator__dot,
+  .locator__site:focus-visible .locator__dot {
+    transform: scale(1.5);
+    background: var(--basalte);
+  }
+
+  .locator__site:focus-visible {
+    outline: none;
+  }
+
+  .locator__site:focus-visible .locator__dot {
+    outline: 2px solid var(--basalte);
+    outline-offset: 3px;
+  }
+
+  /* Nom du site, visible seulement au survol et au focus. */
+  .locator__label--tip {
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-ui);
+  }
+
+  .locator__site:hover .locator__label--tip,
+  .locator__site:focus-visible .locator__label--tip {
+    opacity: 1;
+  }
+
+  /* Repère : le point est au centre de la zone de 44px, l'étiquette s'en écarte de 20px. */
+  .locator__label--tip.locator__label--left {
+    transform: translate(calc(-100% - 16px), -50%);
+  }
+
+  .locator__label--tip.locator__label--right {
+    transform: translate(16px, -50%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .locator__dot,
+    .locator__label--tip {
+      transition: none;
+    }
+  }
+
+  .locator__current {
+    z-index: 1;
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+    border: 4px solid var(--blanc);
+    background: var(--basalte);
+    box-shadow: 0 0 0 8px rgba(67, 72, 64, 0.25);
+  }
+
+  .locator__label {
+    position: absolute;
+    z-index: 2;
+    padding: 6px 12px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .locator__label--left {
+    transform: translate(calc(-100% - 20px), -50%);
+  }
+
+  .locator__label--right {
+    transform: translate(20px, -50%);
+  }
+
+  .locator__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 0;
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .locator__fact {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  /* Pastille blanche : le bloc est sur vert clair. */
+  .locator__fact-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+  }
+
+  .locator__facts dt {
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .locator__facts dd {
+    margin: 4px 0 0;
+  }
+
+  /* Groupements locaux et partenaires. */
+  .groups {
+    display: grid;
+    /* Toujours 2 colonnes, une seule sur mobile (voir plus bas). */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 560px) {
+    .groups {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Chaque carte est mesurée : sa mise en page dépend de sa propre largeur. */
+  .group-item {
+    container-type: inline-size;
+  }
+
+  .group {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-sm);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+    line-height: normal;
+  }
+
+  /* Pictogramme de l'activité : disque menthe, comme les cartes chiffres. */
+  .group__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-pill);
+    background: var(--menthe);
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /*
+   * Carte non cliquable : comme les cartes chiffres, pas d'élévation (réservée
+   * aux liens), seulement l'icône qui grossit avec un petit rebond.
+   */
+  .group:hover .group__icon {
+    transform: scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .group__icon {
+      transition: none;
+    }
+
+    .group:hover .group__icon {
+      transform: none;
+    }
+  }
+
+  .group__text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* Carte étroite : l'icône passe au-dessus du nom pour ne pas le couper. */
+  @container (max-width: 250px) {
+    .group {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+
+  .group__name {
+    font-size: var(--fs-body);
+    font-weight: 700;
+  }
+
+  .group__role {
+    font-size: 14px;
+  }
+
+  .partners {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .partners__title {
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .partners__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .partner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: 1px solid var(--blanc);
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+  }
+
+  /* Partenaire avec site : même survol que les boutons secondaires (fond vert clair, contour basalte). */
+  .partner--link {
+    color: var(--basalte);
+    text-decoration: none;
+    transition:
+      border-color var(--transition-ui),
+      transform var(--transition-ui);
+  }
+
+  .partner--link:hover {
+    color: var(--noir-95);
+    border-color: var(--basalte);
+    transform: translateY(var(--lift-button-hover));
+  }
+
+  .partner :global(.partner__icon) {
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner--link {
+      transition: none;
+    }
+
+    .partner--link:hover {
+      transform: none;
+    }
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  /* Navigation vers les autres sites, sous la carte d'appel. */
+  .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: var(--space-section);
+  }
+
+  /*
+   * Même survol que les liens d'action des titres de section : filet sauge au repos,
+   * trait basalte tracé de gauche à droite au survol, flèche qui glisse vers l'extérieur.
+   */
+  .site-nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding-block: 4px;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--basalte);
+    text-decoration: none;
+  }
+
+  .site-nav__link:hover {
+    color: var(--basalte);
+  }
+
+  .site-nav__label {
+    padding-bottom: 4px;
+    background:
+      linear-gradient(var(--basalte), var(--basalte)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .site-nav__link:hover .site-nav__label,
+  .site-nav__link:focus-visible .site-nav__label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  .site-nav :global(.site-nav__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .site-nav__link:hover :global(.site-nav__arrow),
+  .site-nav__link:focus-visible :global(.site-nav__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  .site-nav__link--back:hover :global(.site-nav__arrow),
+  .site-nav__link--back:focus-visible :global(.site-nav__arrow) {
+    transform: translateX(calc(-1 * var(--nudge-arrow-hover)));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-nav__label {
+      transition: none;
+    }
+
+    .site-nav__link:hover :global(.site-nav__arrow),
+    .site-nav__link:focus-visible :global(.site-nav__arrow) {
+      transform: none;
+    }
+  }
+</style>

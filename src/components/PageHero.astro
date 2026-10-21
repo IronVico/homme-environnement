@@ -2,7 +2,10 @@
 /**
  * Hero des pages internes (pays, sites) : titre en deux temps, phrase de contexte,
  * un bouton secondaire, photo en arche à droite. Plus compact que le hero de l'accueil.
+ * Fiche site (`portrait`) : pastille de lieu, bouton Don avant le bouton secondaire,
+ * photo verticale plus large avec sa légende.
  */
+import MapPin from '@lucide/astro/icons/map-pin';
 import type { ImageMetadata } from 'astro';
 import { Picture } from 'astro:assets';
 import Button from './Button.astro';
@@ -15,37 +18,74 @@ interface Props {
   imageAlt: string;
   /** Cadrage de la photo (object-position). */
   imagePosition?: string;
-  /** Bouton secondaire ; une ancre (« #sites ») affiche une flèche vers le bas. */
-  cta: { label: string; href: string };
+  /** Bouton secondaire, facultatif ; une ancre (« #sites ») affiche une flèche vers le bas. */
+  cta?: { label: string; href: string };
+  /** Bouton Don (pêche), placé avant le bouton secondaire. */
+  donate?: { label: string; href: string };
+  /** Pastille de lieu au-dessus du titre : « Madagascar · Centre-Est ». */
+  badge?: string;
+  /** Légende sous la photo (crédit). */
+  caption?: string;
+  /** Photo verticale (4:5), pour les fiches site. */
+  portrait?: boolean;
 }
 
-const { titleStrong, titleLight, lead, image, imageAlt, imagePosition = '50% 50%', cta } = Astro.props;
+const {
+  titleStrong,
+  titleLight,
+  lead,
+  image,
+  imageAlt,
+  imagePosition = '50% 50%',
+  cta,
+  donate,
+  badge,
+  caption,
+  portrait = false,
+} = Astro.props;
 ---
 
-<section class="page-hero container">
+<section class:list={['page-hero container', { 'page-hero--portrait': portrait }]}>
   <div class="page-hero__text">
+    {
+      badge && (
+        <p class="page-hero__badge" data-reveal>
+          <MapPin size={16} />
+          {badge}
+        </p>
+      )
+    }
     <h1 class="page-hero__title" data-reveal>
       <span class="page-hero__strong">{titleStrong}</span><br />
       <span class="page-hero__light">{titleLight}</span>
     </h1>
     <p class="page-hero__lead" data-reveal>{lead}</p>
     <div class="page-hero__ctas" data-reveal>
-      <Button href={cta.href} variant="secondary" arrow={cta.href.startsWith('#') ? 'down' : 'right'}>{cta.label}</Button>
+      {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
+      {
+        cta && (
+          <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
+            {cta.label}
+          </Button>
+        )
+      }
     </div>
   </div>
 
-  <Picture
-    class="page-hero__photo"
-    data-reveal
-    src={image}
-    alt={imageAlt}
-    style={`object-position: ${imagePosition}`}
-    formats={['avif', 'webp']}
-    widths={[420, 640, 900, 1260]}
-    sizes="(max-width: 1100px) 100vw, 420px"
-    loading="eager"
-    fetchpriority="high"
-  />
+  <figure class="page-hero__figure" data-reveal>
+    <Picture
+      class="page-hero__photo"
+      src={image}
+      alt={imageAlt}
+      style={`object-position: ${imagePosition}`}
+      formats={['avif', 'webp']}
+      widths={[420, 640, 900, 1260]}
+      sizes={portrait ? '(max-width: 1100px) 100vw, 460px' : '(max-width: 1100px) 100vw, 420px'}
+      loading="eager"
+      fetchpriority="high"
+    />
+    {caption && <figcaption class="page-hero__caption">{caption}</figcaption>}
+  </figure>
 </section>
 
 <style>
@@ -79,6 +119,18 @@ const { titleStrong, titleLight, lead, image, imageAlt, imagePosition = '50% 50%
     font-weight: 300;
   }
 
+  .page-hero__badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--vert-clair);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
   .page-hero__lead {
     max-width: 640px;
     font-size: var(--fs-body-lg);
@@ -91,15 +143,37 @@ const { titleStrong, titleLight, lead, image, imageAlt, imagePosition = '50% 50%
     gap: var(--space-3);
   }
 
-  /* Photo en arche : 120px en haut, 20px en bas. */
-  .page-hero :global(.page-hero__photo) {
+  .page-hero__figure {
     flex: 0 1 420px;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  /* Photo en arche : 120px en haut, 20px en bas. */
+  .page-hero :global(.page-hero__photo) {
     width: 100%;
     height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: var(--radius-arch) var(--radius-arch) 20px 20px;
+  }
+
+  /* Fiche site : photo verticale, arche plus marquée (160px). */
+  .page-hero--portrait .page-hero__figure {
+    flex-basis: 460px;
+  }
+
+  .page-hero--portrait :global(.page-hero__photo) {
+    aspect-ratio: 4 / 5;
+    border-radius: 160px 160px 20px 20px;
+  }
+
+  .page-hero__caption {
+    font-size: var(--fs-caption);
+    color: var(--ardoise);
   }
 
   /* Empilé : la photo passe sous le texte et prend toute la largeur. */
@@ -113,14 +187,15 @@ const { titleStrong, titleLight, lead, image, imageAlt, imagePosition = '50% 50%
       flex: none;
     }
 
-    .page-hero :global(.page-hero__photo) {
+    .page-hero__figure {
       flex: none;
     }
   }
 
   /* Tablette : photo pleine largeur moins haute, pour ne pas occuper tout l'écran. */
   @media (min-width: 600px) and (max-width: 1080px) {
-    .page-hero :global(.page-hero__photo) {
+    .page-hero :global(.page-hero__photo),
+    .page-hero--portrait :global(.page-hero__photo) {
       aspect-ratio: 16 / 9;
     }
   }
