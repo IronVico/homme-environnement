@@ -4,6 +4,8 @@ import logoFr from '../assets/logos/logo-couleur.svg';
 import { DON_URL, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
 import { getLang, localeUrl, pathWithoutLocale, t } from '../i18n';
 import Button from './Button.astro';
+import ContourPattern from './ContourPattern.astro';
+import FooterStamp from './FooterStamp.astro';
 
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
@@ -16,6 +18,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
 ---
 
 <footer class="footer">
+  <ContourPattern variant="footer" />
   <div class="footer__inner container">
     <div class="footer__top">
       <div class="footer__brand">
@@ -63,6 +66,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     </div>
 
     <div class="footer__bottom">
+      <FooterStamp class="footer__stamp" />
       <p>{ui.copyright}</p>
       <ul class="footer__legal">
         {
@@ -81,17 +85,42 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
 </footer>
 
 <style>
+  /* Le motif et le tampon se posent dans le footer sans l'agrandir (maquette v119). */
   .footer {
+    position: relative;
+    overflow: hidden;
     background: var(--menthe);
     color: var(--basalte);
   }
 
+  /* Tampon en bas à droite, juste au-dessus de la barre du bas (maquette v119), dans
+     l'espace libre sous la dernière colonne de liens. Repère : la barre du bas ; à 1440px,
+     47px du bord droit comme dans la maquette. Vérifié sans recouvrement de 300 à 2560px. */
+  .footer :global(.footer__stamp) {
+    position: absolute;
+    z-index: 2;
+    right: calc(47px - var(--gutter));
+    bottom: calc(100% + 12px);
+  }
+
+  /* Vers 970-990px, la colonne « Ressources » descend jusqu'à la barre du bas : tampon
+     réduit et plus bas, pour rester dans l'espace libre. */
+  @media (min-width: 960px) and (max-width: 999px) {
+    .footer :global(.footer__stamp) {
+      width: 104px;
+      height: 104px;
+      bottom: calc(100% + 4px);
+    }
+  }
+
   .footer__inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 56px;
-    padding-top: 72px;
-    padding-bottom: var(--space-8);
+    gap: 40px;
+    padding-top: 56px;
+    padding-bottom: var(--space-7);
   }
 
   .footer__top {
@@ -192,6 +221,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
   }
 
   .footer__bottom {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -205,5 +235,24 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-5);
+  }
+
+  /* Mobile (maquette v124) : le tampon passe dans le flux, tout en bas du footer, sous la
+     barre du bas, aligné à droite (20px du bord), 112px. La barre est déjà sur deux lignes
+     à cette largeur : en colonne, le rendu ne change pas. */
+  @media (max-width: 700px) {
+    .footer__bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer :global(.footer__stamp) {
+      position: static;
+      order: 2;
+      align-self: flex-end;
+      width: 112px;
+      height: 112px;
+      margin-right: calc(20px - var(--gutter));
+    }
   }
 </style>

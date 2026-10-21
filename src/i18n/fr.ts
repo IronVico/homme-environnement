@@ -25,6 +25,8 @@ const fr = {
     socialLinkedin: "L'Homme & l'Environnement sur LinkedIn",
     socialFacebook: "L'Homme & l'Environnement sur Facebook",
     footerPitch: 'Préserver la biodiversité et soutenir le développement des populations locales, depuis 1993.',
+    stampText: 'DEPUIS 1993 · MADAGASCAR · BURKINA FASO · ',
+    stampLabel: "L'Homme & l'Environnement, depuis 1993, Madagascar et Burkina Faso",
     copyright: "© L'Homme & l'Environnement · Photos © Day Nabih, © Marc Gansuana, © Langaha Be",
     statsLabel: 'Chiffres clés',
     scrollHint: 'Faire défiler',
