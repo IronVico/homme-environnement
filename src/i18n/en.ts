@@ -41,10 +41,11 @@ const en: Dictionary = {
   },
 
   nav: {
-    main: ['The NGO', 'Our work', 'Get involved', 'Resources', 'Contact'],
+    main: ['The NGO', 'Our sites', 'Our projects', 'Get involved', 'Resources', 'Contact'],
     footer: [
       { title: 'The NGO', links: ['Our approach', 'Our history', 'Partners and funders'] },
-      { title: 'Our work', links: ['Madagascar', 'Burkina Faso', 'Supported projects', 'Empowerment'] },
+      { title: 'Our sites', links: ['Madagascar', 'Burkina Faso'] },
+      { title: 'Our projects', links: ['Conservation', 'Reforestation', 'Health', 'Aromatic plants', 'All projects'] },
       { title: 'Get involved', links: ['Individuals', 'Come to the field', 'Companies'] },
       { title: 'Resources', links: ['Reports and studies', 'Photo gallery', 'Contact'] },
     ],

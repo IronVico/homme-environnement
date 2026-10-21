@@ -18,9 +18,11 @@ interface Props {
    */
   illustration: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families';
   illustrationLabel: string;
+  /** share : part de l'anneau remplie, entre 0 et 1 (par défaut value / 100). */
+  ratio?: number;
 }
 
-const { value, prefix, unit, text, illustration, illustrationLabel } = Astro.props;
+const { value, prefix, unit, text, illustration, illustrationLabel, ratio } = Astro.props;
 
 const NBSP = '\u00a0';
 const numberLocale = getLang(Astro.currentLocale) === 'en' ? 'en-GB' : 'fr-FR';
@@ -51,7 +53,7 @@ const bars = [
 
 // Anneau de part : circonférence du cercle r=38, arc proportionnel à la valeur.
 const SHARE_CIRC = 2 * Math.PI * 38;
-const shareRatio = illustration === 'share' && typeof value === 'number' ? value / 100 : 0;
+const shareRatio = illustration !== 'share' ? 0 : (ratio ?? (typeof value === 'number' ? value / 100 : 0));
 
 // 5 pastilles réparties en cercle, dans le sens horaire depuis midi ; la dernière en pêche.
 const sitePoints = [

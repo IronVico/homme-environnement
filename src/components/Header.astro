@@ -55,7 +55,13 @@ const isCurrent = (href: string) => {
           const id = `sous-menu-${link.section}`;
           return (
             <li class="header__item" data-submenu>
-              <button class="header__toggle" type="button" aria-expanded="false" aria-controls={id} data-current={sectionCurrent ? '' : undefined}>
+              <button
+                class="header__toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls={id}
+                aria-current={sectionCurrent ? 'true' : undefined}
+              >
                 {link.label}
                 <ChevronDown class="header__chevron" size={16} />
               </button>
@@ -112,7 +118,7 @@ const isCurrent = (href: string) => {
 
     // Sous-menus : bouton à bascule (un seul ouvert à la fois en desktop).
     const items = [...nav.querySelectorAll<HTMLElement>('[data-submenu]')];
-    const desktop = window.matchMedia('(min-width: 1181px)');
+    const desktop = window.matchMedia('(min-width: 1281px)');
     const toggleOf = (item: HTMLElement) => item.querySelector<HTMLButtonElement>('.header__toggle');
     const setSubmenu = (item: HTMLElement, open: boolean) => {
       item.toggleAttribute('data-expanded', open);
@@ -312,7 +318,7 @@ const isCurrent = (href: string) => {
     transform: rotate(180deg);
   }
 
-  /* Survol : pastille vert clair. Sélectionné : pastille basalte, comme le sélecteur de langue. */
+  /* Survol : pastille vert clair. Rubrique en cours : soulignée (2px, décalage 6px), comme la maquette. */
   .header__nav a:hover,
   .header__toggle:hover,
   .header__item[data-expanded] > .header__toggle {
@@ -321,10 +327,10 @@ const isCurrent = (href: string) => {
   }
 
   .header__nav > ul > li > a[aria-current],
-  .header__toggle[data-current],
-  .header__item[data-expanded] > .header__toggle[data-current] {
-    background: var(--basalte);
-    color: var(--blanc);
+  .header__toggle[aria-current] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
   }
 
   /* Sous-menu desktop : carte blanche sous la rubrique. */
@@ -376,7 +382,7 @@ const isCurrent = (href: string) => {
    * Sans JS : ouverture au survol et au focus clavier. Avec JS, c'est le script
    * qui gère survol, clic et clavier, pour n'avoir qu'un sous-menu ouvert à la fois.
    */
-  @media (min-width: 1181px) {
+  @media (min-width: 1281px) {
     :global(html:not(.js)) .header__item:hover > .header__submenu,
     :global(html:not(.js)) .header__item:focus-within > .header__submenu {
       display: block;
@@ -429,9 +435,9 @@ const isCurrent = (href: string) => {
 
   /*
    * Menu, sélecteur de langue et bouton Don ne tiennent sur une ligne qu'au-delà
-   * de ~1140px (rubriques avec chevrons) : en dessous de 1180px, on passe au burger.
+   * de ~1270px (6 rubriques avec chevrons) : en dessous de 1280px, on passe au burger.
    */
-  @media (max-width: 1180px) {
+  @media (max-width: 1280px) {
     /* Sans JS : les liens restent visibles, sur une ligne sous le logo. */
     .header__nav {
       order: 10;

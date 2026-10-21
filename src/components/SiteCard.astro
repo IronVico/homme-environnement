@@ -1,53 +1,104 @@
 ---
 /**
- * Carte d'un site d'intervention, toute cliquable vers sa fiche.
- * featured : grande carte photo (texte blanc sur dégradé). Sinon : carte blanche.
+ * Carte blanche d'un site d'intervention, toute cliquable vers sa fiche :
+ * photo, région, nom, texte, espèces emblématiques, chiffres clés.
  */
 import ArrowRight from '@lucide/astro/icons/arrow-right';
-import Flag from '@lucide/astro/icons/flag';
-import Handshake from '@lucide/astro/icons/handshake';
-import Sprout from '@lucide/astro/icons/sprout';
+import Bird from '@lucide/astro/icons/bird';
+import Calendar from '@lucide/astro/icons/calendar';
+import Fish from '@lucide/astro/icons/fish';
+import Leaf from '@lucide/astro/icons/leaf';
+import MapIcon from '@lucide/astro/icons/map';
+import PawPrint from '@lucide/astro/icons/paw-print';
+import Users from '@lucide/astro/icons/users';
 import type { ImageMetadata } from 'astro';
 import { Picture } from 'astro:assets';
 
+type SpeciesType = 'animal' | 'oiseau' | 'poisson' | 'plante';
+
 interface Props {
   name: string;
-  /** Statut du site (collection « sites ») : choisit l'icône de la pastille. */
-  status: 'historique' | 'transmis' | 'en-cours';
-  /** Libellé du statut, dans la langue de la page. */
-  statusLabel: string;
+  region: string;
   summary: string;
   image: ImageMetadata;
   imagePosition?: string;
+  species: { name: string; type: SpeciesType }[];
+  speciesTitle: string;
+  /** Chiffres déjà formatés (« 2 200 ha ») ; vide : on affiche figuresMissing. */
+  figures: { kind: 'hectares' | 'years' | 'beneficiaries'; label: string }[];
+  figuresMissing: string;
   href: string;
   linkLabel: string;
-  featured?: boolean;
-  class?: string;
 }
 
-const { name, status, statusLabel, summary, image, imagePosition = '50% 50%', href, linkLabel, featured = false, class: className } = Astro.props;
+const {
+  name,
+  region,
+  summary,
+  image,
+  imagePosition = '50% 40%',
+  species,
+  speciesTitle,
+  figures,
+  figuresMissing,
+  href,
+  linkLabel,
+} = Astro.props;
 
-// Historique : le site par lequel tout a commencé. Transmis : géré par les acteurs locaux. En cours : projet qui pousse.
-const StatusIcon = { historique: Flag, transmis: Handshake, 'en-cours': Sprout }[status];
+const SpeciesIcon = { animal: PawPrint, oiseau: Bird, poisson: Fish, plante: Leaf };
+const FigureIcon = { hectares: MapIcon, years: Calendar, beneficiaries: Users };
 ---
 
-<a class:list={['site-card', 'card-lift', featured ? 'site-card--featured' : 'site-card--default', className]} href={href} data-reveal>
+<a class="site-card card-lift" href={href} data-reveal>
   <Picture
     class="site-card__photo"
     src={image}
     alt=""
     style={`object-position: ${imagePosition}`}
     formats={['avif', 'webp']}
-    widths={featured ? [640, 900, 1300, 1800] : [400, 640, 900]}
-    sizes={featured ? '(max-width: 700px) 100vw, (max-width: 1440px) 66vw, 860px' : '(max-width: 700px) 100vw, (max-width: 1000px) 50vw, 420px'}
+    widths={[400, 640, 900]}
+    sizes="(max-width: 700px) 100vw, (max-width: 1000px) 50vw, 420px"
   />
   <span class="site-card__body">
-    <span class="site-card__status">
-      <StatusIcon class="site-card__status-icon" size={14} />
-      {statusLabel}
-    </span>
+    <span class="site-card__region">{region}</span>
     <span class="site-card__name">{name}</span>
     <span class="site-card__summary">{summary}</span>
+
+    {
+      species.length > 0 && (
+        <span class="site-card__species">
+          <span class="site-card__eyebrow">{speciesTitle}</span>
+          <span class="site-card__tags">
+            {species.map((item) => {
+              const Icon = SpeciesIcon[item.type];
+              return (
+                <span class="site-card__tag">
+                  <Icon size={16} />
+                  {item.name}
+                </span>
+              );
+            })}
+          </span>
+        </span>
+      )
+    }
+
+    <span class="site-card__figures">
+      {
+        figures.length > 0
+          ? figures.map((figure) => {
+              const Icon = FigureIcon[figure.kind];
+              return (
+                <span class="site-card__figure">
+                  <Icon class="site-card__figure-icon" size={16} />
+                  {figure.label}
+                </span>
+              );
+            })
+          : <span class="site-card__figure">{figuresMissing}</span>
+      }
+    </span>
+
     <span class="site-card__link">
       {linkLabel}
       <ArrowRight class="site-card__arrow" size={18} />
@@ -59,42 +110,122 @@ const StatusIcon = { historique: Flag, transmis: Handshake, 'en-cours': Sprout }
   .site-card {
     overflow: hidden;
     display: flex;
+    flex-direction: column;
+    background: var(--blanc);
+    color: var(--basalte);
+    border: 1px solid var(--bordure-douce);
     border-radius: var(--radius-card-lg);
+    box-shadow: var(--shadow-card);
     text-decoration: none;
   }
 
-  .site-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+  .site-card:hover {
+    color: var(--basalte);
   }
 
-  .site-card__status {
+  .site-card :global(.site-card__photo) {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  /* Le texte occupe toute la hauteur restante : les liens s'alignent en bas des cartes d'une même rangée. */
+  .site-card__body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 28px 28px;
+  }
+
+  .site-card__region {
     align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
     padding: 6px 12px;
     border-radius: var(--radius-pill);
+    background: var(--vert-clair);
     font-size: var(--fs-eyebrow);
     font-weight: 600;
     line-height: 1.2;
   }
 
   .site-card__name {
+    font-size: 28px;
     font-weight: 800;
+    line-height: 1.2;
     letter-spacing: var(--ls-h2);
-    line-height: 1;
   }
 
   .site-card__summary {
+    font-size: 16px;
     line-height: 1.5;
+  }
+
+  /* Espèces emblématiques : sur-titre puis pastilles menthe, noms en italique. */
+  .site-card__species {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .site-card__eyebrow {
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ardoise);
+  }
+
+  .site-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .site-card__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px 5px 10px;
+    border: 1px solid var(--vert-clair);
+    border-radius: var(--radius-pill);
+    background: var(--menthe);
+    font-size: var(--fs-eyebrow);
+    font-style: italic;
+    line-height: 1.3;
+  }
+
+  .site-card__tag :global(svg) {
+    flex-shrink: 0;
+  }
+
+  /* Chiffres clés : séparés du texte par un filet, icônes en sauge. */
+  .site-card__figures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--bordure-douce);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .site-card__figure {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .site-card :global(.site-card__figure-icon) {
+    flex-shrink: 0;
+    color: var(--sauge);
   }
 
   .site-card__link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    margin-top: auto;
+    padding-top: var(--space-2);
     font-size: 16px;
     font-weight: 600;
   }
@@ -114,92 +245,5 @@ const StatusIcon = { historique: Flag, transmis: Handshake, 'en-cours': Sprout }
     .site-card:focus-visible :global(.site-card__arrow) {
       transform: none;
     }
-  }
-
-  /* Carte blanche : photo en haut. */
-  .site-card--default {
-    flex-direction: column;
-    background: var(--blanc);
-    color: var(--basalte);
-    border: 1px solid var(--bordure-douce);
-    box-shadow: var(--shadow-card);
-  }
-
-  .site-card--default:hover {
-    color: var(--basalte);
-  }
-
-  .site-card--default :global(.site-card__photo) {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-  }
-
-  /* Le texte occupe toute la hauteur restante : les liens s'alignent en bas des cartes d'une même rangée. */
-  .site-card--default .site-card__body {
-    flex: 1 1 auto;
-    padding: 24px 28px 28px;
-  }
-
-  .site-card--default .site-card__status {
-    background: var(--vert-clair);
-    color: var(--basalte);
-  }
-
-  .site-card--default .site-card__name {
-    font-size: 28px;
-    line-height: 1.2;
-  }
-
-  .site-card--default .site-card__summary {
-    font-size: 16px;
-  }
-
-  .site-card--default .site-card__link {
-    margin-top: auto;
-    padding-top: var(--space-2);
-  }
-
-  /* Grande carte photo : texte blanc sur dégradé vers le bas. */
-  .site-card--featured {
-    position: relative;
-    align-items: flex-end;
-    min-height: 440px;
-    color: var(--blanc);
-  }
-
-  .site-card--featured:hover {
-    color: var(--blanc);
-  }
-
-  .site-card--featured :global(.site-card__photo) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .site-card--featured .site-card__body {
-    position: relative;
-    width: 100%;
-    gap: var(--space-3);
-    padding: 36px;
-    background: var(--voile-degrade);
-  }
-
-  /* Maquette : pastille pêche pour le site historique (écart à la règle « pêche = Don », à valider). */
-  .site-card--featured .site-card__status {
-    background: var(--peche);
-    color: var(--noir-95);
-  }
-
-  .site-card--featured .site-card__name {
-    font-size: clamp(32px, 3.6vw, 48px);
-  }
-
-  .site-card--featured .site-card__summary {
-    max-width: 560px;
-    font-size: var(--fs-body);
   }
 </style>

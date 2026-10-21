@@ -1,9 +1,11 @@
 ---
 name: Ambohidravy
 country: madagascar
-status: en-cours
+region: Nord-Ouest
 photo: ../../assets/photos/pilier-economie-fete-ambohidravy.jpg
-photoPosition: 50% 35%
-summary: "Mangroves et forêts littorales. [Une phrase sur l'enjeu principal du site.]"
-order: 3
+summary: "Une forêt sacrée pour les populations locales, soumise à de fortes pressions extérieures, qui dispose désormais d'un statut de conservation."
+species:
+  - { name: Pygargue de Madagascar, type: oiseau }
+  - { name: Asteropeia amblyocarpa, type: plante }
+order: 5
 ---

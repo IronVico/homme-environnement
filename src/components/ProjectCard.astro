@@ -1,0 +1,75 @@
+---
+/** Carte blanche compacte d'un projet : titre avec flèche, puis les sites où il est mené. */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+
+interface Props {
+  title: string;
+  sites: string[];
+  /** Préfixe lu par les lecteurs d'écran devant la liste des sites (« Sites : »). */
+  sitesLabel: string;
+  href: string;
+}
+
+const { title, sites, sitesLabel, href } = Astro.props;
+---
+
+<a class="project-card card-lift" href={href} data-reveal>
+  <span class="project-card__title">
+    {title}
+    <ArrowRight class="project-card__arrow" size={18} />
+  </span>
+  <span class="project-card__sites"><span class="visually-hidden">{sitesLabel} : </span>{sites.join(', ')}</span>
+</a>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 22px;
+    background: var(--blanc);
+    color: var(--basalte);
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-sm);
+    box-shadow: var(--shadow-card);
+    text-decoration: none;
+  }
+
+  .project-card:hover {
+    color: var(--basalte);
+  }
+
+  .project-card__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .project-card :global(.project-card__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .project-card:hover :global(.project-card__arrow),
+  .project-card:focus-visible :global(.project-card__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  /* Ardoise : la carte est blanche (contraste 4,7:1). */
+  .project-card__sites {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ardoise);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-card:hover :global(.project-card__arrow),
+    .project-card:focus-visible :global(.project-card__arrow) {
+      transform: none;
+    }
+  }
+</style>

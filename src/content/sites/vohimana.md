@@ -1,10 +1,11 @@
 ---
 name: Vohimana
 country: madagascar
-status: historique
+region: Centre-Est
 photo: ../../assets/photos/hero-artisane-vohimana.jpg
-photoPosition: 50% 40%
-summary: "Forêt humide de l'Est. Réserve gérée avec les villageois, écotourisme et filière d'huiles essentielles."
+summary: "Le site historique de l'ONG, ouvert à la visite. Un sanctuaire écotouristique où 12 espèces de lémuriens cohabitent, en partenariat avec le Muséum national d'Histoire naturelle."
+species:
+  - { name: Indri indri, type: animal }
+  - { name: Varecia variegata, type: animal }
 order: 1
-featured: true
 ---

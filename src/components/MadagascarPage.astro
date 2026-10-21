@@ -1,11 +1,11 @@
 ---
 /**
  * Page pays Madagascar, commune aux deux langues (/actions/madagascar et
- * /en/actions/madagascar). Textes dans src/i18n, sites dans la collection
- * « sites » (src/content/sites).
+ * /en/actions/madagascar). Textes dans src/i18n, sites et projets dans les
+ * collections (src/content), chiffres dans src/data/chiffres.ts.
  */
-import { Picture } from 'astro:assets';
 import { getCollection } from 'astro:content';
+import { MADAGASCAR, SITE_FIGURES } from '../data/chiffres';
 import { DON_URL } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -15,27 +15,42 @@ import Footer from './Footer.astro';
 import Header from './Header.astro';
 import PageHero from './PageHero.astro';
 import PhotoBanner from './PhotoBanner.astro';
+import ProjectCard from './ProjectCard.astro';
 import SectionHeading from './SectionHeading.astro';
 import SiteCard from './SiteCard.astro';
 import StatsBand from './StatsBand.astro';
 
 import heroMadagascar from '../assets/photos/pays-madagascar.jpg';
-import methodClasse from '../assets/photos/pilier-responsabilisation-classe.jpg';
 import ctaSouimanga from '../assets/photos/pilier-biodiversite-souimanga.jpg';
 
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const page = dict.madagascar;
 
+const NBSP = '\u00a0';
+const numberLocale = lang === 'en' ? 'en-GB' : 'fr-FR';
+const formatNumber = (value: number) => value.toLocaleString(numberLocale).replace(/\s/g, NBSP);
+const withCount = (text: string, count: number) => text.replace('{count}', String(count));
+
 const sites = (await getCollection('sites', ({ data }) => data.country === 'madagascar')).sort(
   (a, b) => a.data.order - b.data.order,
 );
+const siteNames = new Map(sites.map((site) => [site.id, site.data.name]));
 
-// Chiffres (identiques dans toutes les langues). « [X] » : nombre de familles À FOURNIR par l'ONG.
+const projects = (await getCollection('projets', ({ data }) => data.country === 'madagascar')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+// Chiffres de la bande sauge (src/data/chiffres.ts).
 const statValues = [
-  { value: sites.length, illustration: 'sites' },
-  { value: 90, prefix: '≈', illustration: 'share' },
-  { value: '[X]', illustration: 'families' },
+  { value: MADAGASCAR.hectares, prefix: '≈', illustration: 'sites' },
+  {
+    value: MADAGASCAR.beneficiaries,
+    prefix: '≈',
+    illustration: 'share',
+    ratio: MADAGASCAR.beneficiaries / MADAGASCAR.inhabitants,
+  },
+  { value: MADAGASCAR.threatenedSpecies, illustration: 'families' },
 ] as const;
 
 const stats = statValues.map((stat, i) => {
@@ -43,14 +58,27 @@ const stats = statValues.map((stat, i) => {
   return { ...stat, unit: text.unit, text: text.text, illustrationLabel: text.illustrationLabel };
 });
 
+// Chiffres de chaque site, formatés dans la langue de la page.
+const siteFigures = (id: string) => {
+  const figures = SITE_FIGURES[id];
+  if (!figures) return [];
+  const list: { kind: 'hectares' | 'years' | 'beneficiaries'; label: string }[] = [];
+  if (figures.hectares !== undefined)
+    list.push({ kind: 'hectares', label: `${formatNumber(figures.hectares)}${NBSP}${page.sites.hectares}` });
+  if (figures.years !== undefined) list.push({ kind: 'years', label: `${formatNumber(figures.years)}${NBSP}${page.sites.years}` });
+  if (figures.beneficiaries !== undefined)
+    list.push({ kind: 'beneficiaries', label: `${formatNumber(figures.beneficiaries)} ${page.sites.beneficiaries}` });
+  return list;
+};
+
 const breadcrumb = [
   { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
-  { label: dict.nav.main[1]!, href: '#' }, // TODO page « Nos actions »
+  { label: dict.nav.main[1]!, href: '#' }, // TODO page « Nos sites »
 ];
 ---
 
 <BaseLayout title={page.title} description={page.description} ogImage={heroMadagascar} ogImageAlt={page.hero.imageAlt}>
-  <Header current="actions" />
+  <Header current="sites" />
   <Breadcrumb items={breadcrumb} current={page.title} />
 
   <main id="contenu">
@@ -61,28 +89,34 @@ const breadcrumb = [
       image={heroMadagascar}
       imageAlt={page.hero.imageAlt}
       imagePosition="50% 55%"
-      cta={{ label: page.hero.cta, href: '#sites' }}
+      cta={{ label: withCount(page.hero.cta, sites.length), href: '#sites' }}
     />
 
     <StatsBand stats={stats} label={page.statsLabel} />
 
     <section id="sites" class="section" aria-labelledby="sites-titre">
       <div class="container stack">
-        <SectionHeading id="sites-titre" strong={page.sites.titleStrong} light={page.sites.titleLight} lead={page.sites.lead} />
+        <SectionHeading
+          id="sites-titre"
+          strong={withCount(page.sites.titleStrong, sites.length)}
+          light={page.sites.titleLight}
+          lead={page.sites.lead}
+        />
         <div class="sites-grid">
           {
             sites.map((site) => (
               <SiteCard
-                class={site.data.featured ? 'sites-grid__featured' : undefined}
                 name={site.data.name}
-                status={site.data.status}
-                statusLabel={page.sites.status[site.data.status]}
+                region={site.data.region}
                 summary={site.data.summary}
                 image={site.data.photo}
                 imagePosition={site.data.photoPosition}
+                species={site.data.species}
+                speciesTitle={page.sites.speciesTitle}
+                figures={siteFigures(site.id)}
+                figuresMissing={page.sites.figuresMissing}
                 href="#"
                 linkLabel={page.sites.link}
-                featured={site.data.featured}
               />
             ))
           }
@@ -90,34 +124,25 @@ const breadcrumb = [
       </div>
     </section>
 
-    <section class="section section--tinted" aria-labelledby="methode-titre">
-      <div class="container method">
-        <Picture
-          class="method__photo"
-          data-reveal
-          src={methodClasse}
-          alt={page.method.imageAlt}
-          formats={['avif', 'webp']}
-          widths={[400, 640, 1040]}
-          sizes="(max-width: 1000px) 100vw, 520px"
+    <section class="section section--tinted" aria-labelledby="projets-titre">
+      <div class="container stack stack--40">
+        <SectionHeading
+          id="projets-titre"
+          strong={page.projects.titleStrong}
+          light={page.projects.titleLight}
+          lead={page.projects.lead}
         />
-        <div class="method__text">
-          <SectionHeading id="methode-titre" strong={page.method.titleStrong} light={page.method.titleLight} />
-          <ol class="method__steps">
-            {
-              page.method.steps.map((step, i) => (
-                <li class="method__step" data-reveal>
-                  <span class="method__number" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <span class="method__step-body">
-                    <span class="method__step-title">{step.title}</span>
-                    <span class="method__step-text">{step.text}</span>
-                  </span>
-                </li>
-              ))
-            }
-          </ol>
+        <div class="projects-grid">
+          {
+            projects.map((project) => (
+              <ProjectCard
+                title={project.data.title}
+                sites={project.data.sites.map((ref) => siteNames.get(ref.id) ?? ref.id)}
+                sitesLabel={page.projects.sitesLabel}
+                href="#"
+              />
+            ))
+          }
         </div>
       </div>
     </section>
@@ -152,15 +177,15 @@ const breadcrumb = [
     gap: var(--space-12);
   }
 
-  /* 3 colonnes, Vohimana en grande carte sur 2 ; 2 colonnes en tablette, 1 en mobile. */
+  .stack--40 {
+    gap: 40px;
+  }
+
+  /* 3 colonnes ; 2 en tablette, 1 en mobile. */
   .sites-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-6);
-  }
-
-  .sites-grid :global(.sites-grid__featured) {
-    grid-column: span 2;
   }
 
   @media (max-width: 1000px) {
@@ -173,103 +198,12 @@ const breadcrumb = [
     .sites-grid {
       grid-template-columns: minmax(0, 1fr);
     }
-
-    .sites-grid :global(.sites-grid__featured) {
-      grid-column: auto;
-    }
   }
 
-  .method {
-    display: flex;
-    align-items: center;
-    gap: 56px;
-  }
-
-  /* Photo en arche : 120px en haut, 20px en bas. */
-  .method :global(.method__photo) {
-    flex: 1 1 380px;
-    min-width: 0;
-    max-width: 520px;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: var(--radius-arch) var(--radius-arch) 20px 20px;
-  }
-
-  .method__text {
-    flex: 1 1 480px;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-7);
-  }
-
-  /* Empilé : la photo passe au-dessus du texte et prend toute la largeur. */
-  @media (max-width: 1000px) {
-    .method {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .method :global(.method__photo) {
-      flex: none;
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .method__text {
-      flex: none;
-    }
-  }
-
-  @media (min-width: 600px) and (max-width: 1000px) {
-    .method :global(.method__photo) {
-      aspect-ratio: 16 / 9;
-    }
-  }
-
-  .method__steps {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .method__step {
-    display: flex;
-    align-items: flex-start;
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: 16px;
-  }
-
-  .method__number {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-pill);
-    background: var(--blanc);
-    font-size: var(--fs-body);
-    font-weight: 800;
-  }
-
-  .method__step-body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .method__step-title {
-    font-size: 20px;
-    font-weight: 700;
-  }
-
-  .method__step-text {
-    font-size: 16px;
-    line-height: var(--lh-body);
   }
 
   .cta__buttons {

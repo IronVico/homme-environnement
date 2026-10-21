@@ -6,7 +6,7 @@ export interface NavLink {
 }
 
 /** Rubriques du menu principal, dans l'ordre de nav.main (src/i18n). */
-export const MAIN_SECTIONS = ['ong', 'actions', 'engager', 'ressources', 'contact'] as const;
+export const MAIN_SECTIONS = ['ong', 'sites', 'projets', 'engager', 'ressources', 'contact'] as const;
 export type MainSection = (typeof MAIN_SECTIONS)[number];
 
 export interface MainNavLink extends NavLink {
@@ -42,10 +42,11 @@ export const SOCIAL_URLS = {
   facebook: '#', // TODO URL de la page Facebook de l'ONG
 };
 
-const MAIN_HREFS = ['#', '#', '#', '#', '#'];
+const MAIN_HREFS = ['#', '#', '#', '#', '#', '#'];
 const FOOTER_HREFS = [
   ['#', '#', '#'],
-  [PAGES.madagascar, '#', '#', '#'],
+  [PAGES.madagascar, '#'],
+  ['#', '#', '#', '#', '#'],
   ['#', '#', '#'],
   ['#', '#', '#'],
 ];
@@ -58,9 +59,10 @@ const LEGAL_HREFS = ['#', '#'];
  */
 const SUBMENUS: Partial<Record<MainSection, { column: number; count?: number }>> = {
   ong: { column: 0 },
-  actions: { column: 1 },
-  engager: { column: 2 },
-  ressources: { column: 3, count: 2 },
+  sites: { column: 1 },
+  projets: { column: 2 },
+  engager: { column: 3 },
+  ressources: { column: 4, count: 2 },
 };
 
 const resolve = (lang: Lang, href: string | undefined) => (!href || href.startsWith('#') ? '#' : localeUrl(lang, href));

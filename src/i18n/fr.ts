@@ -37,10 +37,14 @@ const fr = {
   },
 
   nav: {
-    main: ["L'ONG", 'Nos actions', "S'engager", 'Ressources', 'Contact'],
+    main: ["L'ONG", 'Nos sites', 'Nos projets', "S'engager", 'Ressources', 'Contact'],
     footer: [
       { title: "L'ONG", links: ['Notre approche', 'Notre histoire', 'Partenaires et bailleurs'] },
-      { title: 'Nos actions', links: ['Madagascar', 'Burkina Faso', 'Projets soutenus', 'Autonomisation'] },
+      { title: 'Nos sites', links: ['Madagascar', 'Burkina Faso'] },
+      {
+        title: 'Nos projets',
+        links: ['Conservation', 'Reboisement', 'Santé', 'Plantes aromatiques', 'Tous les projets'],
+      },
       { title: "S'engager", links: ['Particuliers', 'Venir sur le terrain', 'Entreprises'] },
       { title: 'Ressources', links: ['Rapports et études', 'Galerie photos', 'Contact'] },
     ],
@@ -148,65 +152,54 @@ const fr = {
       text: 'Résultats des projets, départs de volontaires, appels à soutien.',
     },
   },
-  // Page pays Madagascar. Les crochets et « [X] familles » sont des textes de maquette À COMPLÉTER avec l'ONG.
+  // Page pays Madagascar. Contenu de la maquette PaysMadagascar (canvas v81) ; chiffres dans src/data/chiffres.ts.
   madagascar: {
     title: 'Madagascar',
     description:
-      "Depuis 1993, L'Homme & l'Environnement protège à Madagascar des forêts d'une richesse unique, avec les communautés qui en vivent, jusqu'à leur en confier la gestion.",
+      "L'Homme & l'Environnement est à l'origine de plusieurs zones protégées à Madagascar : 6 sites, d'une richesse exceptionnelle en espèces endémiques, gérés avec les communautés locales.",
     hero: {
       titleStrong: 'Madagascar,',
-      titleLight: "une nature qui n'existe nulle part ailleurs.",
-      lead: "Depuis 1993, nous protégeons à Madagascar des forêts d'une richesse unique, avec les communautés qui en vivent, jusqu'à leur en confier la gestion.",
-      cta: 'Découvrir nos sites',
+      titleLight: "terre de vie et d'avenir.",
+      lead: "L'Homme & l'Environnement est à l'origine de la création de plusieurs zones qui n'étaient pas protégées, malgré leur richesse exceptionnelle en espèces endémiques. Aujourd'hui, plusieurs projets se transmettent aux acteurs locaux : la preuve que l'approche biodiversité, économie et responsabilisation fonctionne.",
+      /** {count} : nombre de sites. */
+      cta: 'Découvrir nos {count} sites',
       imageAlt: 'Vue aérienne de forêts et de mangroves au bord de la mer, Madagascar',
     },
     statsLabel: 'Madagascar en chiffres',
     stats: [
       {
-        unit: 'sites',
-        text: 'protégés et accompagnés, de la forêt humide aux mangroves.',
-        illustrationLabel: '5 sites',
+        unit: 'ha',
+        text: 'protégés sur 6 sites, de la forêt humide aux mangroves.',
+        illustrationLabel: 'Surface protégée',
       },
       {
-        unit: '%',
-        text: "des espèces de l'île n'existent nulle part ailleurs au monde.",
-        illustrationLabel: 'Part des espèces endémiques',
+        unit: undefined,
+        text: 'bénéficiaires directs de nos actions, sur environ 5 700 habitants.',
+        illustrationLabel: 'Part des habitants bénéficiaires',
       },
       {
-        unit: 'familles',
-        text: 'impliquées dans la gestion des réserves et les filières locales.',
-        illustrationLabel: 'Familles impliquées',
+        unit: undefined,
+        text: 'espèces animales menacées présentes sur nos sites.',
+        illustrationLabel: 'Espèces menacées',
       },
     ],
     sites: {
-      titleStrong: 'Nos 5 sites',
+      /** {count} : nombre de sites. */
+      titleStrong: 'Nos {count} sites',
       titleLight: 'à Madagascar',
-      lead: 'Chaque site a sa fiche : ses enjeux, nos actions et les résultats obtenus avec les habitants.',
+      lead: 'Des forêts uniques au monde, protégées avec les communautés locales qui en vivent.',
+      speciesTitle: 'Espèces emblématiques',
+      figuresMissing: '[Chiffres à fournir]',
+      hectares: 'ha',
+      years: 'ans',
+      beneficiaries: 'bénéficiaires',
       link: 'Voir la fiche du site',
-      status: {
-        historique: 'Site historique',
-        transmis: 'Transmis aux acteurs locaux',
-        'en-cours': 'En cours',
-      },
     },
-    method: {
-      titleStrong: 'Comment nous agissons',
-      titleLight: "sur l'île",
-      imageAlt: 'Des élèves travaillent dans une salle de classe en bois, Vohimana',
-      steps: [
-        {
-          title: 'Protéger',
-          text: "Faire reconnaître et gérer des zones riches en espèces endémiques qui n'étaient pas protégées.",
-        },
-        {
-          title: 'Valoriser',
-          text: 'Créer des revenus liés à la forêt vivante : écotourisme, huiles essentielles avec Aroma Forest.',
-        },
-        {
-          title: 'Transmettre',
-          text: "Former et accompagner les acteurs locaux jusqu'à leur confier la gestion des sites.",
-        },
-      ],
+    projects: {
+      titleStrong: 'Nos projets',
+      titleLight: 'à Madagascar',
+      lead: 'Chaque projet allie protection de la nature et revenus pour les communautés, sur un ou plusieurs de nos sites.',
+      sitesLabel: 'Sites',
     },
     cta: {
       titleStrong: 'Soutenir Madagascar,',

@@ -3,6 +3,7 @@
  * Page d'accueil, commune aux deux langues : les textes viennent de src/i18n,
  * la langue de Astro.currentLocale (/ = français, /en/ = anglais).
  */
+import { getCollection } from 'astro:content';
 import { DON_URL, pagePath } from '../data/navigation';
 import { getLang, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -54,7 +55,10 @@ const engageMedia = [
 ];
 const engagements = home.engage.cards.map((card, i) => ({ ...card, ...engageMedia[i]! }));
 
-const madagascarSites = ['Vohimana', 'Vohibola', 'Ambohidravy', 'Mont Passot', 'Fohisokina'];
+// Pastilles de la carte Madagascar : les sites de la collection, dans l'ordre de la page pays.
+const madagascarSites = (await getCollection('sites', ({ data }) => data.country === 'madagascar'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((site) => site.data.name);
 ---
 
 <BaseLayout title={dict.meta.siteName} description={dict.meta.homeDescription}>

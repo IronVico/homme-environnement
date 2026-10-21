@@ -1,9 +1,10 @@
 ---
 name: Fohisokina
 country: madagascar
-status: en-cours
+region: Centre-Sud
 photo: ../../assets/photos/site-fohisokina.jpg
-photoPosition: 45% 55%
-summary: "[Une phrase sur le site : milieu, enjeu principal.]"
-order: 5
+summary: "Sur une surface minuscule vit la grenouille arlequin, unique au monde. Dès 1988, Olivier Behra alertait pour interdire son commerce international."
+species:
+  - { name: Mantella cowani (grenouille arlequin), type: animal }
+order: 4
 ---

@@ -49,8 +49,10 @@ src/
     en/index.astro    accueil en anglais (/en/)
     actions/madagascar.astro     page pays Madagascar (/actions/madagascar)
     en/actions/madagascar.astro  page pays en anglais (/en/actions/madagascar)
-  content/sites/      un fichier Markdown par site (nom, pays, statut, photo, résumé)
-  content.config.ts   schéma de la collection « sites »
+  content/sites/      un fichier Markdown par site (nom, pays, région, photo, résumé, espèces)
+  content/projets.json  projets, reliés aux sites où ils sont menés
+  content.config.ts   schémas des collections « sites » et « projets »
+  data/chiffres.ts    chiffres de Madagascar et de chaque site (un seul endroit à modifier)
   scripts/stats.ts    animation des chiffres clés
   styles/
     tokens.css        tokens du design system en variables CSS
@@ -62,12 +64,13 @@ src/
 | Composant           | Rôle |
 | ------------------- | ---- |
 | `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
-| `MadagascarPage`    | Page pays Madagascar commune aux deux langues ; sites lus dans la collection `sites` |
+| `MadagascarPage`    | Page pays Madagascar commune aux deux langues ; sites et projets lus dans les collections, chiffres dans `data/chiffres.ts` |
 | `Breadcrumb`        | Fil d'Ariane des pages internes |
 | `PageHero`          | Hero des pages internes : H1 en deux temps, chapeau, bouton secondaire, photo en arche |
-| `SiteCard`          | Carte d'un site : grande carte photo (`featured`) ou carte blanche, statut en pastille |
+| `SiteCard`          | Carte blanche d'un site : région, texte, espèces emblématiques (icône par type), chiffres clés |
+| `ProjectCard`       | Carte compacte d'un projet et des sites où il est mené |
 | `PhotoBanner`       | Carte sur photo assombrie (titre + phrase) avec contenu libre : newsletter, boutons d'appel |
-| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don ; sous-menus déroulants (accordéon dans le burger) ; fixé en haut au scroll ; burger en dessous de 1180px |
+| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don ; sous-menus déroulants (accordéon dans le burger) ; fixé en haut au scroll ; burger en dessous de 1280px |
 | `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
