@@ -7,6 +7,7 @@
  * - `footer` : motif à droite du footer.
  * Le motif s'efface vers le haut (masque) pour ne jamais passer sous le menu.
  * Purement décoratif : ignoré par les lecteurs d'écran et par la souris.
+ * Apparition au scroll comme les autres éléments (data-reveal : fondu et montée de 24px).
  * Les courbes « respirent » très lentement, en décalé (validé, documenté dans le design
  * system) ; coupé avec prefers-reduced-motion.
  */
@@ -49,7 +50,7 @@ const PATTERNS = {
 const pattern = PATTERNS[variant];
 ---
 
-<svg class:list={['contours', `contours--${variant}`, className]} viewBox={pattern.viewBox} aria-hidden="true" focusable="false">
+<svg class:list={['contours', `contours--${variant}`, className]} viewBox={pattern.viewBox} aria-hidden="true" focusable="false" data-reveal>
   {
     pattern.paths.map(({ d, opacity }, index) => (
       <path d={d} stroke-opacity={opacity} style={`--i: ${index}`} />
