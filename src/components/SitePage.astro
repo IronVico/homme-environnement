@@ -639,6 +639,18 @@ const breadcrumb = [
     background: var(--blanc);
     box-shadow: var(--shadow-card);
     line-height: normal;
+    transition: box-shadow var(--transition-ui);
+  }
+
+  /* Carte non cliquable : l'ombre s'élargit au survol, sans élévation (réservée aux liens). */
+  .group:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .group {
+      transition: none;
+    }
   }
 
   .group__name {
