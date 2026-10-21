@@ -99,12 +99,12 @@ actions:
 groups:
   lead: Six groupements locaux portent aujourd'hui les activités du site.
   items:
-    - { name: Comité de gestion de Vohimana, role: Gestion du site }
-    - { name: Fivoarana, role: Éducation }
-    - { name: Vohimana Salama, role: Tradipraticiens }
-    - { name: Manarapenitra, role: Huiles essentielles }
-    - { name: Kanto, role: Artisanat }
-    - { name: MERCIE Vohimana, role: Tourisme }
+    - { name: Comité de gestion de Vohimana, role: Gestion du site, icon: gestion }
+    - { name: Fivoarana, role: Éducation, icon: education }
+    - { name: Vohimana Salama, role: Tradipraticiens, icon: soins }
+    - { name: Manarapenitra, role: Huiles essentielles, icon: huiles }
+    - { name: Kanto, role: Artisanat, icon: artisanat }
+    - { name: MERCIE Vohimana, role: Tourisme, icon: tourisme }
 # Partenaires : l'URL est facultative (sans URL, la pastille n'est pas un lien).
 partners:
   - { name: Rainforest Trust, url: "https://www.rainforesttrust.org/" }

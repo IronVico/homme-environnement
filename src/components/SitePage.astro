@@ -8,6 +8,12 @@
  */
 import ArrowLeft from '@lucide/astro/icons/arrow-left';
 import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Backpack from '@lucide/astro/icons/backpack';
+import Droplets from '@lucide/astro/icons/droplets';
+import GraduationCap from '@lucide/astro/icons/graduation-cap';
+import HandHeart from '@lucide/astro/icons/hand-heart';
+import Scissors from '@lucide/astro/icons/scissors';
+import UsersRound from '@lucide/astro/icons/users-round';
 import Calendar from '@lucide/astro/icons/calendar';
 import ExternalLink from '@lucide/astro/icons/external-link';
 import Leaf from '@lucide/astro/icons/leaf';
@@ -93,6 +99,16 @@ const figureList = (data.figures ?? (page.defaultFigures as { key: FigureKey; te
       : { key, value, unit: page.units[key], suffix: atLeast ? '+' : undefined, text, Icon: FIGURE_ICONS[key] };
   },
 );
+
+// Pictogramme de l'activité de chaque groupement local.
+const GROUP_ICONS = {
+  gestion: UsersRound,
+  education: GraduationCap,
+  soins: HandHeart,
+  huiles: Droplets,
+  artisanat: Scissors,
+  tourisme: Backpack,
+};
 
 const speciesStatus = (status: (typeof data.species)[number]['status']) =>
   status && { label: page.species.status[status], threatened: ['CR', 'EN', 'VU'].includes(status) };
@@ -302,12 +318,20 @@ const breadcrumb = [
           {
             data.groups && (
               <ul class="groups">
-                {data.groups.items.map((group) => (
-                  <li class="group">
-                    <span class="group__name">{group.name}</span>
-                    <span class="group__role">{group.role}</span>
-                  </li>
-                ))}
+                {data.groups.items.map((group) => {
+                  const Icon = GROUP_ICONS[group.icon];
+                  return (
+                    <li class="group">
+                      <span class="group__icon">
+                        <Icon size={20} />
+                      </span>
+                      <span class="group__text">
+                        <span class="group__name">{group.name}</span>
+                        <span class="group__role">{group.role}</span>
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             )
           }
@@ -622,7 +646,8 @@ const breadcrumb = [
   /* Groupements locaux et partenaires. */
   .groups {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* 240px : place pour l'icône sans couper les noms des groupements. */
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
     gap: 10px;
     margin: 0;
     padding: 0;
@@ -631,26 +656,52 @@ const breadcrumb = [
 
   .group {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    gap: 14px;
     padding: 16px 20px;
     border: 1px solid var(--bordure-douce);
     border-radius: var(--radius-card-sm);
     background: var(--blanc);
     box-shadow: var(--shadow-card);
     line-height: normal;
-    transition: box-shadow var(--transition-ui);
   }
 
-  /* Carte non cliquable : l'ombre s'élargit au survol, sans élévation (réservée aux liens). */
-  .group:hover {
-    box-shadow: var(--shadow-card-hover);
+  /* Pictogramme de l'activité : disque menthe, comme les cartes chiffres. */
+  .group__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-pill);
+    background: var(--menthe);
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /*
+   * Carte non cliquable : comme les cartes chiffres, pas d'élévation (réservée
+   * aux liens), seulement l'icône qui grossit avec un petit rebond.
+   */
+  .group:hover .group__icon {
+    transform: scale(1.08);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .group {
+    .group__icon {
       transition: none;
     }
+
+    .group:hover .group__icon {
+      transform: none;
+    }
+  }
+
+  .group__text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   .group__name {

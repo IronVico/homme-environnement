@@ -94,7 +94,18 @@ const sites = defineCollection({
       groups: z
         .object({
           lead: z.string(),
-          items: z.array(z.object({ name: z.string(), role: z.string() })).min(1),
+          /** `icon` : pictogramme de l'activité (par défaut, un groupe de personnes). */
+          items: z
+            .array(
+              z.object({
+                name: z.string(),
+                role: z.string(),
+                icon: z
+                  .enum(['gestion', 'education', 'soins', 'huiles', 'artisanat', 'tourisme'])
+                  .default('gestion'),
+              }),
+            )
+            .min(1),
         })
         .optional(),
       /** Partenaires du site ; `url` (facultative) fait de la pastille un lien vers leur site. */
