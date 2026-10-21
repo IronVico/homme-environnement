@@ -7,6 +7,7 @@
  * Au clic, « coup de tampon » : le sceau s'enfonce et rebondit, le texte fait un tour rapide.
  * Interaction purement décorative (aucune action, pas de focus) : seul le disque blanc
  * capte la souris, jamais le carré autour, pour ne pas gêner les liens voisins.
+ * Apparition au scroll comme les autres éléments (data-reveal).
  * La position et la taille selon l'écran sont gérées par le footer.
  */
 import { getLang, t } from '../i18n';
@@ -19,7 +20,7 @@ const { class: className } = Astro.props;
 const { ui } = t(getLang(Astro.currentLocale));
 ---
 
-<svg class:list={['stamp', className]} viewBox="0 0 200 200" role="img" aria-label={ui.stampLabel}>
+<svg class:list={['stamp', className]} viewBox="0 0 200 200" role="img" aria-label={ui.stampLabel} data-reveal>
   <defs>
     <path id="stamp-circle" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"></path>
   </defs>
