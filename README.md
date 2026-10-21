@@ -25,6 +25,8 @@ Le site tourne sur <http://localhost:4321> (version anglaise : <http://localhost
 | `npm run preview` | Sert le build de `dist/` en local pour le tester            |
 | `npm run check`   | Vérification des types seule                                |
 
+Redirections 301 (anciennes URL, dont celles du site WordPress) : [`vercel.json`](vercel.json), à compléter à mesure que les pages cibles existent.
+
 Le dossier `dist/` est un site statique prêt à déposer sur Netlify, Vercel ou Cloudflare Pages (commande de build `npm run build`, dossier publié `dist`).
 
 ## Organisation
