@@ -26,21 +26,23 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
 ---
 
 <li class="species-card" data-reveal>
-  {
-    photo ? (
-      <Picture
-        class="species-card__photo"
-        src={photo}
-        alt={photoAlt}
-        style={`object-position: ${photoPosition}`}
-        formats={['avif', 'webp']}
-        widths={[320, 520, 760]}
-        sizes="(max-width: 700px) 100vw, 320px"
-      />
-    ) : (
-      <span class="species-card__photo species-card__photo--missing">{photoMissing}</span>
-    )
-  }
+  <div class="species-card__media">
+    {
+      photo ? (
+        <Picture
+          class="species-card__photo"
+          src={photo}
+          alt={photoAlt}
+          style={`object-position: ${photoPosition}`}
+          formats={['avif', 'webp']}
+          widths={[320, 520, 760]}
+          sizes="(max-width: 700px) 100vw, 320px"
+        />
+      ) : (
+        <span class="species-card__photo species-card__photo--missing">{photoMissing}</span>
+      )
+    }
+  </div>
   <div class="species-card__body">
     <h3 class="species-card__name" lang="la">{name}</h3>
     {
@@ -79,10 +81,34 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
     flex-direction: column;
   }
 
+  /* Cadre de la photo : coupe la photo agrandie au survol. */
+  .species-card__media {
+    overflow: hidden;
+  }
+
   .species-card :global(.species-card__photo) {
     width: 100%;
     height: 200px;
     object-fit: cover;
+    transition: transform 400ms ease-out;
+  }
+
+  /*
+   * Survol : la photo se rapproche légèrement dans son cadre. Pas d'élévation de
+   * la carte, réservée aux cartes cliquables (celle-ci n'est pas un lien).
+   */
+  .species-card:hover :global(.species-card__photo) {
+    transform: scale(1.05);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .species-card :global(.species-card__photo) {
+      transition: none;
+    }
+
+    .species-card:hover :global(.species-card__photo) {
+      transform: none;
+    }
   }
 
   .species-card__photo--missing {
