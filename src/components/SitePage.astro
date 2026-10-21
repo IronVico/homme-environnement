@@ -11,7 +11,9 @@ import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Calendar from '@lucide/astro/icons/calendar';
 import Leaf from '@lucide/astro/icons/leaf';
 import MapIcon from '@lucide/astro/icons/map';
+import MapPin from '@lucide/astro/icons/map-pin';
 import PawPrint from '@lucide/astro/icons/paw-print';
+import Trees from '@lucide/astro/icons/trees';
 import Users from '@lucide/astro/icons/users';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { SITE_FIGURES, type SiteFigures } from '../data/chiffres';
@@ -210,13 +212,19 @@ const breadcrumb = [
             </MadagascarMap>
           </div>
           <dl class="locator__facts">
-            <div>
-              <dt>{page.location}</dt>
-              <dd>{data.location ?? page.missing}</dd>
+            <div class="locator__fact">
+              <span class="locator__fact-icon"><MapPin size={20} /></span>
+              <div>
+                <dt>{page.location}</dt>
+                <dd>{data.location ?? page.missing}</dd>
+              </div>
             </div>
-            <div>
-              <dt>{page.habitat}</dt>
-              <dd>{data.habitat ?? page.missing}</dd>
+            <div class="locator__fact">
+              <span class="locator__fact-icon"><Trees size={20} /></span>
+              <div>
+                <dt>{page.habitat}</dt>
+                <dd>{data.habitat ?? page.missing}</dd>
+              </div>
             </div>
           </dl>
         </div>
@@ -542,6 +550,24 @@ const breadcrumb = [
     margin: 0;
     font-size: var(--fs-body-sm);
     line-height: 1.5;
+  }
+
+  .locator__fact {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  /* Pastille blanche : le bloc est sur vert clair. */
+  .locator__fact-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
   }
 
   .locator__facts dt {
