@@ -342,15 +342,15 @@ const breadcrumb = [
     </PhotoBanner>
 
     <nav class="site-nav container" aria-label={page.nav.label}>
-      <a class="site-nav__link" href={pagePath(lang, 'madagascar')}>
-        <ArrowLeft size={18} />
-        {page.nav.all}
+      <a class="site-nav__link site-nav__link--back" href={pagePath(lang, 'madagascar')}>
+        <ArrowLeft class="site-nav__arrow" size={18} />
+        <span class="site-nav__label">{page.nav.all}</span>
       </a>
       {
         next.id !== site.id && (
           <a class="site-nav__link" href={sitePath(lang, next.id)}>
-            {fill(page.nav.next, { name: next.data.name })}
-            <ArrowRight size={18} />
+            <span class="site-nav__label">{fill(page.nav.next, { name: next.data.name })}</span>
+            <ArrowRight class="site-nav__arrow" size={18} />
           </a>
         )
       }
@@ -656,11 +656,63 @@ const breadcrumb = [
     padding-bottom: var(--space-section);
   }
 
+  /*
+   * Même survol que les liens d'action des titres de section : filet sauge au repos,
+   * trait basalte tracé de gauche à droite au survol, flèche qui glisse vers l'extérieur.
+   */
   .site-nav__link {
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    padding-block: 4px;
     font-size: var(--fs-body);
     font-weight: 600;
+    color: var(--basalte);
+    text-decoration: none;
+  }
+
+  .site-nav__link:hover {
+    color: var(--basalte);
+  }
+
+  .site-nav__label {
+    padding-bottom: 4px;
+    background:
+      linear-gradient(var(--basalte), var(--basalte)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .site-nav__link:hover .site-nav__label,
+  .site-nav__link:focus-visible .site-nav__label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  .site-nav :global(.site-nav__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .site-nav__link:hover :global(.site-nav__arrow),
+  .site-nav__link:focus-visible :global(.site-nav__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  .site-nav__link--back:hover :global(.site-nav__arrow),
+  .site-nav__link--back:focus-visible :global(.site-nav__arrow) {
+    transform: translateX(calc(-1 * var(--nudge-arrow-hover)));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-nav__label {
+      transition: none;
+    }
+
+    .site-nav__link:hover :global(.site-nav__arrow),
+    .site-nav__link:focus-visible :global(.site-nav__arrow) {
+      transform: none;
+    }
   }
 </style>
