@@ -85,35 +85,49 @@ const selectedId = sites[0]?.id;
 </script>
 
 <style>
+  /*
+   * Desktop : colonne de la carte à la largeur de la carte, la liste prend le reste.
+   * --map-top : distance sous le header fixé ; --panel-pad : marge intérieure du fond vert.
+   */
   .sites-explorer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    --map-top: 96px;
+    --panel-pad: clamp(20px, 2.5vw, 32px);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
     gap: var(--space-8);
   }
 
   /* La carte reste visible pendant qu'on parcourt la liste (sous le header fixé). */
   .sites-explorer__map {
-    flex: 1 1 440px;
-    min-width: 0;
     position: sticky;
-    top: 96px;
+    top: var(--map-top);
   }
 
   .sites-explorer__panel {
     display: flex;
     justify-content: center;
-    padding: clamp(20px, 3vw, 36px);
+    padding: var(--panel-pad);
     overflow: hidden;
     border-radius: var(--radius-block);
     background: var(--vert-clair);
   }
 
+  /*
+   * La carte tient toujours en entier à l'écran : sa largeur découle de la hauteur
+   * disponible (écran - header - marges), dans le rapport 399 / 772 de l'île.
+   */
+  .sites-explorer__panel :global(.mg-map) {
+    width: clamp(
+      260px,
+      calc((100svh - var(--map-top) - 24px - 2 * var(--panel-pad)) * 399 / 772),
+      440px
+    );
+  }
+
   .sites-explorer__list {
-    flex: 1.4 1 520px;
-    min-width: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
     gap: 16px;
     margin: 0;
     padding: 0;
@@ -191,10 +205,21 @@ const selectedId = sites[0]?.id;
     outline-offset: 3px;
   }
 
-  /* Empilé (carte au-dessus de la liste) : la carte ne reste pas collée, elle masquerait la liste. */
-  @media (max-width: 1080px) {
+  /*
+   * Empilé (tablette, mobile) : la carte passe au-dessus de la liste, sur toute la
+   * largeur, et ne reste pas collée (elle masquerait la liste).
+   */
+  @media (max-width: 900px) {
+    .sites-explorer {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     .sites-explorer__map {
       position: static;
+    }
+
+    .sites-explorer__panel :global(.mg-map) {
+      width: min(100%, 400px);
     }
   }
 
