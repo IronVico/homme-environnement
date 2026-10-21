@@ -321,14 +321,16 @@ const breadcrumb = [
                 {data.groups.items.map((group) => {
                   const Icon = GROUP_ICONS[group.icon];
                   return (
-                    <li class="group">
-                      <span class="group__icon">
-                        <Icon size={20} />
-                      </span>
-                      <span class="group__text">
-                        <span class="group__name">{group.name}</span>
-                        <span class="group__role">{group.role}</span>
-                      </span>
+                    <li class="group-item">
+                      <div class="group">
+                        <span class="group__icon">
+                          <Icon size={20} />
+                        </span>
+                        <span class="group__text">
+                          <span class="group__name">{group.name}</span>
+                          <span class="group__role">{group.role}</span>
+                        </span>
+                      </div>
                     </li>
                   );
                 })}
@@ -646,16 +648,28 @@ const breadcrumb = [
   /* Groupements locaux et partenaires. */
   .groups {
     display: grid;
-    /* 240px : place pour l'icône sans couper les noms des groupements. */
-    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    /* Toujours 2 colonnes, une seule sur mobile (voir plus bas). */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  @media (max-width: 560px) {
+    .groups {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Chaque carte est mesurée : sa mise en page dépend de sa propre largeur. */
+  .group-item {
+    container-type: inline-size;
+  }
+
   .group {
     display: flex;
+    height: 100%;
     align-items: center;
     gap: 14px;
     padding: 16px 20px;
@@ -702,6 +716,15 @@ const breadcrumb = [
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+
+  /* Carte étroite : l'icône passe au-dessus du nom pour ne pas le couper. */
+  @container (max-width: 250px) {
+    .group {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
   }
 
   .group__name {
