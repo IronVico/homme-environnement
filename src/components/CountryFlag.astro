@@ -1,0 +1,44 @@
+---
+/**
+ * Drapeau rond d'un pays d'intervention, décoratif (le nom du pays est toujours écrit à côté).
+ * Exception à la règle « icônes Lucide » : Lucide n'a pas de drapeaux.
+ */
+import type { COUNTRIES } from '../data/projets';
+
+interface Props {
+  country: (typeof COUNTRIES)[number];
+  size?: number;
+}
+
+const { country, size = 18 } = Astro.props;
+---
+
+<svg class="country-flag" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  {
+    country === 'madagascar' ? (
+      <>
+        <rect width="24" height="24" fill="#FFFFFF" />
+        <rect x="8" width="16" height="12" fill="#FC3D32" />
+        <rect x="8" y="12" width="16" height="12" fill="#007E3A" />
+      </>
+    ) : (
+      <>
+        <rect width="24" height="12" fill="#EF2B2D" />
+        <rect y="12" width="24" height="12" fill="#009E49" />
+        <polygon
+          points="12,7.8 13,10.62 15.99,10.7 13.62,12.53 14.47,15.4 12,13.7 9.53,15.4 10.38,12.53 8.01,10.7 11,10.62"
+          fill="#FCD116"
+        />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  /* Rond, avec un liseré pour que le blanc du drapeau malgache se détache sur une pastille blanche. */
+  .country-flag {
+    flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(67, 72, 64, 0.18);
+  }
+</style>

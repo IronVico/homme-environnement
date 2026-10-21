@@ -8,6 +8,8 @@ import ArrowRight from '@lucide/astro/icons/arrow-right';
 import MapPin from '@lucide/astro/icons/map-pin';
 import type { ImageMetadata } from 'astro';
 import { Picture } from 'astro:assets';
+import type { COUNTRIES } from '../data/projets';
+import CountryFlag from './CountryFlag.astro';
 
 interface Props {
   id: string;
@@ -15,8 +17,8 @@ interface Props {
   summary: string;
   theme: string;
   themeLabel: string;
-  countries: string[];
-  countriesLabel: string;
+  /** Pays du projet, avec leur libellé ; un drapeau précède chaque nom. */
+  countries: { id: (typeof COUNTRIES)[number]; label: string }[];
   sites: string[];
   /** Préfixe lu par les lecteurs d'écran devant la liste des sites (« Sites : »). */
   sitesLabel: string;
@@ -32,7 +34,6 @@ const {
   theme,
   themeLabel,
   countries,
-  countriesLabel,
   sites,
   sitesLabel,
   image,
@@ -41,7 +42,7 @@ const {
 } = Astro.props;
 ---
 
-<li class="project-tile" id={`projet-${id}`} data-theme={theme} data-countries={countries.join(' ')} data-reveal>
+<li class="project-tile" id={`projet-${id}`} data-theme={theme} data-countries={countries.map((country) => country.id).join(' ')} data-reveal>
   <a class="project-tile__link card-lift" href={href}>
     <Picture
       class="project-tile__photo"
@@ -55,7 +56,19 @@ const {
     <span class="project-tile__body">
       <span class="project-tile__tags">
         <span class="project-tile__tag project-tile__tag--theme">{themeLabel}</span>
-        <span class="project-tile__tag">{countriesLabel}</span>
+        <span class="project-tile__tag project-tile__tag--countries">
+          {
+            countries.map((country, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true">·</span>}
+                <span class="project-tile__country">
+                  <CountryFlag country={country.id} size={14} />
+                  {country.label}
+                </span>
+              </>
+            ))
+          }
+        </span>
       </span>
       <span class="project-tile__title">{title}</span>
       <span class="project-tile__text">{summary}</span>
@@ -122,6 +135,13 @@ const {
     border: 1px solid var(--vert-clair);
     border-radius: var(--radius-pill);
     font-size: 13px;
+  }
+
+  .project-tile__tag--countries,
+  .project-tile__country {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .project-tile__tag--theme {

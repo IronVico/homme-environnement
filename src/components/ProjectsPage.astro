@@ -12,6 +12,7 @@ import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from './Breadcrumb.astro';
 import Button from './Button.astro';
+import CountryFlag from './CountryFlag.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
 import PageHero from './PageHero.astro';
@@ -38,16 +39,16 @@ const filters = [
     name: 'theme',
     label: page.list.filterTheme,
     options: [
-      { value: 'all', label: page.list.allThemes },
-      ...PROJECT_THEMES.map((theme) => ({ value: theme, label: page.themes[theme] })),
+      { value: 'all', label: page.list.allThemes, country: undefined },
+      ...PROJECT_THEMES.map((theme) => ({ value: theme, label: page.themes[theme], country: undefined })),
     ],
   },
   {
     name: 'pays',
     label: page.list.filterCountry,
     options: [
-      { value: 'all', label: page.list.allCountries },
-      ...COUNTRIES.map((country) => ({ value: country, label: page.countries[country] })),
+      { value: 'all', label: page.list.allCountries, country: undefined },
+      ...COUNTRIES.map((country) => ({ value: country, label: page.countries[country], country })),
     ],
   },
 ];
@@ -93,6 +94,7 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
                     data-filter={filter.name}
                     data-value={option.value}
                   >
+                    {option.country && <CountryFlag country={option.country} />}
                     {option.label}
                   </button>
                 ))}
@@ -112,8 +114,7 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
                   summary={data.summary}
                   theme={data.theme}
                   themeLabel={page.themes[data.theme]}
-                  countries={data.countries}
-                  countriesLabel={data.countries.map((country) => page.countries[country]).join(' · ')}
+                  countries={data.countries.map((country) => ({ id: country, label: page.countries[country] }))}
                   sites={[...data.sites.map((ref) => siteNames.get(ref.id) ?? ref.id), ...data.otherSites]}
                   sitesLabel={page.list.sitesLabel}
                   image={data.photo}
@@ -248,6 +249,9 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
   }
 
   .filters__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
     min-height: 44px;
     padding: 0 18px;
     border: 2px solid var(--blanc);
