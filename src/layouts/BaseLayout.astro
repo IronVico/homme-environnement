@@ -11,13 +11,15 @@ interface Props {
   /** Image de partage (Open Graph), recadrée en 1200×630. */
   ogImage?: ImageMetadata;
   ogImageAlt?: string;
+  /** Page encore incomplète (contenu « [à fournir] ») : pas d'indexation par les moteurs. */
+  noindex?: boolean;
 }
 
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const SITE_NAME = dict.meta.siteName;
 
-const { title, description, ogImage = defaultOgImage, ogImageAlt = dict.home.hero.imageAlt } = Astro.props;
+const { title, description, ogImage = defaultOgImage, ogImageAlt = dict.home.hero.imageAlt, noindex = false } = Astro.props;
 
 const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -46,6 +48,7 @@ const ogUrl = new URL(og.src, Astro.site);
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
     <link rel="alternate" hreflang="x-default" href={alternates[0]?.href} />

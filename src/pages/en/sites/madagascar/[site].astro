@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import SitePage from '../../../../components/SitePage.astro';
+
+/** Une fiche par site de Madagascar (src/content/sites). */
+export const getStaticPaths = (async () => {
+  const sites = await getCollection('sites', ({ data }) => data.country === 'madagascar');
+  return sites.map((site) => ({ params: { site: site.id }, props: { site } }));
+}) satisfies GetStaticPaths;
+
+const { site } = Astro.props as { site: CollectionEntry<'sites'> };
+---
+
+<SitePage site={site} />

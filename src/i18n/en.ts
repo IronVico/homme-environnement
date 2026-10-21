@@ -57,6 +57,9 @@ const en: Dictionary = {
 
   // TODO traduction : contenu de la page Madagascar encore en français (copie de fr.ts).
   madagascar: structuredClone(fr.madagascar),
+
+  // TODO traduction : fiches site encore en français (copie de fr.ts).
+  site: structuredClone(fr.site),
 };
 
 export default en;

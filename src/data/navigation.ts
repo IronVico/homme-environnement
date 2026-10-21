@@ -30,6 +30,11 @@ export function pagePath(lang: Lang, page: keyof typeof PAGES): string {
   return localeUrl(lang, PAGES[page]);
 }
 
+/** URL de la fiche d'un site de Madagascar : « vohimana » → « /sites/madagascar/vohimana ». */
+export function sitePath(lang: Lang, site: string): string {
+  return localeUrl(lang, `${PAGES.madagascar}/${site}`);
+}
+
 /**
  * Destinations des menus. « # » : page pas encore créée. Les autres valeurs sont
  * des chemins sans préfixe de langue, résolus pour la langue de la page.

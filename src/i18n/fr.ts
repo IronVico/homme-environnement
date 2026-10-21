@@ -214,6 +214,73 @@ const fr = {
       field: 'Venir sur le terrain',
     },
   },
+  // Fiche site (gabarit commun, maquette FicheVohimana). Le contenu propre à chaque site est dans src/content/sites.
+  site: {
+    /** {name} : nom du site. Titre de la page (balise title). */
+    title: '{name}, Madagascar',
+    /** Pastille du hero : pays · région. */
+    country: 'Madagascar',
+    /** Légende de la photo du hero ; {credit} : crédit photo. */
+    photoCaption: '{name}, Madagascar — {credit}',
+    /** Valeur ou texte pas encore fourni par l'ONG (affiché tel quel sur la page). */
+    missing: '[à fournir]',
+    photoCreditMissing: '[crédit photo à fournir]',
+    photoMissing: '[Photo à fournir]',
+    donate: 'Soutenir {name}',
+    field: 'Venir sur le terrain',
+    statsLabel: '{name} en chiffres',
+    /** Unités accolées aux chiffres (les autres chiffres n'en ont pas). */
+    units: { hectares: 'ha', years: 'ans' } as Partial<Record<string, string>>,
+    /** Texte des chiffres par défaut (site sans champ `figures`). */
+    defaultFigures: [
+      { key: 'hectares', text: 'protégés sur le site.' },
+      { key: 'years', text: 'de présence sur le site.' },
+      { key: 'beneficiaries', text: 'bénéficiaires directs.' },
+    ],
+    storyMissing: { titleStrong: "L'histoire", titleLight: 'du site.' },
+    location: 'Localisation',
+    habitat: 'Milieu',
+    /** {name}, {region} : site mis en avant sur la carte. */
+    mapLabel: 'Carte de Madagascar : {name} ({region}), parmi nos autres sites',
+    species: {
+      titleStrong: 'Les espèces',
+      titleLight: 'que nous protégeons',
+      /** Statuts de la liste rouge de l'UICN. */
+      status: {
+        CR: 'En danger critique · UICN CR',
+        EN: 'En danger · UICN EN',
+        VU: 'Vulnérable · UICN VU',
+        NT: 'Quasi menacée · UICN NT',
+        LC: 'Préoccupation mineure · UICN LC',
+        endemique: 'Endémique',
+      },
+      /** Lien vers la page de la photo sur Wikimedia Commons. */
+      source: 'Wikimedia Commons',
+    },
+    actions: {
+      titleStrong: 'Nos actions',
+      titleLight: 'sur le site',
+      link: 'Voir le projet',
+    },
+    people: {
+      titleStrong: 'Ceux qui font',
+      /** {name} : nom du site. */
+      titleLight: 'vivre {name}',
+      partners: 'Partenaires du site',
+    },
+    /** Carte d'appel par défaut (site sans champ `cta`). */
+    cta: {
+      titleStrong: 'Soutenir {name},',
+      titleLight: "c'est protéger des espèces uniques au monde.",
+      text: 'Votre don finance directement les actions sur le site.',
+    },
+    nav: {
+      label: 'Autres sites',
+      all: 'Tous les sites à Madagascar',
+      /** {name} : site suivant. */
+      next: 'Site suivant : {name}',
+    },
+  },
 };
 
 export default fr;

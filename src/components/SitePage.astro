@@ -1,0 +1,640 @@
+---
+/**
+ * Fiche d'un site de Madagascar, commune aux deux langues et à tous les sites
+ * (/sites/madagascar/<site> et /en/sites/madagascar/<site>). Contenu du site dans
+ * son fichier src/content/sites/<site>.md, chiffres dans src/data/chiffres.ts,
+ * textes du gabarit dans src/i18n (clé `site`).
+ * Un champ absent du site s'affiche « [à fournir] » et la page n'est pas indexée.
+ */
+import ArrowLeft from '@lucide/astro/icons/arrow-left';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Calendar from '@lucide/astro/icons/calendar';
+import Leaf from '@lucide/astro/icons/leaf';
+import MapIcon from '@lucide/astro/icons/map';
+import PawPrint from '@lucide/astro/icons/paw-print';
+import Users from '@lucide/astro/icons/users';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { SITE_FIGURES, type SiteFigures } from '../data/chiffres';
+import { DON_URL, pagePath, sitePath } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ActionCard from './ActionCard.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import MadagascarMap from './MadagascarMap.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import SectionHeading from './SectionHeading.astro';
+import SpeciesCard from './SpeciesCard.astro';
+
+import ctaPhoto from '../assets/photos/pilier-biodiversite-souimanga.jpg';
+
+interface Props {
+  site: CollectionEntry<'sites'>;
+}
+
+const { site } = Astro.props;
+const { data } = site;
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.site;
+
+const NBSP = ' ';
+const numberLocale = lang === 'en' ? 'en-GB' : 'fr-FR';
+const formatNumber = (value: number) => value.toLocaleString(numberLocale).replace(/\s/g, NBSP);
+const fill = (text: string, values: Record<string, string>) =>
+  text.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
+const withName = (text: string) => fill(text, { name: data.name, region: data.region });
+
+// Autres sites du pays : repères de la carte de localisation et lien « Site suivant ».
+const sites = (await getCollection('sites', ({ data: other }) => other.country === data.country)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const index = sites.findIndex((other) => other.id === site.id);
+const next = sites[(index + 1) % sites.length]!;
+
+// Fiche complète : tous les contenus propres au site sont fournis.
+const complete = Boolean(
+  data.tagline &&
+    data.intro &&
+    data.story &&
+    data.location &&
+    data.habitat &&
+    data.figures &&
+    data.speciesLead &&
+    data.actions?.length &&
+    data.groups &&
+    data.partners?.length &&
+    data.species.every((species) => species.status && species.text && species.photo && species.credit),
+);
+
+// Bande de chiffres : valeurs dans src/data/chiffres.ts, texte dans le frontmatter du site.
+const FIGURE_ICONS = {
+  hectares: MapIcon,
+  years: Calendar,
+  beneficiaries: Users,
+  lemurSpecies: PawPrint,
+  frogSpecies: null, // pas de grenouille chez Lucide : pictogramme de la maquette, dessiné plus bas
+  medicinalPlants: Leaf,
+};
+type FigureKey = keyof typeof FIGURE_ICONS & keyof SiteFigures;
+
+const siteFigures: SiteFigures = SITE_FIGURES[site.id] ?? {};
+const figureList = (data.figures ?? (page.defaultFigures as { key: FigureKey; text: string }[])).map(
+  ({ key, text, ...rest }) => {
+    const value = siteFigures[key];
+    const atLeast = 'atLeast' in rest && rest.atLeast;
+    const unit = page.units[key];
+    const formatted =
+      value === undefined
+        ? page.missing
+        : `${formatNumber(value)}${atLeast ? '+' : ''}${unit ? NBSP + unit : ''}`;
+    return { key, value: formatted, text, Icon: FIGURE_ICONS[key] };
+  },
+);
+
+const speciesStatus = (status: (typeof data.species)[number]['status']) =>
+  status && { label: page.species.status[status], threatened: ['CR', 'EN', 'VU'].includes(status) };
+
+const story = data.story ?? { ...page.storyMissing, paragraphs: [page.missing] };
+const cta = data.cta ?? { ...page.cta, titleStrong: withName(page.cta.titleStrong) };
+const madagascarMap = dict.madagascar.sites.map;
+
+// Étiquette du site sur la carte : à gauche du repère, à droite pour les sites de l'Ouest.
+const labelSide = data.mapPosition.x > 50 ? 'left' : 'right';
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[1]!, href: '#' }, // TODO page « Nos sites »
+  { label: dict.madagascar.title, href: pagePath(lang, 'madagascar') },
+];
+---
+
+<BaseLayout
+  title={withName(page.title)}
+  description={data.summary}
+  ogImage={data.photo}
+  ogImageAlt={data.photoAlt}
+  noindex={!complete}
+>
+  <Header current="sites" />
+  <Breadcrumb items={breadcrumb} current={data.name} />
+
+  <main id="contenu">
+    <PageHero
+      badge={`${page.country} · ${data.region}`}
+      titleStrong={`${data.name},`}
+      titleLight={data.tagline ?? page.missing}
+      lead={data.intro ?? data.summary}
+      image={data.photo}
+      imageAlt={data.photoAlt ?? ''}
+      imagePosition={data.photoPosition}
+      caption={fill(page.photoCaption, { name: data.name, credit: data.photoCredit ?? page.photoCreditMissing })}
+      donate={{ label: withName(page.donate), href: DON_URL }}
+      cta={{ label: page.field, href: '#' }}
+      portrait
+    />
+
+    <section class="figures" aria-label={withName(page.statsLabel)}>
+      <ul class="figures__grid container">
+        {
+          figureList.map(({ key, value, text, Icon }) => (
+            <li class="figure" data-reveal>
+              <span class="figure__icon">
+                {Icon ? (
+                  <Icon size={22} />
+                ) : (
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 14c-4 0-8 2-8 5h16c0-3-4-5-8-5Z" />
+                    <circle cx="8" cy="7" r="3" />
+                    <circle cx="16" cy="7" r="3" />
+                    <path d="M5 10c0 2 3 4 7 4s7-2 7-4" />
+                  </svg>
+                )}
+              </span>
+              <span class="figure__body">
+                <span class="figure__value" data-figure={key}>{value}</span>
+                <span class="figure__text">{text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="section" aria-labelledby="histoire-titre">
+      <div class="container two-cols">
+        <div class="story" data-reveal>
+          <h2 id="histoire-titre" class="title-h2">
+            <span class="title-h2__strong">{story.titleStrong}</span>{' '}
+            <span class="title-h2__light">{story.titleLight}</span>
+          </h2>
+          {story.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+
+        <div class="locator" data-reveal>
+          <div class="locator__map" role="img" aria-label={withName(page.mapLabel)}>
+            <MadagascarMap labels={madagascarMap} compact>
+              {
+                sites
+                  .filter((other) => other.id !== site.id)
+                  .map((other) => (
+                    <span
+                      class="locator__dot"
+                      style={`left: ${other.data.mapPosition.x}%; top: ${other.data.mapPosition.y}%`}
+                    />
+                  ))
+              }
+              <span
+                class="locator__current"
+                style={`left: ${data.mapPosition.x}%; top: ${data.mapPosition.y}%`}
+              />
+              <span
+                class:list={['locator__label', `locator__label--${labelSide}`]}
+                style={`left: ${data.mapPosition.x}%; top: ${data.mapPosition.y}%`}
+              >
+                {data.name}
+              </span>
+            </MadagascarMap>
+          </div>
+          <dl class="locator__facts">
+            <div>
+              <dt>{page.location}</dt>
+              <dd>{data.location ?? page.missing}</dd>
+            </div>
+            <div>
+              <dt>{page.habitat}</dt>
+              <dd>{data.habitat ?? page.missing}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="especes-titre">
+      <div class="container stack">
+        <SectionHeading
+          id="especes-titre"
+          strong={page.species.titleStrong}
+          light={page.species.titleLight}
+          lead={data.speciesLead ?? page.missing}
+        />
+        <ul class="cards-grid">
+          {
+            data.species.map((species) => (
+              <SpeciesCard
+                name={species.name}
+                status={speciesStatus(species.status)}
+                text={species.text ?? page.missing}
+                photo={species.photo}
+                photoAlt={species.photoAlt}
+                photoPosition={species.photoPosition}
+                photoMissing={page.photoMissing}
+                credit={species.credit}
+                sourceLabel={page.species.source}
+              />
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="actions-titre">
+      <div class="container stack">
+        <SectionHeading
+          id="actions-titre"
+          strong={page.actions.titleStrong}
+          light={page.actions.titleLight}
+          lead={data.actionsLead ?? page.missing}
+        />
+        {
+          // TODO pages projet : lien vers la page de action.project.
+          data.actions?.length ? (
+            <ul class="cards-grid">
+              {data.actions.map((action) => (
+                <ActionCard
+                  icon={action.icon}
+                  title={action.title}
+                  text={action.text}
+                  href="#"
+                  linkLabel={page.actions.link}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p class="missing">{page.missing}</p>
+          )
+        }
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="acteurs-titre">
+      <div class="container two-cols two-cols--top">
+        <div class="people" data-reveal>
+          <h2 id="acteurs-titre" class="title-h2">
+            <span class="title-h2__strong">{page.people.titleStrong}</span>{' '}
+            <span class="title-h2__light">{withName(page.people.titleLight)}</span>
+          </h2>
+          <p>{data.groups?.lead ?? page.missing}</p>
+          {
+            data.groups && (
+              <ul class="groups">
+                {data.groups.items.map((group) => (
+                  <li class="group">
+                    <span class="group__name">{group.name}</span>
+                    <span class="group__role">{group.role}</span>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
+        <div class="partners" data-reveal>
+          <h3 class="partners__title">{page.people.partners}</h3>
+          {
+            data.partners?.length ? (
+              <ul class="partners__list">
+                {data.partners.map((partner) => (
+                  <li class="partner">{partner}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>{page.missing}</p>
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="soutenir-titre"
+      titleStrong={cta.titleStrong}
+      titleLight={cta.titleLight}
+      text={cta.text}
+      image={ctaPhoto}
+      imagePosition="50% 45%"
+      spaced
+    >
+      <div class="cta__buttons">
+        <Button href={DON_URL} variant="don">{dict.ui.donate}</Button>
+        <Button href="#" variant="on-dark">{page.field}</Button>
+      </div>
+    </PhotoBanner>
+
+    <nav class="site-nav container" aria-label={page.nav.label}>
+      <a class="site-nav__link" href={pagePath(lang, 'madagascar')}>
+        <ArrowLeft size={18} />
+        {page.nav.all}
+      </a>
+      {
+        next.id !== site.id && (
+          <a class="site-nav__link" href={sitePath(lang, next.id)}>
+            {fill(page.nav.next, { name: next.data.name })}
+            <ArrowRight size={18} />
+          </a>
+        )
+      }
+    </nav>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .section--tinted {
+    background: var(--vert-clair);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* Titres en deux temps hors SectionHeading (colonnes). */
+  .title-h2 {
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+  }
+
+  .title-h2__strong {
+    font-weight: 800;
+  }
+
+  .title-h2__light {
+    font-weight: 300;
+  }
+
+  .two-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 48px 72px;
+  }
+
+  .two-cols--top {
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .two-cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Bande sauge des chiffres : cartes blanches, pastille d'icône menthe. */
+  .figures {
+    background: var(--sauge);
+  }
+
+  .figures__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 16px;
+    margin: 0 auto;
+    padding-block: clamp(40px, 5vw, 56px);
+    list-style: none;
+  }
+
+  .figure {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 24px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+  }
+
+  .figure__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--menthe);
+  }
+
+  .figure__body {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .figure__value {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: var(--ls-stat);
+  }
+
+  .figure__text {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  /* Histoire du site. */
+  .story,
+  .people {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  /* Carte de localisation sur fond vert clair. */
+  .locator {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    overflow: hidden;
+    border-radius: var(--radius-block);
+    background: var(--vert-clair);
+  }
+
+  .locator__map {
+    display: flex;
+    justify-content: center;
+  }
+
+  .locator__map :global(.mg-map) {
+    width: min(100%, 300px);
+  }
+
+  .locator__dot,
+  .locator__current {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: var(--radius-pill);
+  }
+
+  .locator__dot {
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border: 2px solid var(--basalte);
+    background: var(--blanc);
+  }
+
+  .locator__current {
+    z-index: 1;
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+    border: 4px solid var(--blanc);
+    background: var(--basalte);
+    box-shadow: 0 0 0 8px rgba(67, 72, 64, 0.25);
+  }
+
+  .locator__label {
+    position: absolute;
+    z-index: 2;
+    padding: 6px 12px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .locator__label--left {
+    transform: translate(calc(-100% - 20px), -50%);
+  }
+
+  .locator__label--right {
+    transform: translate(20px, -50%);
+  }
+
+  .locator__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 0;
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .locator__facts dt {
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .locator__facts dd {
+    margin: 4px 0 0;
+  }
+
+  /* Groupements locaux et partenaires. */
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 16px 20px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-sm);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+    line-height: normal;
+  }
+
+  .group__name {
+    font-size: var(--fs-body);
+    font-weight: 700;
+  }
+
+  .group__role {
+    font-size: 14px;
+  }
+
+  .partners {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .partners__title {
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .partners__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .partner {
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  /* Navigation vers les autres sites, sous la carte d'appel. */
+  .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: var(--space-section);
+  }
+
+  .site-nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--fs-body);
+    font-weight: 600;
+  }
+</style>
