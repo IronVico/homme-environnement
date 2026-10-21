@@ -4,6 +4,9 @@
  * isotype sauge et texte en cercle, incliné de -10° avec une ombre papier nette.
  * Le texte en cercle est décoratif : le SVG porte un nom lisible (role="img").
  * Le texte en cercle tourne lentement (un tour en 40 s), immobile avec prefers-reduced-motion.
+ * Au clic, « coup de tampon » : le sceau s'enfonce et rebondit, le texte fait un tour rapide.
+ * Interaction purement décorative (aucune action, pas de focus) : seul le disque blanc
+ * capte la souris, jamais le carré autour, pour ne pas gêner les liens voisins.
  * La position et la taille selon l'écran sont gérées par le footer.
  */
 import { getLang, t } from '../i18n';
@@ -20,13 +23,15 @@ const { ui } = t(getLang(Astro.currentLocale));
   <defs>
     <path id="stamp-circle" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"></path>
   </defs>
-  <circle cx="100" cy="100" r="92" fill="#FFFFFF"></circle>
+  <circle class="stamp__hit" cx="100" cy="100" r="92" fill="#FFFFFF"></circle>
   <circle cx="100" cy="100" r="86" fill="none" stroke="#97A785" stroke-width="1.5" stroke-dasharray="2 4"></circle>
   <circle cx="100" cy="100" r="58" fill="none" stroke="#97A785" stroke-width="1.5"></circle>
-  <g class="stamp__ring">
-    <text aria-hidden="true" font-size="13" font-weight="600" letter-spacing="2.6" fill="#434840">
-      <textPath href="#stamp-circle">{ui.stampText}</textPath>
-    </text>
+  <g class="stamp__spin">
+    <g class="stamp__ring">
+      <text aria-hidden="true" font-size="13" font-weight="600" letter-spacing="2.6" fill="#434840">
+        <textPath href="#stamp-circle">{ui.stampText}</textPath>
+      </text>
+    </g>
   </g>
   <g transform="translate(64,62) scale(0.62)">
     <path transform="translate(-34,-20)" fill="#97A785" d="M75.76,80.91c2.78,4.16-3.13,7.34-8.87,12.96-14.37,14.08-26.6,36.68-14.11,42.15,10.73,4.7,16.83-4.62,20.66-11.41,6.38-11.3,8.03-28.93,12.58-29.07,4.55-.14,4.61,14.81,10.29,26.42,4.63,9.46,12.05,16.15,19.14,10.71,7.09-5.45,5.89-13.11,2.22-20.09-6.15-11.68-23.04-20.87-22.78-30.37.27-9.5,18.17-12.88,24.05-18.05,5.88-5.17,5.99-9.53,4.39-12.88s-5.39-6.84-14.54-.78c-4.18,2.77-14,14.67-18.41,12.44-4.41-2.24.86-10.68-.21-18.22-1.07-7.54-6.69-9.5-10.83-8.52-4.15.98-10.03,5.31-7.62,12.15s8.43,13.63,5.22,16.62c-4.85,4.53-10.15-5.73-24.23-6.24-10.04-.36-14.61,14.58,3.24,18.68,13.59,3.12,17.31-.26,19.83,3.52Z"></path>
@@ -41,7 +46,28 @@ const { ui } = t(getLang(Astro.currentLocale));
     font-family: var(--font-sans);
     transform: rotate(-10deg);
     filter: drop-shadow(3px 5px 0 rgba(67, 72, 64, 0.14));
+    transition:
+      transform 200ms ease,
+      filter 200ms ease;
     pointer-events: none;
+  }
+
+  .stamp__hit {
+    pointer-events: visiblePainted;
+    cursor: pointer;
+  }
+
+  /* Survol : le sceau se soulève un peu, son ombre s'allonge. */
+  @media (hover: hover) {
+    .stamp:has(.stamp__hit:hover) {
+      transform: rotate(-10deg) translateY(-3px);
+      filter: drop-shadow(4px 8px 0 rgba(67, 72, 64, 0.16));
+    }
+  }
+
+  .stamp__spin {
+    transform-box: view-box;
+    transform-origin: 100px 100px;
   }
 
   /* Le texte tourne autour du centre du sceau ; l'isotype et les cercles restent fixes. */
@@ -58,8 +84,54 @@ const { ui } = t(getLang(Astro.currentLocale));
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .stamp {
+      transition: none;
+    }
+
     .stamp__ring {
       animation: none;
     }
   }
 </style>
+
+<script>
+  // Coup de tampon au clic : le sceau s'enfonce (l'ombre disparaît) puis rebondit, et le
+  // texte en cercle fait un tour rapide avant de reprendre sa rotation lente.
+  // Avec prefers-reduced-motion : seulement un léger enfoncement, sans rotation.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<SVGSVGElement>('.stamp').forEach((stamp) => {
+    const spin = stamp.querySelector<SVGGElement>('.stamp__spin');
+    const hit = stamp.querySelector<SVGCircleElement>('.stamp__hit');
+    if (!spin || !hit) return;
+
+    hit.addEventListener('click', () => {
+      if (reduceMotion.matches) {
+        stamp.animate(
+          [
+            { transform: 'rotate(-10deg) scale(1)' },
+            { transform: 'rotate(-10deg) scale(0.96)' },
+            { transform: 'rotate(-10deg) scale(1)' },
+          ],
+          { duration: 200 },
+        );
+        return;
+      }
+
+      stamp.animate(
+        [
+          { transform: 'rotate(-10deg) scale(1)', filter: 'drop-shadow(3px 5px 0 rgba(67, 72, 64, 0.14))' },
+          { transform: 'rotate(-6deg) scale(0.86)', filter: 'drop-shadow(0 0 0 rgba(67, 72, 64, 0))', offset: 0.18 },
+          { transform: 'rotate(-12deg) scale(1.06)', filter: 'drop-shadow(4px 8px 0 rgba(67, 72, 64, 0.16))', offset: 0.5 },
+          { transform: 'rotate(-9deg) scale(0.98)', offset: 0.75 },
+          { transform: 'rotate(-10deg) scale(1)', filter: 'drop-shadow(3px 5px 0 rgba(67, 72, 64, 0.14))' },
+        ],
+        { duration: 700, easing: 'ease-out' },
+      );
+      spin.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], {
+        duration: 1100,
+        easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+      });
+    });
+  });
+</script>
