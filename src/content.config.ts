@@ -99,6 +99,8 @@ const sites = defineCollection({
         .optional(),
       /** Partenaires du site ; `url` (facultative) fait de la pastille un lien vers leur site. */
       partners: z.array(z.object({ name: z.string(), url: z.url().optional() })).optional(),
+      /** Site ouvert à la visite : affiche les boutons « Venir sur le terrain » de la fiche. */
+      visitable: z.boolean().default(false),
       /** Carte d'appel en bas de fiche (sinon, texte générique « Soutenir <site> »). */
       cta: z.object({ titleStrong: z.string(), titleLight: z.string(), text: z.string() }).optional(),
       /** Position du repère sur la carte du pays, en % (x : largeur, y : hauteur). */

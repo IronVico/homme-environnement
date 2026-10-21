@@ -42,6 +42,15 @@ export function sitePath(lang: Lang, site: string): string {
  */
 export const DON_URL = '#'; // TODO HelloAsso
 
+/**
+ * « Venir sur le terrain » depuis la fiche d'un site visitable : l'offre de séjour du site.
+ * TODO page S'engager › Venir sur le terrain, puis renvoyer vers sa section du site
+ * (par ex. localeUrl(lang, `s-engager/venir-sur-le-terrain#${site}`)).
+ */
+export function fieldPath(_lang: Lang, _site: string): string {
+  return '#';
+}
+
 export const SOCIAL_URLS = {
   linkedin: '#', // TODO URL de la page LinkedIn de l'ONG
   facebook: '#', // TODO URL de la page Facebook de l'ONG

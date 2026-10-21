@@ -18,8 +18,8 @@ interface Props {
   imageAlt: string;
   /** Cadrage de la photo (object-position). */
   imagePosition?: string;
-  /** Bouton secondaire ; une ancre (« #sites ») affiche une flèche vers le bas. */
-  cta: { label: string; href: string };
+  /** Bouton secondaire, facultatif ; une ancre (« #sites ») affiche une flèche vers le bas. */
+  cta?: { label: string; href: string };
   /** Bouton Don (pêche), placé avant le bouton secondaire. */
   donate?: { label: string; href: string };
   /** Pastille de lieu au-dessus du titre : « Madagascar · Centre-Est ». */
@@ -62,7 +62,13 @@ const {
     <p class="page-hero__lead" data-reveal>{lead}</p>
     <div class="page-hero__ctas" data-reveal>
       {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
-      <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>{cta.label}</Button>
+      {
+        cta && (
+          <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
+            {cta.label}
+          </Button>
+        )
+      }
     </div>
   </div>
 

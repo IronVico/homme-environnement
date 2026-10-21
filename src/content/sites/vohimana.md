@@ -114,6 +114,8 @@ partners:
   - { name: La Guilde, url: "https://la-guilde.org/" }
   - { name: Tam Tam Phyto Aroma } # URL à fournir
   - { name: Bourrelier Group, url: "https://www.bourrelier-group.com/" }
+# Seul site ouvert à la visite : boutons « Venir sur le terrain » sur la fiche.
+visitable: true
 cta:
   titleStrong: Visitez Vohimana,
   titleLight: votre séjour protège la forêt.
