@@ -103,7 +103,7 @@ const breadcrumb = [
               page.why.cards.map((card, i) => {
                 const Icon = whyIcons[i]!;
                 return (
-                  <div class="card why-card" data-reveal>
+                  <div class="card card-lift why-card" data-reveal>
                     <span class="icon-disc">
                       <Icon size={22} />
                     </span>
@@ -151,7 +151,7 @@ const breadcrumb = [
             page.missions.items.map((item, i) => {
               const Icon = missionIcons[i]!;
               return (
-                <li class="card mission" data-reveal>
+                <li class="card card-lift mission" data-reveal>
                   <span class="icon-disc icon-disc--44">
                     <Icon size={20} />
                   </span>
@@ -189,7 +189,7 @@ const breadcrumb = [
             page.conditions.items.map((item, i) => {
               const Icon = conditionIcons[i]!;
               return (
-                <li class="card condition" data-reveal>
+                <li class="card card-lift condition" data-reveal>
                   <span class="icon-disc">
                     <Icon size={22} />
                   </span>
@@ -215,7 +215,7 @@ const breadcrumb = [
             ))
           }
         </div>
-        <div class="card fees-card" data-reveal>
+        <div class="card card-lift fees-card" data-reveal>
           <p class="fees-card__price">
             <span class="fees-card__example">{page.fees.example}</span>
             <span class="fees-card__amount">
@@ -360,6 +360,18 @@ const breadcrumb = [
     border: 1px solid var(--bordure-douce);
     background: var(--blanc);
     box-shadow: var(--shadow-card);
+  }
+
+  /* Même survol que les cartes cliquables du site (.card-lift) : légère élévation et ombre plus marquée. */
+  .card:hover {
+    transform: translateY(var(--lift-card-hover));
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover {
+      transform: none;
+    }
   }
 
   .icon-disc {
