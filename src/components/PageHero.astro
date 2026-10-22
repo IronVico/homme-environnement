@@ -1,9 +1,8 @@
 ---
 /**
  * Hero des pages internes (pays, sites) : titre en deux temps, phrase de contexte,
- * un bouton secondaire, photo en arche à droite. Plus compact que le hero de l'accueil.
- * Fiche site (`portrait`) : pastille de lieu, bouton Don avant le bouton secondaire,
- * photo verticale plus large avec sa légende.
+ * un bouton secondaire, photo verticale en arche à droite (même format sur toutes les pages).
+ * Options des fiches site : pastille de lieu, bouton Don avant le bouton secondaire, légende.
  * Le motif « courbes de niveau » passe derrière la photo, ancré en haut à droite.
  */
 import MapPin from '@lucide/astro/icons/map-pin';
@@ -28,8 +27,6 @@ interface Props {
   badge?: string;
   /** Légende sous la photo (crédit). */
   caption?: string;
-  /** Photo verticale (4:5), pour les fiches site. */
-  portrait?: boolean;
 }
 
 const {
@@ -43,12 +40,16 @@ const {
   donate,
   badge,
   caption,
-  portrait = false,
 } = Astro.props;
+
+// La photo remplit un cadre de 460 × 575 px (4:5) : une photo plus large que haute y est
+// affichée plus large que le cadre (puis rognée). On annonce cette largeur au navigateur,
+// sinon il télécharge une version trop petite et la photo paraît floue sur écran Retina.
+const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height));
 ---
 
 <div class="page-hero-wrap">
-  <section class:list={['page-hero container', { 'page-hero--portrait': portrait }]}>
+  <section class="page-hero container">
     <div class="page-hero__text">
       {
         badge && (
@@ -87,8 +88,8 @@ const {
         alt={imageAlt}
         style={`object-position: ${imagePosition}`}
         formats={['avif', 'webp']}
-        widths={[420, 640, 900, 1260]}
-        sizes={portrait ? '(max-width: 1100px) 100vw, 460px' : '(max-width: 1100px) 100vw, 420px'}
+        widths={[460, 640, 900, 1260, 1800, 2400]}
+        sizes={`(max-width: 1100px) 100vw, ${coverWidth}px`}
         loading="eager"
         fetchpriority="high"
       />
@@ -190,7 +191,7 @@ const {
   }
 
   .page-hero__figure {
-    flex: 0 1 420px;
+    flex: 0 1 460px;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -198,22 +199,12 @@ const {
     margin: 0;
   }
 
-  /* Photo en arche : 120px en haut, 20px en bas. */
+  /* Photo verticale en arche : 160px en haut, 20px en bas. */
   .page-hero :global(.page-hero__photo) {
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: var(--radius-arch) var(--radius-arch) 20px 20px;
-  }
-
-  /* Fiche site : photo verticale, arche plus marquée (160px). */
-  .page-hero--portrait .page-hero__figure {
-    flex-basis: 460px;
-  }
-
-  .page-hero--portrait :global(.page-hero__photo) {
     aspect-ratio: 4 / 5;
+    object-fit: cover;
     border-radius: 160px 160px 20px 20px;
   }
 
@@ -248,8 +239,7 @@ const {
 
   /* Tablette : photo pleine largeur moins haute, pour ne pas occuper tout l'écran. */
   @media (min-width: 600px) and (max-width: 1080px) {
-    .page-hero :global(.page-hero__photo),
-    .page-hero--portrait :global(.page-hero__photo) {
+    .page-hero :global(.page-hero__photo) {
       aspect-ratio: 16 / 9;
     }
   }

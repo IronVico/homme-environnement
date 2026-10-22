@@ -7,7 +7,23 @@ import { COUNTRIES, PROJECT_THEMES } from './data/projets';
 const speciesStatus = z.enum(['CR', 'EN', 'VU', 'NT', 'LC', 'endemique']);
 
 /** Chiffres de la fiche, dont la valeur est dans src/data/chiffres.ts (SITE_FIGURES). */
-const figureKey = z.enum(['hectares', 'years', 'beneficiaries', 'lemurSpecies', 'frogSpecies', 'medicinalPlants']);
+const figureKey = z.enum([
+  'hectares',
+  'naturalForest',
+  'mangrove',
+  'conservationArea',
+  'reforested',
+  'years',
+  'beneficiaries',
+  'animalSpecies',
+  'vertebrateSpecies',
+  'threatenedSpecies',
+  'lemurSpecies',
+  'frogSpecies',
+  'frogsCounted',
+  'medicinalPlants',
+  'lakes',
+]);
 
 /**
  * Sites d'intervention : un fichier Markdown par site (src/content/sites/).
@@ -52,9 +68,18 @@ const sites = defineCollection({
       /**
        * Bande de chiffres de la fiche, dans l'ordre d'affichage : la valeur vient de
        * SITE_FIGURES (clé), le texte qui suit est propre au site.
-       * `atLeast` : la valeur est un minimum (« 70+ »).
+       * `atLeast` : la valeur est un minimum (« 70+ ») ; `approx` : valeur approchée (« ≈ 12 »).
        */
-      figures: z.array(z.object({ key: figureKey, text: z.string(), atLeast: z.boolean().default(false) })).optional(),
+      figures: z
+        .array(
+          z.object({
+            key: figureKey,
+            text: z.string(),
+            atLeast: z.boolean().default(false),
+            approx: z.boolean().default(false),
+          }),
+        )
+        .optional(),
       /** Phrase sous le titre de la section espèces. */
       speciesLead: z.string().optional(),
       /** Espèces emblématiques ; le type choisit l'icône, le reste alimente les cartes de la fiche. */
@@ -67,14 +92,20 @@ const sites = defineCollection({
           photo: image().optional(),
           photoAlt: z.string().optional(),
           photoPosition: z.string().default('50% 50%'),
-          /** Photo sous licence libre : auteur, licence et liens obligatoires. */
+          /**
+           * Crédit de la photo. Photo sous licence libre : auteur, licence et liens obligatoires.
+           * Photo de l'ONG (« © auteur ») : l'auteur seul.
+           */
           credit: z
-            .object({
-              author: z.string(),
-              license: z.string(),
-              licenseUrl: z.url(),
-              source: z.url(),
-            })
+            .union([
+              z.object({
+                author: z.string(),
+                license: z.string(),
+                licenseUrl: z.url(),
+                source: z.url(),
+              }),
+              z.object({ author: z.string() }),
+            ])
             .optional(),
         }),
       ),
@@ -114,7 +145,16 @@ const sites = defineCollection({
       /** Site ouvert à la visite : affiche les boutons « Venir sur le terrain » de la fiche. */
       visitable: z.boolean().default(false),
       /** Carte d'appel en bas de fiche (sinon, texte générique « Soutenir <site> »). */
-      cta: z.object({ titleStrong: z.string(), titleLight: z.string(), text: z.string() }).optional(),
+      cta: z
+        .object({
+          titleStrong: z.string(),
+          titleLight: z.string(),
+          text: z.string(),
+          /** Photo de fond propre au site (sinon, la photo commune du gabarit). */
+          photo: image().optional(),
+          photoPosition: z.string().default('50% 45%'),
+        })
+        .optional(),
       /** Position du repère sur la carte du pays, en % (x : largeur, y : hauteur). */
       mapPosition: z.object({ x: z.number(), y: z.number() }),
       /** Ordre d'affichage dans la page pays ; c'est aussi le numéro du repère. */

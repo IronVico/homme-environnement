@@ -2,7 +2,7 @@
 title: Chaînes de valeur agricoles
 theme: filieres
 countries: [madagascar, burkina-faso]
-sites: [vohimana]
+sites: [vohimana, ambalakalanoro, ambohidravy, fohisokina]
 otherSites: [Kollo et Guiaro]
 photo: ../../assets/photos/projets-soutenus-nicaragua.jpg
 photoPosition: "50% 50%"
