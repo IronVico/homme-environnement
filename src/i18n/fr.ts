@@ -605,6 +605,7 @@ const fr = {
       impactLead: 'Avec {amount} :',
       customLabel: 'Montant libre en euros',
       customPlaceholder: 'Montant libre',
+      customError: 'Saisissez un montant en euros, {min} minimum (par exemple 25 ou 12,50).',
       /** {net} : coût réel après réduction d'impôt, {rate} : taux. TODO ONG : éligibilité aux reçus fiscaux. */
       taxTitle: "Soit {net} après réduction d'impôt de {rate}.",
       taxText: '[À confirmer : éligibilité aux reçus fiscaux]',

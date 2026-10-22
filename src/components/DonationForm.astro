@@ -43,6 +43,7 @@ const config = {
   rate: TAX_REDUCTION_RATE,
   helloasso: HELLOASSO,
   texts: {
+    customError: fill(form.customError, { min: euros(MIN_AMOUNT) }),
     perMonth: form.perMonth,
     impactLead: form.impactLead,
     taxTitle: form.taxTitle,
@@ -110,10 +111,13 @@ const config = {
         inputmode="decimal"
         autocomplete="off"
         placeholder={form.customPlaceholder}
+        aria-describedby="don-custom-error"
         data-custom-amount
       />
       <span class="don-form__custom-unit" aria-hidden="true">€</span>
     </label>
+    <!-- Message d'erreur du montant libre (vide tant que la saisie est valide), lu à son apparition. -->
+    <p class="don-form__error" id="don-custom-error" aria-live="polite" data-custom-error></p>
 
     <div data-tax>
       <InfoNote
@@ -304,6 +308,22 @@ const config = {
 
   .don-form__custom-input::placeholder {
     color: var(--ardoise);
+  }
+
+  .don-form__error {
+    margin-top: -8px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--noir-95);
+  }
+
+  .don-form__error:empty {
+    display: none;
+  }
+
+  .don-form__custom:has([aria-invalid='true']) {
+    border-color: var(--noir-95);
   }
 
   .don-form__custom-unit {
