@@ -99,8 +99,22 @@ export interface RecentDonation {
 }
 
 /**
- * Derniers dons affichés au-dessus du formulaire. Vide : le bandeau n'apparaît pas.
- * Ne jamais y mettre de dons inventés. À brancher sur HelloAsso (prénom et ville
- * seulement, avec l'accord du donateur), voir la PR de la page.
+ * Dons FICTIFS de la maquette, pour juger le bandeau en développement et sur les
+ * previews Vercel. Jamais affichés sur le site de production (voir RECENT_DONATIONS).
  */
-export const RECENT_DONATIONS: RecentDonation[] = [];
+const DEMO_DONATIONS: RecentDonation[] = [
+  { firstName: 'Claire', city: 'Lyon', amount: 50 },
+  { firstName: 'Jean-Marc', city: 'Nantes', amount: 30 },
+  { firstName: 'Fanja', city: 'Antananarivo', amount: 100 },
+];
+
+/** Environnement Vercel du build (« production », « preview ») ; absent en local. */
+const VERCEL_ENV = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VERCEL_ENV;
+
+/**
+ * Derniers dons affichés au-dessus du formulaire. Vide : le bandeau n'apparaît pas.
+ * En production, liste vide tant que les vrais dons HelloAsso ne sont pas branchés
+ * (prénom et ville seulement, avec l'accord du donateur), voir la PR de la page.
+ * Ailleurs (local, previews) : dons fictifs de la maquette.
+ */
+export const RECENT_DONATIONS: RecentDonation[] = VERCEL_ENV === 'production' ? [] : DEMO_DONATIONS;
