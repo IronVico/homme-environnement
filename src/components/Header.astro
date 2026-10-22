@@ -2,12 +2,12 @@
 import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Menu from '@lucide/astro/icons/menu';
 import X from '@lucide/astro/icons/x';
-import logoEn from '../assets/logos/logo-couleur-en.svg';
-import logoFr from '../assets/logos/logo-couleur.svg';
 import { donatePath, getMainNav, type MainSection } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import Button from './Button.astro';
+import Logo from './Logo.astro';
 import LangSwitcher from './LangSwitcher.astro';
+import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
   /** Rubrique de la page courante (sous-page sans lien direct dans le menu), sélectionnée dans le menu. */
@@ -17,8 +17,6 @@ interface Props {
 const { current } = Astro.props;
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
-// Version anglaise : logo « Man & the Environment » (LOGO-ENG-2), jamais « Human ».
-const logo = lang === 'en' ? logoEn : logoFr;
 const mainNav = getMainNav(lang);
 
 // Rubrique en cours : le lien est sélectionné sur sa page et ses sous-pages.
@@ -35,7 +33,7 @@ const isCurrent = (href: string) => {
 <div class="header-bar" data-header-bar>
 <header class="header container">
   <a class="header__home" href={localeUrl(lang)} aria-label={ui.homeLink}>
-    <img class="header__logo" src={logo.src} width={logo.width} height={logo.height} alt={ui.logoAlt} />
+    <Logo class="header__logo" lang={lang} alt={ui.logoAlt} />
   </a>
 
   <nav id="menu-principal" class="header__nav" aria-label={ui.mainNav}>
@@ -53,18 +51,38 @@ const isCurrent = (href: string) => {
             );
           }
           const id = `sous-menu-${link.section}`;
+          // Rubrique qui a sa propre page (L'ONG, Nos projets) : le libellé mène à la page,
+          // la flèche ouvre le sous-menu. Sinon, tout le libellé ouvre le sous-menu.
+          const hasPage = link.href !== '#';
           return (
-            <li class="header__item" data-submenu>
-              <button
-                class="header__toggle"
-                type="button"
-                aria-expanded="false"
-                aria-controls={id}
-                aria-current={sectionCurrent ? 'true' : undefined}
-              >
-                {link.label}
-                <ChevronDown class="header__chevron" size={16} />
-              </button>
+            <li class:list={['header__item', { 'header__item--split': hasPage }]} data-submenu data-current={sectionCurrent ? '' : undefined}>
+              {hasPage ? (
+                <div class="header__split">
+                  <a class="header__link" href={link.href} aria-current={currentPath === link.href.replace(/\/$/, '') ? 'page' : undefined}>
+                    {link.label}
+                  </a>
+                  <button
+                    class="header__toggle header__toggle--icon"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls={id}
+                    aria-label={`${ui.submenu} ${link.label}`}
+                  >
+                    <ChevronDown class="header__chevron" size={16} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  class="header__toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls={id}
+                  aria-current={sectionCurrent ? 'true' : undefined}
+                >
+                  {link.label}
+                  <ChevronDown class="header__chevron" size={16} />
+                </button>
+              )}
               <ul id={id} class="header__submenu">
                 {link.children.map((child) => (
                   <li>
@@ -79,9 +97,15 @@ const isCurrent = (href: string) => {
         })
       }
     </ul>
+    <!-- Menu burger : la bascule du header devient le sélecteur « Apparence ». -->
+    <ThemeToggle variant="segmented" class="header__appearance" />
+    <!-- Menu burger : choix de la langue sous « Apparence », comme la maquette. -->
+    <LangSwitcher class="header__lang-menu" />
   </nav>
 
   <LangSwitcher class="header__lang" />
+
+  <ThemeToggle variant="button" class="header__theme" />
 
   <Button href={donatePath(lang)} variant="don" size="sm" class="header__don" current={isCurrent(donatePath(lang))}>{ui.donate}</Button>
 
@@ -118,7 +142,7 @@ const isCurrent = (href: string) => {
 
     // Sous-menus : bouton à bascule (un seul ouvert à la fois en desktop).
     const items = [...nav.querySelectorAll<HTMLElement>('[data-submenu]')];
-    const desktop = window.matchMedia('(min-width: 1281px)');
+    const desktop = window.matchMedia('(min-width: 1381px)');
     const toggleOf = (item: HTMLElement) => item.querySelector<HTMLButtonElement>('.header__toggle');
     const setSubmenu = (item: HTMLElement, open: boolean) => {
       item.toggleAttribute('data-expanded', open);
@@ -199,7 +223,7 @@ const isCurrent = (href: string) => {
     left: 0;
     right: 0;
     z-index: 30;
-    background: var(--blanc);
+    background: var(--fond);
     transition: background-color var(--transition-ui);
   }
 
@@ -223,22 +247,22 @@ const isCurrent = (href: string) => {
     margin-top: 10px;
     padding: 10px 12px 10px 20px;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.86);
+    background: var(--header-translucide);
     /* Liseré bordure-douce dessiné dans l'ombre : pas de bordure qui changerait la hauteur. */
     box-shadow:
-      inset 0 0 0 1px var(--bordure-douce),
+      inset 0 0 0 1px var(--bordure-carte),
       var(--shadow-card);
     -webkit-backdrop-filter: blur(14px) saturate(1.4);
     backdrop-filter: blur(14px) saturate(1.4);
   }
 
-  .header__logo {
+  .header :global(.header__logo) {
     transition:
       height 320ms cubic-bezier(0.22, 1, 0.36, 1),
       margin 320ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .header-bar[data-scrolled] .header__logo {
+  .header-bar[data-scrolled] :global(.header__logo) {
     height: 56px;
     margin: -10px -28px -10px -15px;
   }
@@ -246,7 +270,7 @@ const isCurrent = (href: string) => {
   @media (prefers-reduced-motion: reduce) {
     .header-bar,
     .header,
-    .header__logo {
+    .header :global(.header__logo) {
       transition: none;
     }
   }
@@ -268,7 +292,7 @@ const isCurrent = (href: string) => {
   }
 
   /* Le fichier du logo inclut sa zone de protection : marges négatives. */
-  .header__logo {
+  .header :global(.header__logo) {
     height: 76px;
     width: auto;
     max-width: none;
@@ -294,8 +318,8 @@ const isCurrent = (href: string) => {
     border-radius: var(--radius-pill);
     text-decoration: none;
     transition:
-      background-color var(--transition-ui),
-      color var(--transition-ui);
+      background-color 150ms ease-out,
+      color 150ms ease-out;
   }
 
   /* Rubriques à sous-menu : bouton qui reprend l'apparence des liens. */
@@ -305,7 +329,7 @@ const isCurrent = (href: string) => {
     gap: 4px;
     border: none;
     background: transparent;
-    color: var(--basalte);
+    color: var(--texte);
     font: inherit;
     cursor: pointer;
   }
@@ -318,19 +342,106 @@ const isCurrent = (href: string) => {
     transform: rotate(180deg);
   }
 
-  /* Survol : pastille vert clair. Rubrique en cours : soulignée (2px, décalage 6px), comme la maquette. */
+  /*
+   * Rubrique en cours : pastille section (vert clair / #252c23) derrière le libellé, en
+   * semi-gras, sans soulignement. Survol d'une autre rubrique : même pastille en
+   * bordure-carte (design system, section Formes, ligne « Navigation »).
+   */
   .header__nav a:hover,
   .header__toggle:hover,
   .header__item[data-expanded] > .header__toggle {
-    background: var(--vert-clair);
-    color: var(--basalte);
+    background: var(--bordure-carte);
+    color: var(--texte);
   }
 
-  .header__nav > ul > li > a[aria-current],
+  .header__nav a[aria-current],
   .header__toggle[aria-current] {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 6px;
+    background: var(--section);
+    color: var(--texte);
+    font-weight: 600;
+  }
+
+  /*
+   * Rubrique avec sa propre page : lien (libellé) + bouton (flèche) dans une même
+   * pastille. Survol et rubrique en cours se dessinent sur la pastille entière.
+   */
+  .header__split {
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    transition: background-color 150ms ease-out;
+  }
+
+  .header__split > .header__link,
+  .header__split > .header__link:hover,
+  .header__split > .header__link[aria-current],
+  .header__split > .header__toggle,
+  .header__split > .header__toggle:hover {
+    background: transparent;
+  }
+
+  .header__split > .header__link {
+    padding-right: 4px;
+  }
+
+  .header__split > .header__toggle {
+    align-self: stretch;
+    padding-left: 4px;
+  }
+
+  .header__split:hover,
+  .header__item[data-expanded] > .header__split {
+    background: var(--bordure-carte);
+  }
+
+  .header__item[data-current] > .header__split {
+    background: var(--section);
+    font-weight: 600;
+  }
+
+  /* Desktop : pastille 8px 14px compensée par une marge négative, le menu ne bouge pas. */
+  @media (min-width: 1381px) {
+    .header__nav > ul {
+      gap: 28px;
+    }
+
+    .header__nav > ul > li > a,
+    .header__nav > ul > li > .header__toggle,
+    .header__split {
+      padding: 8px 14px;
+      margin: -8px -14px;
+    }
+
+    .header__split {
+      padding: 0;
+    }
+
+    .header__split > .header__link {
+      padding: 8px 4px 8px 14px;
+    }
+
+    .header__split > .header__toggle {
+      padding: 8px 14px 8px 4px;
+    }
+
+    /* Sous-menu aligné sur la pastille (qui déborde de 14px à gauche et 8px en bas). */
+    .header__item > .header__submenu {
+      top: calc(100% + 16px);
+      left: -14px;
+    }
+
+    .header__item > .header__submenu::before {
+      inset: -17px 0 auto;
+      height: 17px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header__nav a,
+    .header__toggle,
+    .header__split {
+      transition: none;
+    }
   }
 
   /* Sous-menu desktop : carte blanche sous la rubrique. */
@@ -348,8 +459,8 @@ const isCurrent = (href: string) => {
     margin: 0;
     padding: 8px;
     list-style: none;
-    background: var(--blanc);
-    border: 1px solid var(--bordure-douce);
+    background: var(--surface);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-card-sm);
     box-shadow: var(--shadow-card);
     font-size: 15px;
@@ -371,7 +482,7 @@ const isCurrent = (href: string) => {
 
   .header__submenu a[aria-current] {
     font-weight: 600;
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .header__item[data-expanded] > .header__submenu {
@@ -382,7 +493,7 @@ const isCurrent = (href: string) => {
    * Sans JS : ouverture au survol et au focus clavier. Avec JS, c'est le script
    * qui gère survol, clic et clavier, pour n'avoir qu'un sous-menu ouvert à la fois.
    */
-  @media (min-width: 1281px) {
+  @media (min-width: 1381px) {
     :global(html:not(.js)) .header__item:hover > .header__submenu,
     :global(html:not(.js)) .header__item:focus-within > .header__submenu {
       display: block;
@@ -395,6 +506,12 @@ const isCurrent = (href: string) => {
     }
   }
 
+  /* Sélecteur « Apparence » et langue du panneau : seulement avec le menu burger. */
+  .header :global(.header__appearance),
+  .header :global(.header__lang-menu) {
+    display: none;
+  }
+
   .header__burger {
     display: none;
     width: 44px;
@@ -405,7 +522,7 @@ const isCurrent = (href: string) => {
     border: none;
     border-radius: var(--radius-pill);
     background: transparent;
-    color: var(--basalte);
+    color: var(--texte);
     cursor: pointer;
   }
 
@@ -423,30 +540,50 @@ const isCurrent = (href: string) => {
       height: 84px;
     }
 
-    .header__logo {
+    .header :global(.header__logo) {
       height: 60px;
     }
 
-    .header-bar[data-scrolled] .header__logo {
+    .header-bar[data-scrolled] :global(.header__logo) {
       height: 48px;
       margin: -9px -24px -9px -13px;
     }
   }
 
   /*
-   * Menu, sélecteur de langue et bouton Don ne tiennent sur une ligne qu'au-delà
-   * de ~1270px (6 rubriques avec chevrons) : en dessous de 1280px, on passe au burger.
+   * Menu, sélecteur de langue, bascule clair / sombre et bouton Don ne tiennent sur une
+   * ligne qu'au-delà de ~1365px (6 rubriques avec chevrons) : en dessous de 1380px, on passe au burger.
    */
-  @media (max-width: 1280px) {
+  @media (max-width: 1380px) {
     /* Sans JS : les liens restent visibles, sur une ligne sous le logo. */
     .header__nav {
       order: 10;
       flex-basis: 100%;
     }
 
-    /* Comme la maquette : avec le burger, la langue se change depuis le lien du footer. */
+    /* Avec le burger, la langue se change dans le panneau du menu (header__lang-menu). */
     .header :global(.header__lang) {
       display: none;
+    }
+
+    /* La bascule rejoint le menu burger (sélecteur « Apparence »). */
+    .header :global(.header__theme) {
+      display: none;
+    }
+
+    :global(.js) .header :global(.header__appearance) {
+      display: flex;
+      margin-top: 20px;
+      padding-inline: 16px;
+    }
+
+    .header :global(.header__lang-menu) {
+      display: inline-flex;
+      margin-top: 16px;
+    }
+
+    :global(.js) .header :global(.header__lang-menu) {
+      margin-left: 16px;
     }
 
     .header__nav > ul {
@@ -470,8 +607,8 @@ const isCurrent = (href: string) => {
       overflow-y: auto;
       overscroll-behavior: contain;
       padding: 8px var(--gutter) 24px;
-      background: var(--blanc);
-      border-top: 1px solid var(--bordure-douce);
+      background: var(--fond);
+      border-top: 1px solid var(--bordure-carte);
       box-shadow: var(--shadow-card);
     }
 
@@ -483,7 +620,7 @@ const isCurrent = (href: string) => {
     :global(.js) .header-bar[data-scrolled] .header__nav {
       top: calc(100% + 8px);
       padding-inline: 16px;
-      border: 1px solid var(--bordure-douce);
+      border: 1px solid var(--bordure-carte);
       border-radius: 24px;
     }
 
@@ -505,6 +642,25 @@ const isCurrent = (href: string) => {
 
     :global(.js) .header__toggle {
       justify-content: space-between;
+    }
+
+    /* Rubrique avec page : le lien prend la ligne, la flèche reste un bouton carré à droite. */
+    :global(.js) .header__split {
+      width: 100%;
+      border-radius: 14px;
+    }
+
+    :global(.js) .header__nav .header__split > .header__link {
+      flex: 1 1 auto;
+      width: auto;
+      padding-right: 8px;
+    }
+
+    :global(.js) .header__nav .header__split > .header__toggle {
+      flex: 0 0 auto;
+      width: 52px;
+      justify-content: center;
+      padding: 12px 16px;
     }
 
     /* Sous-menus en accordéon dans le panneau. Sans JS, ils restent dépliés. */

@@ -1,0 +1,33 @@
+---
+/**
+ * Logo complet, en SVG dans la page : le nom suit le mode (token --logo-nom).
+ * Clair : logo couleur (nom basalte). Sombre : logo semi-inverse (isotype sauge, nom blanc),
+ * comme l'asset logo-semi-inverse du design system.
+ * Version anglaise : logo « Man & the Environment » (LOGO-ENG-2), jamais « Human ».
+ */
+import logoEnRaw from '../assets/logos/logo-couleur-en.svg?raw';
+import logoFrRaw from '../assets/logos/logo-couleur.svg?raw';
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  alt: string;
+  class?: string;
+}
+
+const { lang, alt, class: className } = Astro.props;
+
+// Nom du logo (#444941 dans les fichiers) : couleur pilotée par le token --logo-nom.
+const inner = (lang === 'en' ? logoEnRaw : logoFrRaw)
+  .replace(/^[\s\S]*?<svg[^>]*>/, '')
+  .replace(/<\/svg>\s*$/, '')
+  .replaceAll('fill="#444941"', 'class="logo__nom"');
+---
+
+<svg class:list={['logo', className]} viewBox="0 0 432.01 173.81" width="432" height="174" role="img" aria-label={alt} set:html={inner} />
+
+<style>
+  .logo :global(.logo__nom) {
+    fill: var(--logo-nom);
+  }
+</style>

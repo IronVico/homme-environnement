@@ -41,9 +41,9 @@ const { items } = Astro.props;
 
   .faq__item {
     padding: 0 22px;
-    border: 1px solid var(--bordure-douce);
+    border: 1px solid var(--bordure-carte);
     border-radius: 18px;
-    background: var(--blanc);
+    background: var(--surface);
     box-shadow: var(--shadow-card);
     transition:
       box-shadow var(--transition-ui),
@@ -52,7 +52,7 @@ const { items } = Astro.props;
 
   /* Survol : la carte se détache un peu plus, comme les cartes cliquables. */
   .faq__item:hover {
-    border-color: var(--bordure);
+    border-color: var(--trait);
     box-shadow: var(--shadow-card-hover);
   }
 
@@ -73,7 +73,7 @@ const { items } = Astro.props;
   }
 
   .faq__question:hover {
-    color: var(--noir-95);
+    color: var(--texte-fort);
   }
 
   .faq__question {
@@ -100,7 +100,7 @@ const { items } = Astro.props;
   }
 
   .faq__item:has(.faq__question:focus-visible) {
-    outline: 2px solid var(--basalte);
+    outline: 2px solid var(--texte);
     outline-offset: 2px;
   }
 

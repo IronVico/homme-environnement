@@ -62,6 +62,7 @@ const { ui } = t(getLang(Astro.currentLocale));
     align-items: center;
     gap: var(--space-2);
     padding: 6px;
+    /* Sur photo : la pilule reste blanche dans les deux modes. */
     background: var(--blanc);
     border-radius: var(--radius-pill);
     transition: box-shadow var(--transition-ui);
@@ -129,7 +130,7 @@ const { ui } = t(getLang(Astro.currentLocale));
     padding: 0 26px;
     border: none;
     border-radius: var(--radius-pill);
-    background: var(--sauge);
+    background: var(--accent);
     color: var(--noir-95);
     font-size: var(--fs-button);
     font-weight: 600;
@@ -137,7 +138,7 @@ const { ui } = t(getLang(Astro.currentLocale));
   }
 
   .newsletter-form__btn:hover {
-    background: color-mix(in srgb, var(--sauge) 88%, var(--noir-95));
+    background: color-mix(in srgb, var(--accent) 88%, var(--noir-95));
   }
 
   .newsletter-form__btn:focus-visible {

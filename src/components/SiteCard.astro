@@ -3,7 +3,7 @@
  * Carte compacte d'un site, dans la liste à côté de la carte du pays. Toute la carte
  * mène à la fiche du site : photo, numéro du repère et nom, accroche sur 2 lignes,
  * surface protégée. Le reste (région, années, bénéficiaires, espèces) est sur la fiche.
- * `selected` : site mis en avant sur la carte (contour basalte).
+ * `selected` : site mis en avant sur la carte (contour basalte, sauge en mode sombre).
  */
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import MapIcon from '@lucide/astro/icons/map';
@@ -65,16 +65,16 @@ const { id, num, name, summary, image, imagePosition = '50% 40%', figure, figure
   .site-card {
     overflow: hidden;
     border-radius: var(--radius-card-lg);
-    background: var(--blanc);
+    background: var(--surface);
     box-shadow: var(--shadow-card);
     /* Contour dessiné à l'intérieur : la carte sélectionnée ne change pas de taille. */
-    outline: 1px solid var(--bordure-douce);
+    outline: 1px solid var(--bordure-carte);
     outline-offset: -1px;
     transition: outline-color var(--transition-ui);
   }
 
   .site-card[data-selected] {
-    outline: 2px solid var(--basalte);
+    outline: 2px solid var(--carte-active);
     outline-offset: -2px;
   }
 
@@ -83,16 +83,16 @@ const { id, num, name, summary, image, imagePosition = '50% 40%', figure, figure
     display: flex;
     flex-direction: column;
     height: 100%;
-    color: var(--basalte);
+    color: var(--texte);
     text-decoration: none;
   }
 
   .site-card__link:hover {
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .site-card__link:focus-visible {
-    outline: 2px solid var(--basalte);
+    outline: 2px solid var(--texte);
     outline-offset: -4px;
     border-radius: var(--radius-card-lg);
   }
@@ -126,8 +126,8 @@ const { id, num, name, summary, image, imagePosition = '50% 40%', figure, figure
     width: 28px;
     height: 28px;
     border-radius: var(--radius-pill);
-    background: var(--basalte);
-    color: var(--blanc);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
     font-size: 14px;
     font-weight: 700;
   }
@@ -159,7 +159,7 @@ const { id, num, name, summary, image, imagePosition = '50% 40%', figure, figure
     gap: var(--space-3);
     margin-top: auto;
     padding-top: 10px;
-    border-top: 1px solid var(--bordure-douce);
+    border-top: 1px solid var(--bordure-carte);
     font-size: 13px;
     font-weight: 600;
   }
@@ -172,7 +172,7 @@ const { id, num, name, summary, image, imagePosition = '50% 40%', figure, figure
 
   .site-card :global(.site-card__figure-icon) {
     flex-shrink: 0;
-    color: var(--sauge);
+    color: var(--accent);
   }
 
   .site-card__more {
