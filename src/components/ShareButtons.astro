@@ -30,7 +30,7 @@ const href = shareLinks(pageUrl, label, text);
   <p class="share__label">{label}</p>
   <ul class="share__list">
     <li>
-      <a class="share__btn btn-motion" href={href.facebook} data-share-to="facebook" target="_blank" rel="noopener" aria-label={ui.shareFacebook}>
+      <a class="share__btn btn-motion" href={href.facebook} data-share-to="facebook" target="_blank" rel="noopener" aria-label={ui.shareFacebook} data-tooltip={ui.shareFacebook} data-tooltip-align="start">
         <!-- Tracé de l'ancienne icône Lucide « facebook » (ISC), comme dans le footer. -->
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
@@ -38,7 +38,7 @@ const href = shareLinks(pageUrl, label, text);
       </a>
     </li>
     <li>
-      <a class="share__btn btn-motion" href={href.linkedin} data-share-to="linkedin" target="_blank" rel="noopener" aria-label={ui.shareLinkedin}>
+      <a class="share__btn btn-motion" href={href.linkedin} data-share-to="linkedin" target="_blank" rel="noopener" aria-label={ui.shareLinkedin} data-tooltip={ui.shareLinkedin}>
         <!-- Tracé de l'ancienne icône Lucide « linkedin » (ISC), comme dans le footer. -->
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -48,17 +48,17 @@ const href = shareLinks(pageUrl, label, text);
       </a>
     </li>
     <li>
-      <a class="share__btn btn-motion" href={href.whatsapp} data-share-to="whatsapp" target="_blank" rel="noopener" aria-label={ui.shareWhatsapp}>
+      <a class="share__btn btn-motion" href={href.whatsapp} data-share-to="whatsapp" target="_blank" rel="noopener" aria-label={ui.shareWhatsapp} data-tooltip={ui.shareWhatsapp}>
         <MessageCircle size={20} />
       </a>
     </li>
     <li>
-      <a class="share__btn btn-motion" href={href.email} data-share-to="email" aria-label={ui.shareEmail}>
+      <a class="share__btn btn-motion" href={href.email} data-share-to="email" aria-label={ui.shareEmail} data-tooltip={ui.shareEmail}>
         <Mail size={20} />
       </a>
     </li>
     <li>
-      <button class="share__btn btn-motion" type="button" data-share-copy aria-label={ui.shareCopy}>
+      <button class="share__btn btn-motion" type="button" data-share-copy aria-label={ui.shareCopy} data-tooltip={ui.shareCopy}>
         <Link class="share__icon-copy" size={20} />
         <Check class="share__icon-done" size={20} />
       </button>
@@ -93,11 +93,14 @@ const href = shareLinks(pageUrl, label, text);
       } catch {
         return;
       }
+      const done = status?.dataset.done ?? '';
       copy.toggleAttribute('data-copied', true);
-      if (status) status.textContent = status.dataset.done ?? '';
+      copy.dataset.tooltip = done;
+      if (status) status.textContent = done;
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
         copy.removeAttribute('data-copied');
+        copy.dataset.tooltip = copy.getAttribute('aria-label') ?? '';
         if (status) status.textContent = '';
       }, 2500);
     });

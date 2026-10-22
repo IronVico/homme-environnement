@@ -27,7 +27,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
         <Button href={donatePath(lang)} variant="don" size="sm" class="footer__don">{ui.donate}</Button>
         <ul class="footer__social" aria-label={ui.social}>
           <li>
-            <a class="btn-motion" href={SOCIAL_URLS.linkedin} aria-label={ui.socialLinkedin} rel="noopener">
+            <a class="btn-motion" href={SOCIAL_URLS.linkedin} aria-label={ui.socialLinkedin} data-tooltip={ui.socialLinkedin} data-tooltip-align="start" rel="noopener">
               <!-- Tracé de l'ancienne icône Lucide « linkedin » (ISC) : Lucide 1.x n'a plus d'icônes de marques. -->
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -37,7 +37,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
             </a>
           </li>
           <li>
-            <a class="btn-motion" href={SOCIAL_URLS.facebook} aria-label={ui.socialFacebook} rel="noopener">
+            <a class="btn-motion" href={SOCIAL_URLS.facebook} aria-label={ui.socialFacebook} data-tooltip={ui.socialFacebook} data-tooltip-align="start" rel="noopener">
               <!-- Tracé de l'ancienne icône Lucide « facebook » (ISC). -->
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
