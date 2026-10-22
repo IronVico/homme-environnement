@@ -88,6 +88,11 @@ const { id, titleStrong, titleLight, text, image, imagePosition = '50% 40%', spa
     padding: clamp(28px, 6vw, 72px);
   }
 
+  /* Sur la photo assombrie, le contour de focus basalte ne se verrait pas : blanc. */
+  .photo-banner__content :global(:focus-visible) {
+    outline-color: var(--blanc);
+  }
+
   .photo-banner__text {
     flex: 1 1 420px;
     min-width: 0;
