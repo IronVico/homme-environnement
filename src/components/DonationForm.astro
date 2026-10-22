@@ -285,7 +285,8 @@ const config = {
     display: flex;
     align-items: stretch;
     overflow: hidden;
-    border: 1.5px solid var(--trait);
+    /* Contour du champ à 3:1 minimum sur la carte (WCAG 1.4.11) : texte doux, pas le trait. */
+    border: 1.5px solid var(--texte-doux);
     border-radius: 14px;
     font-size: 16px;
   }
