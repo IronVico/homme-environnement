@@ -32,6 +32,8 @@ const { items } = Astro.props;
 
 <style>
   .faq {
+    /* Permet d'animer la hauteur jusqu'à « auto » (navigateurs récents ; ailleurs, ouverture sans animation). */
+    interpolate-size: allow-keywords;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -43,6 +45,35 @@ const { items } = Astro.props;
     border-radius: 18px;
     background: var(--blanc);
     box-shadow: var(--shadow-card);
+    transition:
+      box-shadow var(--transition-ui),
+      border-color var(--transition-ui);
+  }
+
+  /* Survol : la carte se détache un peu plus, comme les cartes cliquables. */
+  .faq__item:hover {
+    border-color: var(--bordure);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* Ouverture et fermeture : la réponse se déplie en hauteur et apparaît en fondu. */
+  .faq__item::details-content {
+    block-size: 0;
+    overflow: clip;
+    opacity: 0;
+    transition:
+      block-size 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 200ms ease-out,
+      content-visibility 280ms allow-discrete;
+  }
+
+  .faq__item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+
+  .faq__question:hover {
+    color: var(--noir-95);
   }
 
   .faq__question {
@@ -96,6 +127,8 @@ const { items } = Astro.props;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .faq__item,
+    .faq__item::details-content,
     .faq :global(.faq__icon) {
       transition: none;
     }
