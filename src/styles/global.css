@@ -58,6 +58,13 @@ p {
   margin: 0;
 }
 
+/* Mot trop long pour l'écran (« Ambalakalanoro, » à 320px) : il passe à la ligne plutôt que de déborder. */
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+}
+
 a {
   color: var(--basalte);
 }

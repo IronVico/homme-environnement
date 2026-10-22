@@ -50,6 +50,15 @@ const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current
     flex-shrink: 0;
   }
 
+  /* Écran très étroit (320px, zoom 400 %) : le libellé passe sur deux lignes plutôt que de déborder. */
+  @media (max-width: 400px) {
+    .btn {
+      max-width: 100%;
+      white-space: normal;
+      line-height: 1.2;
+    }
+  }
+
   .btn--don {
     background: var(--peche);
     color: var(--noir-95);
