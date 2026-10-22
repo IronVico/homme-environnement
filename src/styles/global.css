@@ -267,6 +267,20 @@ a.card-lift:focus-visible {
   translate: 0 0;
 }
 
+/* Bouton en fin de rangée (bord droit de l'écran) : l'infobulle s'aligne sur son bord droit. */
+[data-tooltip-align='end']::after,
+[data-tooltip-align='end']:hover::after,
+[data-tooltip-align='end']:focus-visible::after {
+  left: auto;
+  right: 0;
+  translate: 0 4px;
+}
+
+[data-tooltip-align='end']:hover::after,
+[data-tooltip-align='end']:focus-visible::after {
+  translate: 0 0;
+}
+
 /* Échap : toutes les infobulles se ferment jusqu'au prochain mouvement de souris ou de focus. */
 [data-tooltips-off] [data-tooltip]::after {
   opacity: 0;
@@ -279,7 +293,8 @@ a.card-lift:focus-visible {
     transition: none;
   }
 
-  [data-tooltip-align='start']::after {
+  [data-tooltip-align='start']::after,
+  [data-tooltip-align='end']::after {
     translate: 0 0;
   }
 

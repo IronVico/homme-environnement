@@ -45,6 +45,8 @@ const en: Dictionary = {
     shareEmail: 'Share by email',
     shareCopy: 'Copy link',
     shareCopied: 'Link copied',
+    pauseMotion: 'Pause the animation',
+    playMotion: 'Resume the animation',
     newsletterPending: 'Thank you. Sign-ups open very soon: your address has not been saved yet.',
   },
 
