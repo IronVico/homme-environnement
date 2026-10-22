@@ -581,6 +581,11 @@ const breadcrumb = [
     opacity: 1;
   }
 
+  /* Échap masque l'étiquette, comme les infobulles (WCAG 1.4.13, src/scripts/tooltip.ts). */
+  :global([data-tooltips-off]) .locator__site .locator__label--tip {
+    opacity: 0;
+  }
+
   /* Repère : le point est au centre de la zone de 44px, l'étiquette s'en écarte de 20px. */
   .locator__label--tip.locator__label--left {
     transform: translate(calc(-100% - 16px), -50%);
