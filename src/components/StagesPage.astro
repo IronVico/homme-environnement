@@ -1,0 +1,650 @@
+---
+/**
+ * Page « Stages et volontariat » (S'engager), commune aux deux langues
+ * (/s-engager/stages-volontariat et /en/s-engager/stages-volontariat).
+ * Textes dans src/i18n (clé `stages`), sites dans la collection `sites`.
+ */
+import BarChart from '@lucide/astro/icons/chart-column';
+import Binoculars from '@lucide/astro/icons/binoculars';
+import Cake from '@lucide/astro/icons/cake';
+import Calendar from '@lucide/astro/icons/calendar';
+import Check from '@lucide/astro/icons/check';
+import FlaskConical from '@lucide/astro/icons/flask-conical';
+import Globe from '@lucide/astro/icons/globe';
+import GraduationCap from '@lucide/astro/icons/graduation-cap';
+import HandHeart from '@lucide/astro/icons/hand-heart';
+import Leaf from '@lucide/astro/icons/leaf';
+import MapIcon from '@lucide/astro/icons/map';
+import NotebookText from '@lucide/astro/icons/notebook-text';
+import Sprout from '@lucide/astro/icons/sprout';
+import Users from '@lucide/astro/icons/users';
+import X from '@lucide/astro/icons/x';
+import { Picture } from 'astro:assets';
+import { engagePath, STAGES_EMAIL } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getExplorerSites } from '../lib/explorer-sites';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Faq, { type FaqAnswer } from './Faq.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import InfoNote from './InfoNote.astro';
+import PageHero from './PageHero.astro';
+import SectionHeading from './SectionHeading.astro';
+import SitesExplorer from './SitesExplorer.astro';
+
+import heroRepas from '../assets/photos/engager-entreprises.jpg';
+import mosaicGuide from '../assets/photos/engager-terrain.jpg';
+import mosaicClasse from '../assets/photos/pilier-responsabilisation-classe.jpg';
+import mosaicLac from '../assets/photos/stages-lac-mont-passot.jpg';
+import mosaicVari from '../assets/photos/stages-vari-canopee.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.stages;
+
+const mailto = `mailto:${STAGES_EMAIL}`;
+
+// Angodroabe n'accueille pas de missions : il n'apparaît ni sur la carte ni dans la liste.
+const sites = await getExplorerSites(lang, ['angodroabe']);
+
+const whyIcons = [Sprout, Users];
+const missionIcons = [Binoculars, Leaf, BarChart, MapIcon, GraduationCap, HandHeart];
+const conditionIcons = [Cake, Calendar, Globe, FlaskConical];
+
+// Mosaïque : la 1re et la 3e photo occupent deux rangées (arches), dans l'ordre de la maquette.
+const mosaic = [
+  { image: mosaicGuide, position: '50% 30%', shape: 'arch' },
+  { image: mosaicClasse, position: '50% 50%', shape: 'plain' },
+  { image: mosaicVari, position: '50% 40%', shape: 'arch-end' },
+  { image: mosaicLac, position: '50% 50%', shape: 'plain' },
+].map((photo, i) => ({ ...photo, alt: page.why.photos[i]! }));
+
+// L'adresse de candidature n'apparaît en clair que dans la réponse « Comment candidater ? ».
+const faqItems = page.faq.items.map(({ question, answer }) => {
+  const [before, after] = answer.split('{email}');
+  const parts: FaqAnswer =
+    after === undefined ? [answer] : [before ?? '', { label: STAGES_EMAIL, href: mailto }, after];
+  return { question, answer: parts };
+});
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[3]!, href: engagePath(lang) }, // TODO page « S'engager »
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={heroRepas} ogImageAlt={page.hero.imageAlt}>
+  <Header current="engager" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <main id="contenu">
+    <PageHero
+      tags={page.hero.tags}
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      text={page.hero.text}
+      image={heroRepas}
+      imageAlt={page.hero.imageAlt}
+      imagePosition="50% 40%"
+      primary={{ label: page.hero.apply, href: '#candidater' }}
+      cta={{ label: page.hero.faq, href: '#faq' }}
+      caption={page.hero.caption}
+    />
+
+    <section class="section section--tinted" aria-labelledby="pourquoi-titre">
+      <div class="container two-cols">
+        <div class="stack stack--24">
+          <SectionHeading id="pourquoi-titre" strong={page.why.titleStrong} light={page.why.titleLight} />
+          <div class="stack stack--16">
+            {
+              page.why.cards.map((card, i) => {
+                const Icon = whyIcons[i]!;
+                return (
+                  <div class="card why-card" data-reveal>
+                    <span class="icon-disc">
+                      <Icon size={22} />
+                    </span>
+                    <h3 class="why-card__title">{card.title}</h3>
+                    <p class="why-card__text">{card.text}</p>
+                  </div>
+                );
+              })
+            }
+          </div>
+        </div>
+        <figure class="mosaic-figure">
+          <div class="mosaic">
+            {
+              mosaic.map((photo) => (
+                <Picture
+                  data-reveal
+                  class:list={['mosaic__photo', `mosaic__photo--${photo.shape}`]}
+                  src={photo.image}
+                  alt={photo.alt}
+                  style={`object-position: ${photo.position}`}
+                  formats={['avif', 'webp']}
+                  widths={[320, 480, 640, 960]}
+                  sizes="(max-width: 900px) 50vw, 300px"
+                />
+              ))
+            }
+          </div>
+          <figcaption class="mosaic__credit">{page.why.credit}</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="missions-titre">
+      <div class="container two-cols">
+        <div class="stack stack--20">
+          <SectionHeading id="missions-titre" strong={page.missions.titleStrong} light={page.missions.titleLight} />
+          <p class="body-text" data-reveal>{page.missions.text}</p>
+          <div data-reveal>
+            <InfoNote icon={NotebookText} title={page.missions.noteTitle} text={page.missions.noteText} />
+          </div>
+        </div>
+        <ul class="missions">
+          {
+            page.missions.items.map((item, i) => {
+              const Icon = missionIcons[i]!;
+              return (
+                <li class="card mission" data-reveal>
+                  <span class="icon-disc icon-disc--44">
+                    <Icon size={20} />
+                  </span>
+                  {item}
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section id="sites" class="section" aria-labelledby="sites-titre">
+      <div class="container stack stack--40">
+        <SectionHeading
+          id="sites-titre"
+          strong={page.sites.titleStrong}
+          light={page.sites.titleLight}
+          lead={page.sites.lead}
+        />
+        <SitesExplorer map={dict.madagascar.sites.map} sites={sites} />
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="conditions-titre">
+      <div class="container stack stack--40">
+        <SectionHeading
+          id="conditions-titre"
+          strong={page.conditions.titleStrong}
+          light={page.conditions.titleLight}
+          lead={page.conditions.lead}
+        />
+        <ul class="conditions">
+          {
+            page.conditions.items.map((item, i) => {
+              const Icon = conditionIcons[i]!;
+              return (
+                <li class="card condition" data-reveal>
+                  <span class="icon-disc">
+                    <Icon size={22} />
+                  </span>
+                  <span class="condition__title">{item.title}</span>
+                  <span class="condition__text">{item.text}</span>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="section section--sauge" aria-labelledby="frais-titre">
+      <div class="container two-cols">
+        <div class="stack stack--16 fees__text">
+          <SectionHeading id="frais-titre" strong={page.fees.titleStrong} light={page.fees.titleLight} />
+          {
+            page.fees.texts.map((text) => (
+              <p class="body-text" data-reveal>
+                {text}
+              </p>
+            ))
+          }
+        </div>
+        <div class="card fees-card" data-reveal>
+          <p class="fees-card__price">
+            <span class="fees-card__example">{page.fees.example}</span>
+            <span class="fees-card__amount">
+              {page.fees.amount} <span class="fees-card__period">{page.fees.period}</span>
+            </span>
+          </p>
+          <div class="fees-card__group">
+            <h3 class="fees-card__label">{page.fees.included}</h3>
+            <ul class="fees-card__list">
+              {
+                page.fees.includedItems.map((item) => (
+                  <li>
+                    <Check class="fees-card__icon fees-card__icon--in" size={18} />
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div class="fees-card__group fees-card__group--out">
+            <h3 class="fees-card__label">{page.fees.excluded}</h3>
+            <ul class="fees-card__list">
+              {
+                page.fees.excludedItems.map((item) => (
+                  <li>
+                    <X class="fees-card__icon fees-card__icon--out" size={18} />
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="candidater" class="section" aria-labelledby="candidater-titre">
+      <div class="container">
+        <div class="apply two-cols">
+          <div class="stack stack--20">
+            <SectionHeading id="candidater-titre" strong={page.apply.titleStrong} light={page.apply.titleLight} />
+            <p class="body-text" data-reveal>{page.apply.text}</p>
+            <div class="apply__buttons" data-reveal>
+              <Button href={mailto} variant="primary" icon="mail">{page.apply.button}</Button>
+            </div>
+          </div>
+          <ol class="steps">
+            {
+              page.apply.steps.map((step, i) => (
+                <li class="step" data-reveal>
+                  <span class="step__num" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <span class="step__body">
+                    <span class="step__title">{step.title}</span>
+                    <span class="step__text">{step.text}</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section section--after-apply" aria-labelledby="faq-titre">
+      <div class="container stack stack--32">
+        <SectionHeading id="faq-titre" strong={page.faq.titleStrong} light={page.faq.titleLight} />
+        <Faq items={faqItems} />
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .section--tinted {
+    background: var(--vert-clair);
+  }
+
+  /* Bande sauge : le texte passe en noir-95 (le basalte n'est pas assez contrasté). */
+  .section--sauge {
+    background: var(--sauge);
+  }
+
+  .fees__text,
+  .fees__text :global(.section-heading__title) {
+    color: var(--noir-95);
+  }
+
+  /* La FAQ suit le bloc « Candidater » : pas de double espacement entre les deux. */
+  .section--after-apply {
+    padding-top: 0;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stack--16 {
+    gap: 16px;
+  }
+
+  .stack--20 {
+    gap: 20px;
+  }
+
+  .stack--24 {
+    gap: var(--space-6);
+  }
+
+  .stack--32 {
+    gap: var(--space-8);
+  }
+
+  .stack--40 {
+    gap: 40px;
+  }
+
+  /* Deux colonnes égales, empilées sous 900px. */
+  .two-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px 64px;
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .two-cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .body-text {
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .card {
+    border: 1px solid var(--bordure-douce);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+  }
+
+  /*
+   * Survol des cartes non cliquables, comme StatCard : pas d'élévation (qui suggérerait
+   * un clic), seulement l'icône qui grossit légèrement, avec un petit rebond.
+   */
+  .icon-disc,
+  .fees-card :global(.fees-card__icon) {
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .card:hover .icon-disc,
+  .fees-card:hover :global(.fees-card__icon) {
+    transform: scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover .icon-disc,
+    .fees-card:hover :global(.fees-card__icon) {
+      transform: none;
+    }
+  }
+
+  .icon-disc {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--menthe);
+    color: var(--basalte);
+  }
+
+  .icon-disc--44 {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Pourquoi nous rejoindre */
+  .why-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--space-7);
+    border-radius: var(--radius-card-lg);
+  }
+
+  .why-card__title {
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .why-card__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .mosaic-figure {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .mosaic {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(150px, 1fr));
+    gap: 16px;
+    min-height: 520px;
+  }
+
+  .mosaic :global(.mosaic__photo) {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+    border-radius: var(--radius-card);
+  }
+
+  .mosaic :global(.mosaic__photo--arch) {
+    grid-row: span 2;
+    border-radius: var(--radius-arch) var(--radius-arch) var(--radius-card) var(--radius-card);
+  }
+
+  .mosaic :global(.mosaic__photo--arch-end) {
+    grid-row: span 2;
+    border-radius: var(--radius-card) var(--radius-card) var(--radius-arch) var(--radius-card);
+  }
+
+  /* Sur vert clair : légende en basalte (l'ardoise est réservée au fond blanc). */
+  .mosaic__credit {
+    font-size: var(--fs-caption);
+  }
+
+  @media (max-width: 900px) {
+    .mosaic {
+      min-height: 420px;
+    }
+  }
+
+  /* Nos missions */
+  .missions,
+  .conditions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .missions {
+    gap: 12px;
+  }
+
+  .mission {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--radius-card);
+    font-size: var(--fs-body);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  /* Conditions de participation */
+  .conditions {
+    gap: 16px;
+  }
+
+  .condition {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: var(--space-6);
+    border-radius: var(--radius-card);
+  }
+
+  .condition__title {
+    font-size: 19px;
+    font-weight: 800;
+  }
+
+  .condition__text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  /* Frais de mission */
+  .fees-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: var(--space-7);
+    border-radius: var(--radius-card-lg);
+  }
+
+  .fees-card__price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fees-card__example {
+    font-size: 14px;
+  }
+
+  .fees-card__amount {
+    font-size: clamp(40px, 4vw, 52px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: var(--ls-stat);
+  }
+
+  .fees-card__period {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: normal;
+  }
+
+  .fees-card__group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fees-card__group--out {
+    padding-top: 16px;
+    border-top: 1px solid var(--bordure-douce);
+  }
+
+  .fees-card__label {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .fees-card__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fees-card__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .fees-card :global(.fees-card__icon) {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .fees-card :global(.fees-card__icon--in) {
+    color: var(--sauge);
+  }
+
+  .fees-card :global(.fees-card__icon--out) {
+    color: var(--ardoise);
+  }
+
+  /* Candidater */
+  .apply {
+    padding: clamp(28px, 5vw, 64px);
+    border-radius: var(--radius-block);
+    background: var(--vert-clair);
+  }
+
+  .apply__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .step__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    font-size: var(--fs-body);
+    font-weight: 800;
+  }
+
+  .step__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .step__title {
+    font-size: 19px;
+    font-weight: 800;
+  }
+
+  .step__text {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+</style>

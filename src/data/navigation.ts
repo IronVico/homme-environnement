@@ -24,7 +24,22 @@ export interface NavColumn {
 export const PAGES = {
   madagascar: 'sites/madagascar',
   projets: 'projets',
+  stages: 's-engager/stages-volontariat',
 } as const;
+
+/** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
+export const STAGES_EMAIL = 'contact.vsc@homme-environnement.org';
+
+/**
+ * Section « S'engager » de l'accueil : destination des liens S'engager tant que la page
+ * S'engager (et ses pages Particuliers, Entreprises) n'existe pas.
+ */
+const HOME_ENGAGE = '/#s-engager';
+
+/** URL de la section S'engager de l'accueil dans une langue (« /#s-engager », « /en/#s-engager »). */
+export function engagePath(lang: Lang): string {
+  return resolve(lang, HOME_ENGAGE);
+}
 
 /** URL d'une page dans une langue : « sites/madagascar » → « /en/sites/madagascar ». */
 export function pagePath(lang: Lang, page: keyof typeof PAGES): string {
@@ -55,12 +70,11 @@ const projectsByTheme = (theme: string) => `${PAGES.projets}?theme=${theme}`;
 export const DON_URL = '#'; // TODO HelloAsso
 
 /**
- * « Venir sur le terrain » depuis la fiche d'un site visitable : l'offre de séjour du site.
- * TODO page S'engager › Venir sur le terrain, puis renvoyer vers sa section du site
- * (par ex. localeUrl(lang, `s-engager/venir-sur-le-terrain#${site}`)).
+ * « Venir sur le terrain » : la page Stages et volontariat, à la section des sites.
+ * TODO offre de séjour (écotourisme) : renvoyer vers la section du site (`site` est déjà passé).
  */
-export function fieldPath(_lang: Lang, _site: string): string {
-  return '#';
+export function fieldPath(lang: Lang, _site?: string): string {
+  return `${pagePath(lang, 'stages')}#sites`;
 }
 
 export const SOCIAL_URLS = {
@@ -68,7 +82,7 @@ export const SOCIAL_URLS = {
   facebook: '#', // TODO URL de la page Facebook de l'ONG
 };
 
-const MAIN_HREFS = ['#', '#', PAGES.projets, '#', '#', '#'];
+const MAIN_HREFS = ['#', '#', PAGES.projets, HOME_ENGAGE, '#', '#'];
 const FOOTER_HREFS = [
   ['#', '#', '#'],
   [PAGES.madagascar, '#'],
@@ -80,7 +94,8 @@ const FOOTER_HREFS = [
     projectsByTheme('filieres'),
     PAGES.projets,
   ],
-  ['#', '#', '#'],
+  // TODO pages Particuliers et Entreprises.
+  [HOME_ENGAGE, PAGES.stages, HOME_ENGAGE],
   ['#', '#', '#'],
 ];
 const LEGAL_HREFS = ['#', '#'];
@@ -98,11 +113,14 @@ const SUBMENUS: Partial<Record<MainSection, { column: number; count?: number }>>
   ressources: { column: 4, count: 2 },
 };
 
-const resolve = (lang: Lang, href: string | undefined) => {
+// « # » seul : page pas encore créée. Sinon chemin sans préfixe de langue, avec query et ancre éventuelles.
+function resolve(lang: Lang, href: string | undefined): string {
   if (!href || href.startsWith('#')) return '#';
-  const [path = '', query] = href.split('?');
-  return query ? `${localeUrl(lang, path)}?${query}` : localeUrl(lang, path);
-};
+  const [target = '', hash] = href.split('#');
+  const [path = '', query] = target.split('?');
+  const url = localeUrl(lang, path.replace(/^\//, ''));
+  return `${url}${query ? `?${query}` : ''}${hash ? `#${hash}` : ''}`;
+}
 
 const zip = (lang: Lang, labels: string[], hrefs: string[]): NavLink[] =>
   labels.map((label, i) => ({ label, href: resolve(lang, hrefs[i]) }));

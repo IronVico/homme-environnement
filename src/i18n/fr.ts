@@ -47,7 +47,7 @@ const fr = {
         title: 'Nos projets',
         links: ['Conservation', 'Reboisement', 'Santé', 'Plantes aromatiques', 'Tous les projets'],
       },
-      { title: "S'engager", links: ['Particuliers', 'Venir sur le terrain', 'Entreprises'] },
+      { title: "S'engager", links: ['Particuliers', 'Stages et volontariat', 'Entreprises'] },
       { title: 'Ressources', links: ['Rapports et études', 'Galerie photos', 'Contact'] },
     ],
     legal: ['Mentions légales', 'Confidentialité'],
@@ -335,6 +335,198 @@ const fr = {
       titleLight: 'sur le terrain.',
       text: 'Écovolontariat, séjours et visites : découvrez les projets avec les équipes locales, ou soutenez-les par un don.',
       field: 'Venir sur le terrain',
+    },
+  },
+  // Page « Stages et volontariat » (maquette StagesVolontariat, texte VSC de l'ONG).
+  stages: {
+    title: 'Stages et volontariat',
+    description:
+      "Volontariat, stage ou recherche à Madagascar : rejoignez les projets de conservation de L'Homme & l'Environnement, aux côtés des communautés locales.",
+    hero: {
+      tags: ['Volontariat', 'Stage', 'Recherche'],
+      titleStrong: 'Engagez-vous',
+      titleLight: 'sur le terrain à Madagascar.',
+      lead: "Chaque année, nous accueillons des volontaires, des stagiaires et des chercheurs, malgaches comme internationaux. Vous travaillez aux côtés des communautés locales, au cœur de l'un des plus grands hotspots de biodiversité de la planète.",
+      text: 'Étudiant, jeune diplômé, chercheur confirmé ou simplement motivé : nous construisons avec vous une mission adaptée à votre profil et aux besoins du terrain.',
+      apply: 'Candidater',
+      faq: 'Questions fréquentes',
+      imageAlt: "Volontaires et équipe de l'ONG partageant un repas sur le terrain",
+      caption: 'Madagascar — [crédit photo]',
+    },
+    why: {
+      titleStrong: 'Pourquoi',
+      titleLight: 'nous rejoindre ?',
+      cards: [
+        {
+          title: 'Des projets utiles',
+          text: "Depuis plus de vingt ans, nous préservons la biodiversité tout en améliorant les conditions de vie des habitants. Vous participez à de vrais projets de conservation, pas à des activités montées pour l'occasion.",
+        },
+        {
+          title: 'Une expérience à taille humaine',
+          text: "Vous rejoignez une petite équipe où chacun compte. Cette proximité favorise les échanges, l'autonomie et un accompagnement personnalisé tout au long de votre mission.",
+        },
+      ],
+      /** Mosaïque de photos, dans l'ordre de la maquette. */
+      photos: [
+        'Visite guidée en forêt avec un guide local',
+        'Classe dans un village voisin de Vohimana',
+        'Vari noir et blanc dans la canopée',
+        'Lac de cratère du Mont Passot au petit matin, Nosy Be',
+      ],
+      credit: 'Vari et lac du Mont Passot © Olivier Behra',
+    },
+    missions: {
+      titleStrong: 'Nos missions',
+      titleLight: 'sur le terrain',
+      text: "Les activités reflètent la diversité des actions de l'ONG. Selon votre profil, votre projet et vos envies, vous rejoignez une mission déjà planifiée ou vous construisez avec votre tuteur une mission sur mesure, adaptée à votre cursus et aux besoins du terrain.",
+      noteTitle: 'Bientôt : notre catalogue de missions',
+      noteText:
+        'Des missions prêtes à rejoindre, par sujet, site et durée, seront publiées ici une fois notre programme scientifique finalisé. En attendant, écrivez-nous : nous construisons la mission avec vous.',
+      items: [
+        'Suivi de la biodiversité',
+        'Inventaires faune et flore',
+        'Analyse de données',
+        'Cartographie',
+        "Éducation à l'environnement",
+        'Projets communautaires et socio-éducatifs',
+      ],
+    },
+    sites: {
+      titleStrong: 'Nos sites',
+      titleLight: "d'intervention",
+      lead: 'Les missions se déroulent surtout dans la réserve de Vohimana, véritable laboratoire vivant de conservation, mais aussi sur nos autres sites. Chacun a ses enjeux écologiques et humains, et offre une expérience de terrain unique.',
+    },
+    conditions: {
+      titleStrong: 'Conditions',
+      titleLight: 'de participation',
+      lead: "Les missions demandent autonomie, curiosité et capacité d'adaptation, et parfois une bonne condition physique.",
+      items: [
+        { title: '18 ans ou plus', text: 'Les missions sont ouvertes à toute personne majeure.' },
+        { title: '4 semaines minimum', text: "Sans limite de durée, toute l'année." },
+        {
+          title: 'Toutes nationalités, toutes disciplines',
+          text: "Dès qu'un projet cohérent peut être construit, au départ de Madagascar ou de l'étranger.",
+        },
+        { title: 'Chercheurs bienvenus', text: 'Pour développer un projet ou rejoindre un programme en cours.' },
+      ],
+    },
+    fees: {
+      titleStrong: 'Frais',
+      titleLight: 'de mission',
+      texts: [
+        'Nos missions sont du volontariat, des stages ou de la recherche : elles ne sont pas rémunérées. Les frais varient selon le site, la durée et la logistique : certains sites très isolés demandent des moyens de transport spécifiques.',
+        'Avant votre départ, vous recevez un budget prévisionnel détaillé. Pour les participants qui vivent déjà à Madagascar, les modalités sont étudiées au cas par cas.',
+      ],
+      example: 'À titre indicatif, à Vohimana',
+      amount: '≈ 700 €',
+      period: 'par mois',
+      included: 'Compris',
+      includedItems: [
+        "L'hébergement et la restauration en pension complète",
+        'Les transports sur place',
+        "Les frais de coordination et d'encadrement",
+        'Le matériel spécifique, selon le sujet',
+        'Les dépenses courantes de la vie sur le terrain',
+      ],
+      excluded: 'Non compris',
+      excludedItems: ["Le billet d'avion international", 'Le visa', "L'assurance voyage (obligatoire)"],
+    },
+    apply: {
+      titleStrong: 'Candidater,',
+      titleLight: "à tout moment de l'année.",
+      text: "Que vous viviez à Madagascar ou à l'étranger, nous étudions chaque candidature pour vous proposer des modalités adaptées. Vous êtes chercheur ? Écrivez-nous directement pour présenter votre projet.",
+      button: 'Envoyer ma candidature',
+      steps: [
+        {
+          title: 'Envoyez votre dossier',
+          text: 'Votre CV, une lettre de motivation, vos dates de disponibilité et la durée souhaitée.',
+        },
+        {
+          title: 'Échangeons ensemble',
+          text: 'Un entretien pour construire une mission adaptée à votre profil et à nos besoins.',
+        },
+        {
+          title: 'Préparez votre départ',
+          text: "Nous vous accompagnons à chaque étape, jusqu'à votre arrivée à Madagascar.",
+        },
+      ],
+    },
+    faq: {
+      titleStrong: 'Questions',
+      titleLight: 'fréquentes',
+      /** {email} : adresse de candidature, affichée en lien. */
+      items: [
+        {
+          question: 'Qui peut nous rejoindre ?',
+          answer:
+            'Toute personne majeure souhaitant s\'investir dans un projet de conservation à Madagascar : étudiant, jeune diplômé, professionnel en reconversion ou chercheur confirmé. Nous étudions chaque candidature pour construire une mission adaptée à votre profil.',
+        },
+        {
+          question: 'Dois-je avoir des compétences spécifiques ?',
+          answer:
+            "Pas nécessairement. Certaines missions demandent des connaissances particulières, d'autres sont accessibles à toute personne motivée, autonome et prête à apprendre. Nous cherchons avant tout des personnes impliquées, curieuses et capables de s'adapter au terrain.",
+        },
+        {
+          question: "Quelle est la durée minimale d'une mission ?",
+          answer:
+            "Au moins quatre semaines. C'est le temps qu'il faut pour découvrir nos projets, prendre ses marques et apporter une contribution vraiment utile.",
+        },
+        {
+          question: 'À quelle période puis-je venir ?',
+          answer:
+            "Toute l'année. Chaque saison offre des opportunités différentes selon les espèces étudiées, les projets en cours et le climat.",
+        },
+        {
+          question: 'Sur quels sites puis-je être affecté ?',
+          answer:
+            'Principalement sur la réserve de Vohimana, mais aussi sur nos autres sites de conservation selon les besoins des projets.',
+        },
+        {
+          question: 'Où serai-je hébergé ?',
+          answer:
+            "Selon votre mission : à Antananarivo près du siège de l'ONG, dans une maison d'hôtes partenaire, au Relais du Naturaliste à Vohimana, dans un écolodge partenaire ou en bivouac sur les sites les plus isolés.",
+        },
+        {
+          question: 'Les missions sont-elles ouvertes aux Malgaches ?',
+          answer:
+            "Oui. Nos programmes sont ouverts aux nationaux comme aux internationaux. L'accueil, l'hébergement et la participation financière sont adaptés à votre lieu de résidence, à votre statut et à votre mission.",
+        },
+        {
+          question: 'Les missions sont-elles rémunérées ?',
+          answer:
+            "Non. Il s'agit de volontariat, de stages ou de recherche. Vous prenez en charge votre voyage et vos frais de séjour, dont une participation aux frais de coordination qui finance l'encadrement et nos programmes.",
+        },
+        {
+          question: 'Quels sont les frais à prévoir ?',
+          answer:
+            "Ils dépendent de la durée et du site. À titre indicatif, comptez environ 700 € pour un mois à Vohimana, hors billet d'avion. Ce budget couvre l'hébergement, la restauration, les transports sur place, la coordination et l'encadrement. Vous recevez un budget détaillé avant votre départ.",
+        },
+        {
+          question: 'Dois-je souscrire une assurance ?',
+          answer:
+            "Oui. Une assurance couvrant les frais médicaux à l'étranger et le rapatriement sanitaire est obligatoire. Nous vous indiquons les assurances adaptées à votre mission.",
+        },
+        {
+          question: 'Dois-je être vacciné ?',
+          answer:
+            "Aucun vaccin n'est obligatoire pour entrer à Madagascar, mais plusieurs sont fortement recommandés, et un traitement préventif contre le paludisme peut être conseillé. Nous vous transmettons toutes les informations avant le départ.",
+        },
+        {
+          question: 'Comment préparer ma mission ?',
+          answer:
+            'Une fois votre candidature acceptée, nous construisons votre mission avec vous lors de plusieurs échanges : objectifs, aspects techniques, voyage, visa, assurances, vaccins, logistique et arrivée.',
+        },
+        {
+          question: 'Comment serai-je accompagné sur le terrain ?',
+          answer:
+            "Par les équipes locales de L'Homme & l'Environnement et par votre tuteur, avec selon la mission l'appui de guides locaux, de chercheurs, de techniciens ou de partenaires de l'ONG.",
+        },
+        {
+          question: 'Comment candidater ?',
+          answer:
+            "Envoyez votre CV, une lettre de motivation, vos dates de disponibilité et la durée souhaitée à {email}. Après un premier échange, nous construisons ensemble une mission adaptée à votre profil, puis nous vous accompagnons jusqu'à votre arrivée à Madagascar.",
+        },
+      ],
     },
   },
 };
