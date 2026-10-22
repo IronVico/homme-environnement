@@ -36,8 +36,8 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
           alt={photoAlt}
           style={`object-position: ${photoPosition}`}
           formats={['avif', 'webp']}
-          widths={[320, 520, 760]}
-          sizes="(max-width: 700px) 100vw, 320px"
+          widths={[320, 520, 760, 900]}
+          sizes="(max-width: 700px) 100vw, 440px"
         />
       ) : (
         <span class="species-card__photo species-card__photo--missing">{photoMissing}</span>

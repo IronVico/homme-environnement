@@ -41,6 +41,11 @@ const {
   badge,
   caption,
 } = Astro.props;
+
+// La photo remplit un cadre de 460 × 575 px (4:5) : une photo plus large que haute y est
+// affichée plus large que le cadre (puis rognée). On annonce cette largeur au navigateur,
+// sinon il télécharge une version trop petite et la photo paraît floue sur écran Retina.
+const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height));
 ---
 
 <div class="page-hero-wrap">
@@ -83,8 +88,8 @@ const {
         alt={imageAlt}
         style={`object-position: ${imagePosition}`}
         formats={['avif', 'webp']}
-        widths={[420, 640, 900, 1260]}
-        sizes="(max-width: 1100px) 100vw, 460px"
+        widths={[460, 640, 900, 1260, 1800, 2400]}
+        sizes={`(max-width: 1100px) 100vw, ${coverWidth}px`}
         loading="eager"
         fetchpriority="high"
       />

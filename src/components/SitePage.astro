@@ -478,6 +478,11 @@ const breadcrumb = [
     list-style: none;
   }
 
+  /* Une seule carte (Fohisokina) : elle garde la largeur d'une carte au lieu de s'étirer. */
+  .cards-grid:has(> :only-child) {
+    grid-template-columns: minmax(0, 440px);
+  }
+
   /* Bande sauge des chiffres : cartes chiffre, variante icône (StatCard). */
   .figures {
     background: var(--sauge);
