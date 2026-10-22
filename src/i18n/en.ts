@@ -84,6 +84,9 @@ const en: Dictionary = {
   // TODO traduction : page « Équipe » encore en français (copie de fr.ts).
   equipe: structuredClone(fr.equipe),
 
+  // TODO traduction : page « L'ONG » encore en français (copie de fr.ts).
+  ong: structuredClone(fr.ong),
+
   // TODO traduction : page « Faire un don » encore en français (copie de fr.ts).
   don: structuredClone(fr.don),
 };
