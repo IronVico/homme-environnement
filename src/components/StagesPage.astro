@@ -292,12 +292,12 @@ const breadcrumb = [
 
 <style>
   .section--tinted {
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   /* Bande sauge : le texte passe en noir-95 (le basalte n'est pas assez contrasté). */
   .section--sauge {
-    background: var(--sauge);
+    background: var(--accent);
   }
 
   .fees__text,
@@ -355,8 +355,8 @@ const breadcrumb = [
   }
 
   .card {
-    border: 1px solid var(--bordure-douce);
-    background: var(--blanc);
+    border: 1px solid var(--bordure-carte);
+    background: var(--surface);
     box-shadow: var(--shadow-card);
   }
 
@@ -389,8 +389,8 @@ const breadcrumb = [
     width: 48px;
     height: 48px;
     border-radius: var(--radius-pill);
-    background: var(--menthe);
-    color: var(--basalte);
+    background: var(--disque);
+    color: var(--texte);
   }
 
   .icon-disc--44 {
@@ -545,7 +545,7 @@ const breadcrumb = [
 
   .fees-card__group--out {
     padding-top: 16px;
-    border-top: 1px solid var(--bordure-douce);
+    border-top: 1px solid var(--bordure-carte);
   }
 
   .fees-card__label {
@@ -578,18 +578,18 @@ const breadcrumb = [
   }
 
   .fees-card :global(.fees-card__icon--in) {
-    color: var(--sauge);
+    color: var(--accent);
   }
 
   .fees-card :global(.fees-card__icon--out) {
-    color: var(--ardoise);
+    color: var(--texte-doux);
   }
 
   /* Candidater */
   .apply {
     padding: clamp(28px, 5vw, 64px);
     border-radius: var(--radius-block);
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .apply__buttons {
@@ -621,7 +621,7 @@ const breadcrumb = [
     width: 40px;
     height: 40px;
     border-radius: var(--radius-pill);
-    background: var(--blanc);
+    background: var(--surface);
     font-size: var(--fs-body);
     font-weight: 800;
   }

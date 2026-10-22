@@ -61,10 +61,10 @@ const { ui } = t(getLang(Astro.currentLocale));
     width: 44px;
     height: 44px;
     padding: 0;
-    border: 1px solid var(--bordure);
+    border: 1px solid var(--trait);
     border-radius: var(--radius-pill);
-    background: var(--blanc);
-    color: var(--basalte);
+    background: var(--surface);
+    color: var(--texte);
     cursor: pointer;
     transition:
       background-color var(--transition-ui),
@@ -83,9 +83,9 @@ const { ui } = t(getLang(Astro.currentLocale));
 
   .pause-btn:hover,
   .pause-btn:focus-visible {
-    border-color: var(--basalte);
-    background: var(--basalte);
-    color: var(--blanc);
+    border-color: var(--texte);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
   .pause-btn :global(.pause-btn__play),

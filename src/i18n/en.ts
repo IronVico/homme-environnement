@@ -20,9 +20,16 @@ const en: Dictionary = {
     logoAlt: 'Man & the Environment',
     donate: 'Donate',
     mainNav: 'Main navigation',
+    submenu: 'Submenu',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     langSwitcher: 'Language',
+    themeToDark: 'Switch to dark mode',
+    themeToLight: 'Switch to light mode',
+    themeLabel: 'Appearance',
+    themeAuto: 'Auto',
+    themeLight: 'Light',
+    themeDark: 'Dark',
     otherLanguage: 'Version française',
     sitemap: 'Site map',
     social: 'Social media',
@@ -79,6 +86,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Équipe » encore en français (copie de fr.ts).
   equipe: structuredClone(fr.equipe),
+
+  // TODO traduction : page « L'ONG » encore en français (copie de fr.ts).
+  ong: structuredClone(fr.ong),
 
   // TODO traduction : page « Faire un don » encore en français (copie de fr.ts).
   don: structuredClone(fr.don),

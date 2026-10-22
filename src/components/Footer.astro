@@ -1,15 +1,13 @@
 ---
-import logoEn from '../assets/logos/logo-couleur-en.svg';
-import logoFr from '../assets/logos/logo-couleur.svg';
 import { donatePath, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
 import { getLang, localeUrl, pathWithoutLocale, t } from '../i18n';
 import Button from './Button.astro';
+import Logo from './Logo.astro';
 import ContourPattern from './ContourPattern.astro';
 import FooterStamp from './FooterStamp.astro';
 
 const lang = getLang(Astro.currentLocale);
 const { ui } = t(lang);
-const logo = lang === 'en' ? logoEn : logoFr;
 const footerNav = getFooterNav(lang);
 const legalNav = getLegalNav(lang);
 // Lien vers la même page dans l'autre langue (« English version » / « Version française »).
@@ -22,7 +20,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
   <div class="footer__inner container">
     <div class="footer__top">
       <div class="footer__brand">
-        <img class="footer__logo" src={logo.src} width={logo.width} height={logo.height} alt={ui.logoAlt} loading="lazy" />
+        <Logo class="footer__logo" lang={lang} alt={ui.logoAlt} />
         <p class="footer__pitch">{ui.footerPitch}</p>
         <Button href={donatePath(lang)} variant="don" size="sm" class="footer__don">{ui.donate}</Button>
         <ul class="footer__social" aria-label={ui.social}>
@@ -89,8 +87,8 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
   .footer {
     position: relative;
     overflow: hidden;
-    background: var(--menthe);
-    color: var(--basalte);
+    background: var(--footer);
+    color: var(--texte);
   }
 
   /* Tampon en bas à droite, juste au-dessus de la barre du bas (maquette v119), dans
@@ -140,7 +138,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
   }
 
   /* Le fichier du logo inclut sa zone de protection : marges négatives. */
-  .footer__logo {
+  .footer :global(.footer__logo) {
     height: 96px;
     width: auto;
     max-width: none;
@@ -207,17 +205,17 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     justify-content: center;
     width: 44px;
     height: 44px;
-    border: 1px solid var(--bordure);
+    border: 1px solid var(--trait);
     border-radius: var(--radius-pill);
-    background: var(--blanc);
+    background: var(--surface);
   }
 
   /* Survol : le disque se remplit en basalte et se soulève (classe btn-motion). */
   .footer__social a:hover,
   .footer__social a:focus-visible {
-    border-color: var(--basalte);
-    background: var(--basalte);
-    color: var(--blanc);
+    border-color: var(--texte);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
   .footer__bottom {
@@ -227,7 +225,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     justify-content: space-between;
     gap: 16px;
     padding-top: var(--space-6);
-    border-top: 1px solid var(--bordure);
+    border-top: 1px solid var(--trait);
     font-size: 14px;
   }
 

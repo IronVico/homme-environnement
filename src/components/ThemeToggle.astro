@@ -1,0 +1,159 @@
+---
+/**
+ * Bascule clair / sombre (composant ThemeToggle du design system, section « Mode sombre »).
+ * - `button` (header desktop) : bouton rond de 44px, icône lune en clair, soleil en sombre.
+ *   Libellé accessible et infobulle qui disent l'action, aria-pressed = mode sombre actif.
+ * - `segmented` (menu mobile) : ligne « Apparence », pilule à trois choix Auto · Clair · Sombre.
+ * Le choix est enregistré sur l'appareil ; sans choix, le site suit l'appareil
+ * (voir src/scripts/theme.ts et le script inline du <head> dans BaseLayout).
+ * Sans JS, la bascule est masquée : le site suit l'appareil.
+ */
+import Monitor from '@lucide/astro/icons/monitor';
+import Moon from '@lucide/astro/icons/moon';
+import Sun from '@lucide/astro/icons/sun';
+import { getLang, t } from '../i18n';
+
+interface Props {
+  variant: 'button' | 'segmented';
+  class?: string;
+}
+
+const { variant, class: className } = Astro.props;
+const { ui } = t(getLang(Astro.currentLocale));
+const choices = [
+  { value: 'auto', label: ui.themeAuto, Icon: Monitor },
+  { value: 'light', label: ui.themeLight, Icon: Sun },
+  { value: 'dark', label: ui.themeDark, Icon: Moon },
+] as const;
+---
+
+{
+  variant === 'button' ? (
+    <button
+      class:list={['theme-toggle', className]}
+      type="button"
+      aria-pressed="false"
+      aria-label={ui.themeToDark}
+      data-tooltip={ui.themeToDark}
+      data-tooltip-pos="below"
+      data-theme-toggle
+      data-label-dark={ui.themeToDark}
+      data-label-light={ui.themeToLight}
+    >
+      <Moon class="theme-toggle__moon" size={20} />
+      <Sun class="theme-toggle__sun" size={20} />
+    </button>
+  ) : (
+    <div class:list={['theme-choice', className]}>
+      <span class="theme-choice__label" id="theme-choice-label">
+        {ui.themeLabel}
+      </span>
+      <div class="theme-choice__group" role="group" aria-labelledby="theme-choice-label">
+        {choices.map(({ value, label, Icon }) => (
+          <button class="theme-choice__btn" type="button" aria-pressed={value === 'auto' ? 'true' : 'false'} data-theme-choice={value}>
+            <Icon size={16} />
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<script>
+  import { initThemeControls } from '../scripts/theme';
+  initThemeControls();
+</script>
+
+<style>
+  /* Sans JS : pas de bascule, le site suit l'appareil. */
+  :global(html:not(.js)) .theme-toggle,
+  :global(html:not(.js)) .theme-choice {
+    display: none;
+  }
+
+  .theme-toggle {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid var(--trait);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--texte);
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui);
+  }
+
+  .theme-toggle:hover {
+    background: var(--section);
+    border-color: var(--texte);
+  }
+
+  .theme-toggle :global(.theme-toggle__sun),
+  .theme-toggle[aria-pressed='true'] :global(.theme-toggle__moon) {
+    display: none;
+  }
+
+  .theme-toggle[aria-pressed='true'] :global(.theme-toggle__sun) {
+    display: block;
+  }
+
+  .theme-choice {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .theme-choice__label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .theme-choice__group {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--section);
+  }
+
+  .theme-choice__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 10px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--texte);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-ui);
+  }
+
+  .theme-choice__btn :global(svg) {
+    flex-shrink: 0;
+  }
+
+  .theme-choice__btn[aria-pressed='true'] {
+    background: var(--surface);
+    box-shadow: 0 1px 2px color-mix(in srgb, #000 15%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle,
+    .theme-choice__btn {
+      transition: none;
+    }
+  }
+</style>

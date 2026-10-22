@@ -27,16 +27,16 @@ const { title, sites, sitesLabel, href } = Astro.props;
     flex-direction: column;
     gap: 6px;
     padding: 20px 22px;
-    background: var(--blanc);
-    color: var(--basalte);
-    border: 1px solid var(--bordure-douce);
+    background: var(--surface);
+    color: var(--texte);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-card-sm);
     box-shadow: var(--shadow-card);
     text-decoration: none;
   }
 
   .project-card:hover {
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .project-card__title {
@@ -63,7 +63,7 @@ const { title, sites, sitesLabel, href } = Astro.props;
   .project-card__sites {
     font-size: 14px;
     line-height: 1.5;
-    color: var(--ardoise);
+    color: var(--texte-doux);
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -69,7 +69,7 @@ const { strong, light, eyebrow, lead, link, id } = Astro.props;
 
   /* Sur-titre basalte : posé aussi bien sur blanc que sur vert-clair. */
   .section-heading__eyebrow {
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .section-heading__title {
@@ -97,19 +97,19 @@ const { strong, light, eyebrow, lead, link, id } = Astro.props;
     padding-block: 4px;
     font-size: var(--fs-body);
     font-weight: 600;
-    color: var(--basalte);
+    color: var(--texte);
     text-decoration: none;
   }
 
   .section-heading__link:hover {
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .section-heading__link-label {
     padding-bottom: 4px;
     background:
-      linear-gradient(var(--basalte), var(--basalte)) 0 100% / 0% 2px no-repeat,
-      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+      linear-gradient(var(--texte), var(--texte)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 2px no-repeat;
     transition: background-size 300ms ease-out;
   }
 

@@ -41,7 +41,7 @@ const gallery = [
 
 const breadcrumb = [
   { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
-  { label: dict.nav.main[0]!, href: '#' }, // TODO page « L'ONG »
+  { label: dict.nav.main[0]!, href: pagePath(lang, 'ong') },
 ];
 ---
 
@@ -143,7 +143,7 @@ const breadcrumb = [
 
 <style>
   .section--tinted {
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .stack {
@@ -157,9 +157,9 @@ const breadcrumb = [
   }
 
   .card {
-    border: 1px solid var(--bordure-douce);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-card);
-    background: var(--blanc);
+    background: var(--surface);
     box-shadow: var(--shadow-card);
   }
 
@@ -316,7 +316,7 @@ const breadcrumb = [
   .expert__domain {
     padding: 4px 10px;
     border-radius: var(--radius-pill);
-    background: var(--vert-clair);
+    background: var(--section);
     font-size: 12px;
     font-weight: 600;
     line-height: 1.4;

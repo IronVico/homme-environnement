@@ -1,8 +1,13 @@
 ---
+import type LucideIcon from '@lucide/astro/icons/map-pin';
 import { getLang, t } from '../i18n';
 import StatCard from './StatCard.astro';
 
-type Stat = Parameters<typeof StatCard>[0];
+/**
+ * Icon : variante icône de StatCard (composant Lucide, affiché à 28px dans le disque menthe),
+ * à la place d'une illustration.
+ */
+type Stat = Parameters<typeof StatCard>[0] & { Icon?: typeof LucideIcon };
 
 interface Props {
   stats: Stat[];
@@ -16,7 +21,11 @@ const { stats, label = ui.statsLabel } = Astro.props;
 
 <section id="chiffres-cles" class="stats" aria-label={label}>
   <div class="stats__grid container">
-    {stats.map((stat) => <StatCard {...stat} />)}
+    {
+      stats.map(({ Icon, ...stat }) => (
+        <StatCard {...stat}>{Icon && <Icon slot="icon" size={28} />}</StatCard>
+      ))
+    }
   </div>
 </section>
 
@@ -27,7 +36,7 @@ const { stats, label = ui.statsLabel } = Astro.props;
 
 <style>
   .stats {
-    background: var(--sauge);
+    background: var(--accent);
   }
 
   .stats__grid {

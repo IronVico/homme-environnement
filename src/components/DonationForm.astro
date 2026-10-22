@@ -155,9 +155,9 @@ const config = {
     flex-direction: column;
     gap: 18px;
     padding: var(--space-7);
-    border: 1px solid var(--bordure-douce);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-card-lg);
-    background: var(--blanc);
+    background: var(--surface);
     box-shadow: var(--shadow-card);
   }
 
@@ -179,7 +179,7 @@ const config = {
     align-items: center;
     gap: 6px;
     font-size: 13px;
-    color: var(--ardoise);
+    color: var(--texte-doux);
   }
 
   .don-form__secure :global(svg) {
@@ -193,7 +193,7 @@ const config = {
     gap: 4px;
     padding: 4px;
     border-radius: var(--radius-pill);
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .don-form__freq-btn {
@@ -202,7 +202,7 @@ const config = {
     border: 0;
     border-radius: var(--radius-pill);
     background: transparent;
-    color: var(--basalte);
+    color: var(--texte);
     font-size: var(--fs-body-sm);
     font-weight: 500;
     cursor: pointer;
@@ -212,9 +212,9 @@ const config = {
   }
 
   .don-form__freq-btn[aria-pressed='true'] {
-    background: var(--blanc);
+    background: var(--surface);
     font-weight: 700;
-    box-shadow: 0 1px 2px rgba(67, 72, 64, 0.12);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--ombre-teinte) 12%, transparent);
   }
 
   .don-form__amounts {
@@ -226,10 +226,10 @@ const config = {
   .don-form__amount {
     min-height: 52px;
     padding: 0 6px;
-    border: 1.5px solid var(--bordure);
+    border: 1.5px solid var(--trait);
     border-radius: 14px;
-    background: var(--blanc);
-    color: var(--basalte);
+    background: var(--surface);
+    color: var(--texte);
     font-size: 18px;
     font-weight: 700;
     white-space: nowrap;
@@ -241,13 +241,13 @@ const config = {
   }
 
   .don-form__amount:hover {
-    border-color: var(--basalte);
+    border-color: var(--texte);
   }
 
   .don-form__amount[aria-pressed='true'] {
-    border-color: var(--basalte);
-    background: var(--basalte);
-    color: var(--blanc);
+    border-color: var(--texte);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
   .don-form__impact {
@@ -255,9 +255,9 @@ const config = {
     align-items: center;
     gap: 14px;
     padding: 12px;
-    border: 1px solid var(--bordure-douce);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-card-sm);
-    background: var(--blanc);
+    background: var(--surface);
   }
 
   .don-form__impact[hidden] {
@@ -285,14 +285,14 @@ const config = {
     display: flex;
     align-items: stretch;
     overflow: hidden;
-    border: 1.5px solid var(--bordure);
+    border: 1.5px solid var(--trait);
     border-radius: 14px;
     font-size: 16px;
   }
 
   .don-form__custom:focus-within {
-    border-color: var(--basalte);
-    outline: 2px solid var(--basalte);
+    border-color: var(--texte);
+    outline: 2px solid var(--texte);
     outline-offset: 2px;
   }
 
@@ -302,12 +302,12 @@ const config = {
     padding: 16px 18px;
     border: 0;
     background: transparent;
-    color: var(--basalte);
+    color: var(--texte);
     outline: none;
   }
 
   .don-form__custom-input::placeholder {
-    color: var(--ardoise);
+    color: var(--texte-doux);
   }
 
   .don-form__error {
@@ -315,7 +315,7 @@ const config = {
     font-size: 14px;
     line-height: 1.4;
     font-weight: 500;
-    color: var(--noir-95);
+    color: var(--texte);
   }
 
   .don-form__error:empty {
@@ -323,15 +323,15 @@ const config = {
   }
 
   .don-form__custom:has([aria-invalid='true']) {
-    border-color: var(--noir-95);
+    border-color: var(--texte);
   }
 
   .don-form__custom-unit {
     display: flex;
     align-items: center;
     padding: 0 18px;
-    border-left: 1.5px solid var(--bordure);
-    background: var(--menthe);
+    border-left: 1.5px solid var(--trait);
+    background: var(--disque);
     font-weight: 600;
   }
 
@@ -346,7 +346,7 @@ const config = {
   .don-form__footnote {
     font-size: 13px;
     line-height: 1.5;
-    color: var(--ardoise);
+    color: var(--texte-doux);
     text-align: center;
   }
 

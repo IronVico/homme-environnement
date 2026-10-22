@@ -16,9 +16,16 @@ const fr = {
     logoAlt: "L'Homme & l'Environnement",
     donate: 'Faire un don',
     mainNav: 'Navigation principale',
+    submenu: 'Sous-menu',
     openMenu: 'Ouvrir le menu',
     closeMenu: 'Fermer le menu',
     langSwitcher: 'Choix de la langue',
+    themeToDark: 'Passer en mode sombre',
+    themeToLight: 'Passer en mode clair',
+    themeLabel: 'Apparence',
+    themeAuto: 'Auto',
+    themeLight: 'Clair',
+    themeDark: 'Sombre',
     otherLanguage: 'English version',
     sitemap: 'Plan du site',
     social: 'Réseaux sociaux',
@@ -572,6 +579,120 @@ const fr = {
       text: 'Missions de service civique, stages, mécénat de compétences.',
       missions: 'Voir les missions',
       contact: 'Nous contacter',
+    },
+  },
+  /**
+   * Page « L'ONG » (texte de Tadzio, comité). Les {repères} sont remplacés par les
+   * chiffres et dates de src/data/chiffres.ts (ONG), mis en forme selon la langue.
+   */
+  ong: {
+    title: "L'ONG",
+    description:
+      "Depuis {founded}, L'Homme & l'Environnement associe les communautés locales et les entreprises à la préservation de la biodiversité, à Madagascar et au-delà : notre approche, nos sites et notre histoire.",
+    hero: {
+      titleStrong: 'Protéger la nature',
+      titleLight: 'avec ceux qui en vivent.',
+      lead: "Depuis {founded}, L'Homme & l'Environnement imagine des programmes qui associent les communautés locales et les entreprises à la préservation de la biodiversité, à Madagascar et au-delà.",
+      imageAlt: "Des femmes avec leurs paniers de fleurs d'ylang-ylang dans les plantations du Mont-Passot",
+      caption: "Cueillette d'ylang-ylang, Nosy Be — © Olivier Behra",
+      history: 'Notre histoire',
+      team: 'Notre équipe',
+    },
+    statsLabel: "L'ONG en chiffres",
+    /** Dans l'ordre de la maquette : espèces, paysans, arbres, sites, Man & Nature, Vohimana. */
+    stats: [
+      'espèces menacées protégées dans nos sanctuaires, dont {critical} en danger critique.',
+      'paysans soutenus, en majorité des femmes, dans des filières fondées sur la nature.',
+      'arbres plantés à Vohimana pour restaurer les zones dégradées.',
+      'sites gérés à Madagascar, chacun avec sa filière de valorisation.',
+      'projets accompagnés dans {countries} pays tropicaux avec le programme Man & Nature.',
+      'Vohimana entre dans la liste officielle des nouvelles aires protégées.',
+    ],
+    approach: {
+      titleStrong: 'Notre approche,',
+      titleLight: 'trois leviers.',
+      lead: "Préserver la biodiversité ne marche durablement que si elle fait vivre ceux qui l'entourent.",
+      cards: [
+        {
+          title: 'Des sanctuaires créés avec les habitants',
+          text: 'Hors du système existant des aires protégées, nous avons créé des sanctuaires pour plus de {species} espèces menacées, gérés avec les communautés qui y vivent.',
+        },
+        {
+          title: 'Des solutions fondées sur la nature',
+          text: 'Nous impliquons des entreprises de la cosmétique, de la parfumerie, de la mode et du soin pour que la forêt debout fasse vivre les paysans qui la protègent.',
+        },
+        {
+          title: 'Une recherche appliquée',
+          text: 'Avec des institutions nationales et internationales, nous testons des modèles reproductibles, utiles au Cadre mondial pour la biodiversité et à la résilience face au changement climatique.',
+        },
+      ],
+    },
+    sectors: {
+      titleStrong: 'Une filière',
+      titleLight: 'par site',
+      lead: "Nos {count} sites à Madagascar s'appuient chacun sur une ressource naturelle valorisée avec les habitants.",
+      /** Filière de chaque site (clé = nom du fichier dans src/content/sites). */
+      filieres: {
+        vohimana: 'Plantes aromatiques et médicinales',
+        'mont-passot': 'Ylang-ylang et fruitiers',
+        ambohidravy: 'Vanille sauvage',
+        ambalakalanoro: 'Saro et raphia',
+        fohisokina: 'Pisciculture',
+      } as Record<string, string>,
+      siteLink: 'Voir la fiche du site',
+      /** Noms affichés sur les cartes quand ils diffèrent du nom du site. */
+      names: { 'mont-passot': 'Mont-Passot, Nosy Be' } as Record<string, string>,
+      map: {
+        title: 'Tous nos sites sur la carte',
+        text: 'Surfaces, espèces et projets de chaque site, à Madagascar et au Burkina Faso.',
+        link: 'Voir la carte',
+      },
+    },
+    history: {
+      titleStrong: 'Notre histoire,',
+      titleLight: 'plus de trente ans de terrain.',
+      /** Dans l'ordre de la frise ; les dates sont dans src/data/chiffres.ts (ONG.dates). */
+      events: [
+        {
+          title: 'Un premier combat',
+          text: 'Olivier Behra, biologiste, alerte les autorités malgaches et la communauté internationale pour faire interdire le commerce de la grenouille arlequin.',
+        },
+        {
+          title: "Naissance de l'ONG",
+          text: "Après avoir dirigé pour les Nations unies le premier projet associant communautés locales et opérateurs privés autour d'une ressource sauvage, il fonde L'Homme & l'Environnement.",
+        },
+        {
+          title: 'Man & Nature',
+          text: "Le programme aide d'autres ONG locales à gérer des filières : plus de {projects} projets voient le jour dans {countries} pays tropicaux.",
+        },
+        {
+          title: 'Aroma Forest',
+          text: 'Première entreprise sociale et solidaire fondée sur la nature : une cinquantaine de salariés et des revenus pour plus de {farmers} paysans.',
+        },
+        {
+          title: 'Vohimana protégée',
+          text: "La forêt qu'on disait condamnée entre dans la liste officielle des nouvelles aires protégées de Madagascar.",
+        },
+      ],
+      imageAlt: 'Cascade dans la forêt de Vohimana',
+      quote: "C'est quand j'ai vu ce paysage que je me suis dit que c'était là qu'il fallait installer la base de Vohimana.",
+      quoteAuthor: 'Olivier Behra, fondateur — © Olivier Behra',
+    },
+    models: {
+      titleStrong: 'Des modèles',
+      titleLight: 'à reproduire',
+      paragraphs: [
+        "Le Cadre mondial pour la biodiversité de Kunming-Montréal fixe le cap. Il faut maintenant s'appuyer sur ce qui fonctionne pour étendre l'implication des communautés locales et des entreprises dans la restauration de la biodiversité.",
+        "C'est le sens du programme pilote d'Ambalakalanoro, dans l'ouest de Madagascar, que nous portons avec un nombre croissant de partenaires scientifiques.",
+      ],
+      partners: 'Nos partenaires de recherche',
+      newTab: '(nouvel onglet)',
+    },
+    cta: {
+      titleStrong: 'Les solutions',
+      titleLight: 'se trouvent au sein du vivant.',
+      text: 'Soutenez nos programmes par un don, ou venez les découvrir sur le terrain avec nos équipes.',
+      field: 'Venir sur le terrain',
     },
   },
   don: {

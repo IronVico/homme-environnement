@@ -4,7 +4,7 @@
  * la langue de Astro.currentLocale (/ = français, /en/ = anglais).
  */
 import { getCollection } from 'astro:content';
-import { donatePath, pagePath } from '../data/navigation';
+import { donatePath, ongPath, pagePath } from '../data/navigation';
 import { getLang, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CountryCard from './CountryCard.astro';
@@ -83,7 +83,7 @@ const madagascarSites = (await getCollection('sites', ({ data }) => data.country
           id="approche-titre"
           strong={home.approach.titleStrong}
           light={home.approach.titleLight}
-          link={{ label: home.approach.link, href: '#' }}
+          link={{ label: home.approach.link, href: ongPath(lang, 'approach') }}
         />
         <div class="grid grid--pillars">
           {pillars.map((pillar) => <PillarCard {...pillar} />)}
@@ -155,7 +155,7 @@ const madagascarSites = (await getCollection('sites', ({ data }) => data.country
 
 <style>
   .section--tinted {
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .stack {

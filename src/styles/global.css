@@ -22,8 +22,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--blanc);
-  color: var(--basalte);
+  background: var(--fond);
+  color: var(--texte);
   font-family: var(--font-sans);
   font-size: var(--fs-body);
   /* Interligne fixé par style de texte (tokens) ; « normal » pour les libellés courts. */
@@ -66,21 +66,39 @@ h3 {
 }
 
 a {
-  color: var(--basalte);
+  color: var(--texte);
 }
 
 a:hover {
-  color: var(--noir-95);
+  color: var(--texte-fort);
 }
 
 :focus-visible {
-  outline: 2px solid var(--basalte);
+  outline: 2px solid var(--texte);
   outline-offset: 2px;
 }
 
 button,
 input {
   font: inherit;
+}
+
+/*
+ * Changement de mode au clic sur la bascule : fondu des couleurs de 200 ms
+ * (classe posée 250 ms par src/scripts/theme.ts, jamais au chargement ni avec
+ * prefers-reduced-motion).
+ */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition:
+    background-color 200ms ease-out,
+    color 200ms ease-out,
+    border-color 200ms ease-out,
+    fill 200ms ease-out,
+    stroke 200ms ease-out,
+    box-shadow 200ms ease-out !important;
 }
 
 /* Cartes cliquables : légère élévation au survol et au focus clavier. */
@@ -179,7 +197,7 @@ a.card-lift:focus-visible {
   line-height: 1.3;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--ardoise);
+  color: var(--texte-doux);
 }
 
 .visually-hidden {
@@ -201,15 +219,15 @@ a.card-lift:focus-visible {
   z-index: 100;
   padding: 12px 20px;
   border-radius: var(--radius-pill);
-  background: var(--basalte);
-  color: var(--blanc);
+  background: var(--bouton-plein);
+  color: var(--texte-sur-bouton);
   font-weight: 600;
   text-decoration: none;
 }
 
 .skip-link:focus {
   top: 12px;
-  color: var(--blanc);
+  color: var(--texte-sur-bouton);
 }
 
 /*
@@ -229,8 +247,8 @@ a.card-lift:focus-visible {
   z-index: 20;
   padding: 6px 10px;
   border-radius: 8px;
-  background: var(--basalte);
-  color: var(--blanc);
+  background: var(--bouton-plein);
+  color: var(--texte-sur-bouton);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.3;
@@ -279,6 +297,13 @@ a.card-lift:focus-visible {
 [data-tooltip-align='end']:hover::after,
 [data-tooltip-align='end']:focus-visible::after {
   translate: 0 0;
+}
+
+/* Bouton en haut de page (bascule du header) : l'infobulle s'ouvre dessous. */
+[data-tooltip-pos='below']::after {
+  top: calc(100% + 8px);
+  bottom: auto;
+  translate: -50% -4px;
 }
 
 /* Échap : toutes les infobulles se ferment jusqu'au prochain mouvement de souris ou de focus. */

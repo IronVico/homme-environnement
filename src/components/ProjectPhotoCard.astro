@@ -97,16 +97,16 @@ const {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: var(--blanc);
-    color: var(--basalte);
-    border: 1px solid var(--bordure-douce);
+    background: var(--surface);
+    color: var(--texte);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-card-lg);
     box-shadow: var(--shadow-card);
     text-decoration: none;
   }
 
   .project-tile__link:hover {
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .project-tile :global(.project-tile__photo) {
@@ -132,7 +132,7 @@ const {
 
   .project-tile__tag {
     padding: 4px 12px;
-    border: 1px solid var(--vert-clair);
+    border: 1px solid var(--section);
     border-radius: var(--radius-pill);
     font-size: 13px;
   }
@@ -145,7 +145,7 @@ const {
   }
 
   .project-tile__tag--theme {
-    background: var(--vert-clair);
+    background: var(--section);
     font-weight: 600;
   }
 
@@ -168,7 +168,7 @@ const {
     gap: var(--space-3);
     margin-top: auto;
     padding-top: var(--space-3);
-    border-top: 1px solid var(--bordure-douce);
+    border-top: 1px solid var(--bordure-carte);
     font-size: 13px;
     font-weight: 600;
   }
@@ -183,7 +183,7 @@ const {
   /* Icône décorative : la sauge est permise hors texte. */
   .project-tile :global(.project-tile__pin) {
     flex-shrink: 0;
-    color: var(--sauge);
+    color: var(--accent);
   }
 
   .project-tile :global(.project-tile__arrow) {
