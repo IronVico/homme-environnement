@@ -38,12 +38,12 @@ export const TAX_REDUCTION_RATE = 0.66;
 
 /**
  * Formulaires HelloAsso de l'ONG. Le bouton « Donner » envoie vers `donation`.
- * TODO ONG : URL du formulaire de don HelloAsso (non fournie), par exemple
- * https://www.helloasso.com/associations/<slug>/formulaires/<n>.
- * Tant qu'elle est vide, le bouton reste un lien « # ».
+ * Pour l'instant, la page de l'association sur HelloAsso (lien donné par Paul, 20/10/2026).
+ * TODO ONG : remplacer par l'URL du formulaire de don lui-même quand on l'aura
+ * (https://www.helloasso.com/associations/<slug>/formulaires/<n>).
  */
 export const HELLOASSO = {
-  donation: '',
+  donation: 'https://www.helloasso.com/associations/association-l-homme-et-l-environnement',
   /** Formulaire de don mensuel s'il est distinct ; vide : même formulaire que `donation`. */
   donationMonthly: '',
   /** TODO ONG : formulaire d'adhésion (« Devenir membre »). */

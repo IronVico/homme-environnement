@@ -59,10 +59,11 @@ export const MADAGASCAR = {
  * TODO ONG : les valeurs marquées « à confirmer » doivent être validées avant la mise en ligne.
  */
 export const ONG = {
-  /** Création de l'ONG. TODO à confirmer : l'ancienneté « depuis 1993 » (hero, footer, tampon). */
+  /**
+   * Création de l'association (confirmé par Paul, 22/10/2026). On affiche « depuis 1993 »,
+   * jamais un nombre d'années qu'il faudrait mettre à jour chaque année.
+   */
   founded: 1993,
-  /** Années de terrain annoncées dans le titre de l'histoire (« plus de trente ans »). */
-  yearsActive: 30,
   /** Espèces menacées protégées dans les sanctuaires (minimum : « 150+ »)… */
   threatenedSpecies: 150,
   /** …dont en danger critique. */
@@ -85,6 +86,8 @@ export const ONG = {
     firstFight: 1988,
     manNature: { from: 2010, to: 2015 },
     aromaForest: 2011,
+    /** Enregistrement comme ONG à Madagascar (Paul, 22/10/2026). */
+    ngoMadagascar: 2013,
     /** Classement de Vohimana en aire protégée. TODO à confirmer : année (2026) et statut officiel. */
     vohimanaProtected: 2026,
   },
