@@ -10,7 +10,6 @@ import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Coins from '@lucide/astro/icons/coins';
 import ExternalLink from '@lucide/astro/icons/external-link';
 import MapPin from '@lucide/astro/icons/map-pin';
-import Mail from '@lucide/astro/icons/mail';
 import Microscope from '@lucide/astro/icons/microscope';
 import Plus from '@lucide/astro/icons/plus';
 import Sprout from '@lucide/astro/icons/sprout';
@@ -189,8 +188,8 @@ const breadcrumb = [
               <span class="join-card__lead">{page.list.join.text}</span>
             </span>
             <a class="join-card__link text-link text-link--on-dark" href={mailto}>
-              <Mail class="join-card__mail" size={18} />
               <span class="text-link__label">{page.list.join.link}</span>
+              <ArrowRight class="join-card__arrow" size={18} />
             </a>
           </li>
         </ul>
@@ -471,7 +470,7 @@ const breadcrumb = [
     background: var(--vert-clair);
   }
 
-  .join-card:hover :global(.join-card__mail) {
+  .join-card:hover :global(.join-card__arrow) {
     transform: translateX(var(--nudge-arrow-hover));
   }
 
@@ -673,14 +672,14 @@ const breadcrumb = [
     color: var(--blanc);
   }
 
-  .join-card__link :global(.join-card__mail),
+  .join-card__link :global(.join-card__arrow),
   .featured__link :global(.featured__arrow) {
     flex-shrink: 0;
     transition: transform var(--transition-ui);
   }
 
-  .join-card__link:hover :global(.join-card__mail),
-  .join-card__link:focus-visible :global(.join-card__mail),
+  .join-card__link:hover :global(.join-card__arrow),
+  .join-card__link:focus-visible :global(.join-card__arrow),
   .featured__link:hover :global(.featured__arrow),
   .featured__link:focus-visible :global(.featured__arrow) {
     transform: translateX(var(--nudge-arrow-hover));
@@ -761,7 +760,7 @@ const breadcrumb = [
     .partner-card__logo,
     .icon-disc,
     .filters__pill,
-    .join-card__link :global(.join-card__mail),
+    .join-card__link :global(.join-card__arrow),
     .featured__link :global(.featured__arrow) {
       transition: none;
     }
@@ -773,12 +772,12 @@ const breadcrumb = [
     .partner-card:focus-within,
     .join-card:hover,
     .join-card:focus-within,
-    .join-card:hover :global(.join-card__mail) {
+    .join-card:hover :global(.join-card__arrow) {
       transform: none;
     }
 
-    .join-card__link:hover :global(.join-card__mail),
-    .join-card__link:focus-visible :global(.join-card__mail),
+    .join-card__link:hover :global(.join-card__arrow),
+    .join-card__link:focus-visible :global(.join-card__arrow),
     .featured__link:hover :global(.featured__arrow),
     .featured__link:focus-visible :global(.featured__arrow) {
       transform: none;
