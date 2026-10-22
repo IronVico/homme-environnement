@@ -1,7 +1,8 @@
 /**
  * Apparition au scroll : chaque élément [data-reveal] apparaît (fondu + montée)
  * la première fois qu'il entre dans l'écran. Les éléments qui entrent ensemble
- * (une rangée de cartes) apparaissent en cascade.
+ * (une rangée de cartes) apparaissent en cascade, à 90 ms d'écart ; data-reveal-stagger
+ * (en ms) allonge cet écart (étapes de la frise de la page L'ONG).
  *
  * L'état masqué n'existe qu'avec JS (classe .js posée dans le <head>) et sans
  * prefers-reduced-motion : voir global.css. Si ce script ne s'exécute pas,
@@ -27,7 +28,8 @@ export function initReveal() {
       const entering = entries.filter((entry) => entry.isIntersecting);
       entering.forEach((entry, i) => {
         const el = entry.target as HTMLElement;
-        el.style.setProperty('--reveal-delay', `${i * STAGGER_MS}ms`);
+        const stagger = Number(el.dataset.revealStagger) || STAGGER_MS;
+        el.style.setProperty('--reveal-delay', `${i * stagger}ms`);
         el.classList.add('is-revealed');
         observer.unobserve(el);
       });

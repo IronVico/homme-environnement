@@ -53,8 +53,46 @@ export const MADAGASCAR = {
   threatenedSpecies: 84,
 };
 
+/**
+ * Chiffres et dates de la page « L'ONG » (texte de Tadzio, comité, octobre 2026).
+ * Les textes qui les entourent sont dans src/i18n (clé `ong`), avec des repères {n}.
+ * TODO ONG : les valeurs marquées « à confirmer » doivent être validées avant la mise en ligne.
+ */
+export const ONG = {
+  /** Création de l'ONG. TODO à confirmer : l'ancienneté « depuis 1993 » (hero, footer, tampon). */
+  founded: 1993,
+  /** Années de terrain annoncées dans le titre de l'histoire (« plus de trente ans »). */
+  yearsActive: 30,
+  /** Espèces menacées protégées dans les sanctuaires (minimum : « 150+ »)… */
+  threatenedSpecies: 150,
+  /** …dont en danger critique. */
+  criticallyEndangered: 18,
+  /** Paysans soutenus dans les filières. TODO à confirmer (6 000 dans le texte de Tadzio). */
+  farmers: 6000,
+  /**
+   * Arbres plantés à Vohimana. TODO à confirmer : 500 000 dans le texte de Tadzio,
+   * 400 000 sur l'accueil (« en 10 ans d'expériences pilotes », src/components/HomePage.astro).
+   */
+  treesPlanted: 500_000,
+  /** Programme Man & Nature : projets accompagnés (minimum : « 20+ ») dans ce nombre de pays. */
+  manNatureProjects: 20,
+  manNatureCountries: 15,
+  /** Aroma Forest : salariés (environ) et paysans qui en tirent un revenu (minimum). */
+  aromaForestEmployees: 50,
+  aromaForestFarmers: 5000,
+  /** Dates de la frise « Notre histoire ». */
+  dates: {
+    firstFight: 1988,
+    manNature: { from: 2010, to: 2015 },
+    aromaForest: 2011,
+    /** Classement de Vohimana en aire protégée. TODO à confirmer : année (2026) et statut officiel. */
+    vohimanaProtected: 2026,
+  },
+} as const;
+
 /** Par site, clé = nom du fichier dans src/content/sites. */
 export const SITE_FIGURES: Record<string, SiteFigures | null> = {
+  // TODO ONG : années de présence à confirmer (année de création du site de Vohimana).
   vohimana: { hectares: 2200, years: 30, beneficiaries: 1400, lemurSpecies: 12, frogSpecies: 70, medicinalPlants: 160 },
   // years et beneficiaries d'Ambalakalanoro, beneficiaries de Mont-Passot : ancien site, absents des PDF.
   ambalakalanoro: {
