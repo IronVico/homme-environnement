@@ -470,10 +470,6 @@ const breadcrumb = [
     background: var(--vert-clair);
   }
 
-  .join-card:hover :global(.join-card__arrow) {
-    transform: translateX(var(--nudge-arrow-hover));
-  }
-
   .partner-card[hidden] {
     display: none;
   }
@@ -771,8 +767,7 @@ const breadcrumb = [
     .partner-card:hover,
     .partner-card:focus-within,
     .join-card:hover,
-    .join-card:focus-within,
-    .join-card:hover :global(.join-card__arrow) {
+    .join-card:focus-within {
       transform: none;
     }
 
