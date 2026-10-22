@@ -16,7 +16,7 @@ import Sprout from '@lucide/astro/icons/sprout';
 import { Image, Picture } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { donatePath, PARTNERS_EMAIL, pagePath, sitePath } from '../data/navigation';
-import { PARTNER_TYPES, PARTNERS, partnerMonogram } from '../data/partenaires';
+import { PARTNER_TYPES, PARTNERS, partnerMonogram, provisionalLogo } from '../data/partenaires';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { fill } from '../lib/don';
@@ -45,6 +45,7 @@ const partners = PARTNERS.map((partner) => ({
   ...partner,
   typeLabel: page.types[partner.type],
   monogramText: partnerMonogram(partner),
+  logoSvg: partner.logo ? undefined : provisionalLogo(partner),
   siteNames: (partner.sites ?? []).map((id) => {
     const name = siteNames.get(id);
     if (!name) throw new Error(`Site « ${id} » absent de src/content/sites (partenaire ${partner.id}).`);
@@ -143,6 +144,8 @@ const breadcrumb = [
                 <span class="partner-card__logo">
                   {partner.logo ? (
                     <Image class="partner-card__logo-img" src={partner.logo} alt="" height={52} densities={[1, 2]} />
+                  ) : partner.logoSvg ? (
+                    <span class="partner-card__logo-svg" set:html={partner.logoSvg} />
                   ) : (
                     <span class="partner-card__monogram" aria-hidden="true">
                       {partner.monogramText}
@@ -434,6 +437,43 @@ const breadcrumb = [
     border-radius: var(--radius-card);
   }
 
+  /*
+   * Survol : la carte se soulève (comme les cartes cliquables) et la zone logo se teinte.
+   * Les cartes ne sont pas des liens (lien « Site web » à l'intérieur) : même effet au focus
+   * de ce lien.
+   */
+  .partner-card,
+  .join-card {
+    transition:
+      transform var(--transition-ui),
+      box-shadow var(--transition-ui);
+  }
+
+  .partner-card:hover,
+  .partner-card:focus-within {
+    transform: translateY(var(--lift-card-hover));
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .join-card:hover,
+  .join-card:focus-within {
+    transform: translateY(var(--lift-card-hover));
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .partner-card__logo {
+    transition: background-color var(--transition-ui);
+  }
+
+  .partner-card:hover .partner-card__logo,
+  .partner-card:focus-within .partner-card__logo {
+    background: var(--vert-clair);
+  }
+
+  .join-card:hover :global(.join-card__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
   .partner-card[hidden] {
     display: none;
   }
@@ -453,6 +493,19 @@ const breadcrumb = [
     max-height: 52px;
     width: auto;
     height: auto;
+  }
+
+  /* Logo provisoire (SVG en ligne) : hauteur fixe, comme les vrais logos. */
+  .partner-card__logo-svg {
+    display: flex;
+    max-width: 100%;
+    color: var(--basalte);
+  }
+
+  .partner-card__logo-svg :global(svg) {
+    max-width: 100%;
+    height: 52px;
+    width: auto;
   }
 
   /* Monogramme sobre, en attendant les logos fournis par l'ONG. */
@@ -655,6 +708,9 @@ const breadcrumb = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .partner-card,
+    .join-card,
+    .partner-card__logo,
     .icon-disc,
     .filters__pill,
     .join-card__link :global(.join-card__arrow),
@@ -662,7 +718,12 @@ const breadcrumb = [
       transition: none;
     }
 
-    .way-card:hover .icon-disc {
+    .way-card:hover .icon-disc,
+    .partner-card:hover,
+    .partner-card:focus-within,
+    .join-card:hover,
+    .join-card:focus-within,
+    .join-card:hover :global(.join-card__arrow) {
       transform: none;
     }
 

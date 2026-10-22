@@ -19,8 +19,8 @@ export interface Partner {
   /** Site de l'organisation, ouvert dans un nouvel onglet. */
   url?: string;
   /**
-   * Logo fourni par l'ONG (src/assets/logos/partenaires/…). Absent : monogramme aux initiales.
-   * Les logos des maquettes sont provisoires (inventés) : ne pas les mettre en ligne.
+   * Logo fourni par l'ONG (src/assets/logos/partenaires/…). Absent : logo provisoire de la
+   * maquette (voir SHOW_PROVISIONAL_LOGOS), sinon monogramme aux initiales.
    */
   logo?: ImageMetadata;
   /** Monogramme affiché sans logo, quand les initiales calculées ne conviennent pas. */
@@ -133,6 +133,27 @@ export const PARTNERS: Partner[] = [
     // TODO URL
   },
 ];
+
+/**
+ * Logos provisoires de la maquette (src/assets/logos/partenaires-provisoires, nom = id du
+ * partenaire) : pictogramme et nom dessinés pour la maquette, ce ne sont PAS les logos des
+ * organisations. Affichés en ligne à la demande de Victor, en attendant les vrais fichiers.
+ * TODO avant la mise en production : remplacer par les logos fournis par l'ONG (champ `logo`)
+ * ou passer cette constante à false (monogrammes).
+ */
+export const SHOW_PROVISIONAL_LOGOS = true;
+
+const provisionalLogos = import.meta.glob<string>('../assets/logos/partenaires-provisoires/*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+/** Logo provisoire d'un partenaire (SVG en ligne, couleur du texte), ou undefined. */
+export function provisionalLogo(partner: Partner): string | undefined {
+  if (!SHOW_PROVISIONAL_LOGOS) return undefined;
+  return provisionalLogos[`../assets/logos/partenaires-provisoires/${partner.id}.svg`];
+}
 
 // Petits mots ignorés pour les initiales, sauf en tête : « Université d'Antananarivo » → « UA », « La Guilde » → « LG ».
 const MINOR_WORDS = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'et', 'of', 'the']);
