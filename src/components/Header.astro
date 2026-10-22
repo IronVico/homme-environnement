@@ -79,6 +79,8 @@ const isCurrent = (href: string) => {
     </ul>
     <!-- Menu burger : la bascule du header devient le sélecteur « Apparence ». -->
     <ThemeToggle variant="segmented" class="header__appearance" />
+    <!-- Menu burger : choix de la langue sous « Apparence », comme la maquette. -->
+    <LangSwitcher class="header__lang-menu" />
   </nav>
 
   <LangSwitcher class="header__lang" />
@@ -432,8 +434,9 @@ const isCurrent = (href: string) => {
     }
   }
 
-  /* Sélecteur « Apparence » : seulement dans le panneau du menu burger. */
-  .header :global(.header__appearance) {
+  /* Sélecteur « Apparence » et langue du panneau : seulement avec le menu burger. */
+  .header :global(.header__appearance),
+  .header :global(.header__lang-menu) {
     display: none;
   }
 
@@ -486,7 +489,7 @@ const isCurrent = (href: string) => {
       flex-basis: 100%;
     }
 
-    /* Comme la maquette : avec le burger, la langue se change depuis le lien du footer. */
+    /* Avec le burger, la langue se change dans le panneau du menu (header__lang-menu). */
     .header :global(.header__lang) {
       display: none;
     }
@@ -500,6 +503,15 @@ const isCurrent = (href: string) => {
       display: flex;
       margin-top: 20px;
       padding-inline: 16px;
+    }
+
+    .header :global(.header__lang-menu) {
+      display: inline-flex;
+      margin-top: 16px;
+    }
+
+    :global(.js) .header :global(.header__lang-menu) {
+      margin-left: 16px;
     }
 
     .header__nav > ul {
