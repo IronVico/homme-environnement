@@ -165,13 +165,13 @@ const breadcrumb = [
                       </span>
                     )}
                     {partner.url && (
-                      <a class="partner-card__link" href={partner.url} target="_blank" rel="noopener">
-                        {page.list.website}
+                      <a class="partner-card__link text-link" href={partner.url} target="_blank" rel="noopener">
+                        <span class="text-link__label">{page.list.website}</span>
                         <span class="visually-hidden">
                           {' '}
                           {fill(page.list.websiteOf, { name: partner.name })} {page.list.newTab}
                         </span>
-                        <ExternalLink size={14} />
+                        <ExternalLink class="partner-card__external" size={14} />
                       </a>
                     )}
                   </span>
@@ -187,8 +187,8 @@ const breadcrumb = [
               <span class="join-card__title">{page.list.join.title}</span>
               <span class="join-card__lead">{page.list.join.text}</span>
             </span>
-            <a class="join-card__link" href={`#${CONTACT_ID}`}>
-              {page.list.join.link}
+            <a class="join-card__link text-link text-link--on-dark" href={`#${CONTACT_ID}`}>
+              <span class="text-link__label">{page.list.join.link}</span>
               <ArrowRight class="join-card__arrow" size={18} />
             </a>
           </li>
@@ -214,8 +214,8 @@ const breadcrumb = [
             <span class="featured__light">{page.featured.titleLight}</span>
           </h2>
           <p class="featured__text">{page.featured.text}</p>
-          <a class="featured__link" href={sitePath(lang, 'ambalakalanoro')}>
-            {page.featured.link}
+          <a class="featured__link text-link" href={sitePath(lang, 'ambalakalanoro')}>
+            <span class="text-link__label">{page.featured.link}</span>
             <ArrowRight class="featured__arrow" size={18} />
           </a>
         </div>
@@ -565,8 +565,53 @@ const breadcrumb = [
     font-weight: 600;
   }
 
-  .partner-card__link :global(svg) {
+  .partner-card__link :global(.partner-card__external) {
     flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  /* Lien externe : l'icône glisse vers le haut et la droite, dans le sens de la flèche. */
+  .partner-card__link:hover :global(.partner-card__external),
+  .partner-card__link:focus-visible :global(.partner-card__external) {
+    transform: translate(2px, -2px);
+  }
+
+  /*
+   * Liens texte : même survol que les liens d'action des titres de section (SectionHeading) :
+   * filet sauge au repos, trait tracé de gauche à droite au survol, icône qui glisse.
+   */
+  .text-link {
+    --trait: var(--basalte);
+    color: var(--basalte);
+    text-decoration: none;
+  }
+
+  .text-link:hover {
+    color: var(--basalte);
+  }
+
+  .text-link--on-dark {
+    --trait: var(--blanc);
+    color: var(--blanc);
+  }
+
+  .text-link--on-dark:hover {
+    color: var(--blanc);
+  }
+
+  .text-link__label {
+    padding-bottom: 3px;
+    background:
+      linear-gradient(var(--trait), var(--trait)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .text-link:hover .text-link__label,
+  .text-link:focus-visible .text-link__label {
+    background-size:
+      100% 2px,
+      100% 2px;
   }
 
   /* Dernière carte, basalte : appel à rejoindre les partenaires. */
@@ -708,6 +753,8 @@ const breadcrumb = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .text-link__label,
+    .partner-card__link :global(.partner-card__external),
     .partner-card,
     .join-card,
     .partner-card__logo,
@@ -718,6 +765,8 @@ const breadcrumb = [
       transition: none;
     }
 
+    .partner-card__link:hover :global(.partner-card__external),
+    .partner-card__link:focus-visible :global(.partner-card__external),
     .way-card:hover .icon-disc,
     .partner-card:hover,
     .partner-card:focus-within,
