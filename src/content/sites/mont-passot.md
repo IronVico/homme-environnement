@@ -3,6 +3,7 @@ name: Mont-Passot
 country: madagascar
 region: Nosy Be
 photo: ../../assets/photos/site-mont-passot.jpg
+photoAlt: "Un couple de lémurs macaco dans les arbres : le mâle noir et la femelle rousse aux favoris blancs"
 summary: "Les hauteurs sacrées de l'île aux parfums : des lacs de cratère qui alimentent Nosy Be en eau, sauvés grâce aux communautés et à la filière ylang-ylang."
 
 # ---- Fiche du site (source : présentation PDF de l'ONG, 2026) ----
