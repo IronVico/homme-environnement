@@ -121,21 +121,21 @@ export function initDonationForm() {
   );
 
   render();
-  keepStickyFormVisible(aside);
+  keepStickyFormVisible(form);
 }
 
 /** Header fixé (88px) + marge : point d'accroche du formulaire collant. */
 const STICKY_TOP = 100;
 const STICKY_BOTTOM_GAP = 16;
 
-/** Formulaire collant plus haut que l'écran : on l'accroche plus haut pour que son bouton reste visible. */
-function keepStickyFormVisible(aside: HTMLElement | null) {
-  if (!aside || !('ResizeObserver' in window)) return;
+/** Carte collante plus haute que l'écran : on l'accroche plus haut pour que son bouton reste visible. */
+function keepStickyFormVisible(card: HTMLElement) {
+  if (!('ResizeObserver' in window)) return;
   const update = () => {
-    const top = Math.min(STICKY_TOP, window.innerHeight - aside.offsetHeight - STICKY_BOTTOM_GAP);
-    aside.style.setProperty('--sticky-top', `${Math.round(top)}px`);
+    const top = Math.min(STICKY_TOP, window.innerHeight - card.offsetHeight - STICKY_BOTTOM_GAP);
+    card.style.setProperty('--sticky-top', `${Math.round(top)}px`);
   };
-  new ResizeObserver(update).observe(aside);
+  new ResizeObserver(update).observe(card);
   window.addEventListener('resize', update, { passive: true });
   update();
 }

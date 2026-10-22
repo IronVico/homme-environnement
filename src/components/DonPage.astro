@@ -420,19 +420,22 @@ const breadcrumb = [
     padding-bottom: var(--space-section);
   }
 
-  /* Le formulaire remonte sur la photo, à droite, et reste à l'écran au défilement. */
+  /* Le formulaire remonte sur la photo, à droite, sur toute la hauteur de la colonne
+     (align-self: stretch) pour que sa carte puisse rester collée au défilement. */
   .don-grid > :global(.don-form) {
     grid-column: 2;
     grid-row: 1 / span 2;
+    align-self: stretch;
     position: relative;
     z-index: 2;
     margin-top: -560px;
     margin-right: clamp(0px, 2vw, 32px);
   }
 
-  /* Collant sous le header ; sur un écran bas, --sticky-top (src/scripts/don.ts)
-     remonte le point d'accroche pour que le bas du formulaire reste visible. */
-  .don-grid > :global(.don-form) {
+  /* Seule la carte du formulaire est collante : les derniers dons défilent avec la page.
+     Sur un écran bas, --sticky-top (src/scripts/don.ts) remonte le point d'accroche
+     pour que le bas de la carte reste visible. */
+  .don-grid > :global(.don-form) :global(.don-form__card) {
     position: sticky;
     top: var(--sticky-top, 100px);
   }
@@ -792,11 +795,14 @@ const breadcrumb = [
       grid-template-columns: minmax(0, 1fr);
     }
 
+    .don-grid > :global(.don-form) :global(.don-form__card) {
+      position: static;
+    }
+
     .don-grid > :global(.don-form) {
       grid-column: 1;
       grid-row: auto;
-      position: relative;
-      top: auto;
+      align-self: start;
       width: 100%;
       max-width: 520px;
       margin: 24px auto 0;
