@@ -74,9 +74,9 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
 <style>
   .species-card {
     overflow: hidden;
-    border: 1px solid var(--bordure-douce);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-card-lg);
-    background: var(--blanc);
+    background: var(--surface);
     box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
@@ -116,7 +116,7 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--vert-clair);
+    background: var(--section);
     font-size: 14px;
     font-weight: 600;
   }
@@ -139,14 +139,14 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
     align-self: flex-start;
     padding: 5px 12px;
     border-radius: var(--radius-pill);
-    background: var(--vert-clair);
+    background: var(--section);
     font-size: 12px;
     font-weight: 600;
   }
 
   .species-card__status--threatened {
-    background: var(--basalte);
-    color: var(--blanc);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
   .species-card__text {
@@ -160,11 +160,11 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
     padding-top: 4px;
     font-size: 11px;
     line-height: 1.4;
-    color: var(--ardoise);
+    color: var(--texte-doux);
   }
 
   .species-card__credit a,
   .species-card__credit a:hover {
-    color: var(--ardoise);
+    color: var(--texte-doux);
   }
 </style>

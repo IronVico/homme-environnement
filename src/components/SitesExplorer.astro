@@ -105,7 +105,7 @@ const selectedId = sites[0]?.id;
     padding: var(--panel-pad);
     overflow: hidden;
     border-radius: var(--radius-block);
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   /*
@@ -158,9 +158,9 @@ const selectedId = sites[0]?.id;
     box-sizing: border-box;
     width: 28px;
     height: 28px;
-    border: 2px solid var(--basalte);
+    border: 2px solid var(--texte);
     border-radius: 50% 50% 50% 0;
-    background: var(--blanc);
+    background: var(--surface);
     transform: rotate(-45deg);
     transition:
       width var(--transition-ui),
@@ -172,23 +172,23 @@ const selectedId = sites[0]?.id;
     transform: rotate(45deg);
     font-size: 12px;
     font-weight: 700;
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .sites-explorer__pin:hover .sites-explorer__drop {
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .sites-explorer__pin[data-selected] .sites-explorer__drop {
     width: 36px;
     height: 36px;
-    border: 3px solid var(--blanc);
-    background: var(--basalte);
+    border: 3px solid var(--fond);
+    background: var(--bouton-plein);
   }
 
   .sites-explorer__pin[data-selected] .sites-explorer__num {
     font-size: 14px;
-    color: var(--blanc);
+    color: var(--texte-sur-bouton);
   }
 
   .sites-explorer__pin:focus-visible {
@@ -196,7 +196,7 @@ const selectedId = sites[0]?.id;
   }
 
   .sites-explorer__pin:focus-visible .sites-explorer__drop {
-    outline: 2px solid var(--basalte);
+    outline: 2px solid var(--texte);
     outline-offset: 3px;
   }
 

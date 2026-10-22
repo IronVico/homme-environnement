@@ -51,25 +51,26 @@ const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current
   }
 
   .btn--don {
-    background: var(--peche);
+    background: var(--don);
     color: var(--noir-95);
   }
 
   .btn--don:hover {
     color: var(--noir-95);
-    background: color-mix(in srgb, var(--peche) 88%, var(--noir-95));
+    background: color-mix(in srgb, var(--don) 88%, var(--noir-95));
   }
 
   .btn--primary {
-    background: var(--basalte);
-    color: var(--blanc);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
   .btn--primary:hover {
-    background: var(--noir-95);
-    color: var(--blanc);
+    background: var(--texte-fort);
+    color: var(--texte-sur-bouton);
   }
 
+  /* Sur photo : inchangé dans les deux modes. */
   .btn--on-dark-primary {
     background: var(--blanc);
     color: var(--noir-95);
@@ -87,12 +88,12 @@ const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current
   }
 
   .btn--secondary {
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .btn--secondary:hover {
-    color: var(--noir-95);
-    background: var(--vert-clair);
+    color: var(--texte-fort);
+    background: var(--section);
   }
 
   .btn--on-dark,

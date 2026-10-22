@@ -40,6 +40,12 @@ const ogUrl = new URL(og.src, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline>
       document.documentElement.classList.add('js');
+      // Mode forcé par le visiteur (bascule du header, src/scripts/theme.ts) : posé avant le
+      // premier rendu, sans flash. Sans choix enregistré, le CSS suit l'appareil.
+      try {
+        const theme = localStorage.getItem('lhe-theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch {}
       // Filet de sécurité : si le script d'apparition ne s'exécute pas, tout s'affiche.
       setTimeout(() => {
         if (!document.documentElement.dataset.revealReady) document.documentElement.classList.add('reveal-off');

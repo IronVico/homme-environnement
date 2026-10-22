@@ -210,7 +210,7 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
 
 <style>
   .section--tinted {
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .stack {
@@ -254,10 +254,10 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
     gap: var(--space-2);
     min-height: 44px;
     padding: 0 18px;
-    border: 2px solid var(--blanc);
+    border: 2px solid var(--surface);
     border-radius: var(--radius-pill);
-    background: var(--blanc);
-    color: var(--basalte);
+    background: var(--surface);
+    color: var(--texte);
     font-size: var(--fs-body-sm);
     font-weight: 600;
     cursor: pointer;
@@ -268,13 +268,13 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
   }
 
   .filters__pill:hover {
-    border-color: var(--basalte);
+    border-color: var(--texte);
   }
 
   .filters__pill[aria-pressed='true'] {
-    background: var(--basalte);
-    border-color: var(--basalte);
-    color: var(--blanc);
+    background: var(--bouton-plein);
+    border-color: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
   .projects-grid {

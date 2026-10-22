@@ -10,6 +10,7 @@
  * Apparition au scroll comme les autres éléments (data-reveal : fondu et montée de 24px).
  * Les courbes « respirent » très lentement, en décalé (validé, documenté dans le design
  * system) ; coupé avec prefers-reduced-motion.
+ * En mode sombre, l'opacité des courbes est réduite (×0,6, token --motif-opacite).
  */
 interface Props {
   variant: 'hero' | 'footer';
@@ -53,7 +54,7 @@ const pattern = PATTERNS[variant];
 <svg class:list={['contours', `contours--${variant}`, className]} viewBox={pattern.viewBox} aria-hidden="true" focusable="false" data-reveal>
   {
     pattern.paths.map(({ d, opacity }, index) => (
-      <path d={d} stroke-opacity={opacity} style={`--i: ${index}`} />
+      <path d={d} style={`--i: ${index}; stroke-opacity: calc(${opacity} * var(--motif-opacite))`} />
     ))
   }
 </svg>
@@ -65,7 +66,7 @@ const pattern = PATTERNS[variant];
     max-width: none;
     pointer-events: none;
     fill: none;
-    stroke: var(--sauge);
+    stroke: var(--accent);
     stroke-width: 1.3;
   }
 
