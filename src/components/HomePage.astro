@@ -50,7 +50,7 @@ const pillars = home.approach.pillars.map((pillar, i) => ({ ...pillar, image: pi
 
 const engageMedia = [
   { href: DON_URL, image: engagerDonner, imagePosition: '40% 60%' },
-  { href: '#', image: engagerTerrain, imagePosition: '50% 30%' },
+  { href: pagePath(lang, 'stages'), image: engagerTerrain, imagePosition: '50% 30%' },
   { href: '#', image: engagerEntreprises, imagePosition: '50% 40%' },
 ];
 const engagements = home.engage.cards.map((card, i) => ({ ...card, ...engageMedia[i]! }));

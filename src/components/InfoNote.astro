@@ -1,0 +1,58 @@
+---
+/**
+ * Encart d'information (modèle unique du site) : icône Lucide nue à gauche,
+ * titre en gras et texte, sur fond menthe bordé de vert clair.
+ */
+import type { AstroComponent } from '@lucide/astro';
+
+interface Props {
+  /** Icône Lucide (composant), affichée à 22px en basalte. */
+  icon: AstroComponent;
+  title: string;
+  text: string;
+}
+
+const { icon: Icon, title, text } = Astro.props;
+---
+
+<div class="info-note" role="note">
+  <Icon class="info-note__icon" size={22} />
+  <span class="info-note__body">
+    <span class="info-note__title">{title}</span>
+    <span class="info-note__text">{text}</span>
+  </span>
+</div>
+
+<style>
+  .info-note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: 16px 20px;
+    border: 1px solid var(--vert-clair);
+    border-radius: var(--radius-card-sm);
+    background: var(--menthe);
+  }
+
+  .info-note :global(.info-note__icon) {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--basalte);
+  }
+
+  .info-note__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .info-note__title {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .info-note__text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+</style>

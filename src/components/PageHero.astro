@@ -3,6 +3,7 @@
  * Hero des pages internes (pays, sites) : titre en deux temps, phrase de contexte,
  * un bouton secondaire, photo verticale en arche à droite (même format sur toutes les pages).
  * Options des fiches site : pastille de lieu, bouton Don avant le bouton secondaire, légende.
+ * Options des pages S'engager : étiquettes, second paragraphe, bouton principal (basalte).
  * Le motif « courbes de niveau » passe derrière la photo, ancré en haut à droite.
  */
 import MapPin from '@lucide/astro/icons/map-pin';
@@ -23,6 +24,12 @@ interface Props {
   cta?: { label: string; href: string };
   /** Bouton Don (pêche), placé avant le bouton secondaire. */
   donate?: { label: string; href: string };
+  /** Bouton principal (basalte), placé avant le bouton secondaire. */
+  primary?: { label: string; href: string };
+  /** Étiquettes au-dessus du titre : « Volontariat », « Stage »… */
+  tags?: string[];
+  /** Second paragraphe, sous le chapeau, en texte courant. */
+  text?: string;
   /** Pastille de lieu au-dessus du titre : « Madagascar · Centre-Est ». */
   badge?: string;
   /** Légende sous la photo (crédit). */
@@ -38,6 +45,9 @@ const {
   imagePosition = '50% 50%',
   cta,
   donate,
+  primary,
+  tags,
+  text,
   badge,
   caption,
 } = Astro.props;
@@ -59,15 +69,26 @@ const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height))
           </p>
         )
       }
+      {
+        tags && tags.length > 0 && (
+          <ul class="page-hero__tags" data-reveal>
+            {tags.map((tag) => (
+              <li class="page-hero__tag">{tag}</li>
+            ))}
+          </ul>
+        )
+      }
       <h1 class="page-hero__title" data-reveal>
         <span class="page-hero__strong">{titleStrong}</span><br />
         <span class="page-hero__light">{titleLight}</span>
       </h1>
       <p class="page-hero__lead" data-reveal>{lead}</p>
+      {text && <p class="page-hero__text-more" data-reveal>{text}</p>}
       {
-        (donate || cta) && (
+        (donate || primary || cta) && (
           <div class="page-hero__ctas" data-reveal>
             {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
+            {primary && <Button href={primary.href} variant="primary">{primary.label}</Button>}
             {cta && (
               <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
                 {cta.label}
@@ -178,9 +199,33 @@ const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height))
     font-weight: 600;
   }
 
+  .page-hero__tags {
+    align-self: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .page-hero__tag {
+    padding: 7px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--vert-clair);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
   .page-hero__lead {
     max-width: 640px;
     font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  .page-hero__text-more {
+    max-width: 640px;
+    font-size: 16px;
     line-height: var(--lh-body);
   }
 
@@ -237,10 +282,17 @@ const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height))
     }
   }
 
-  /* Tablette : photo pleine largeur moins haute, pour ne pas occuper tout l'écran. */
-  @media (min-width: 600px) and (max-width: 1080px) {
+  /* Empilé (tablette et mobile) : photo pleine largeur en paysage, pour ne pas occuper tout l'écran. */
+  @media (max-width: 1080px) {
     .page-hero :global(.page-hero__photo) {
       aspect-ratio: 16 / 9;
+    }
+  }
+
+  /* Mobile : arche réduite, à l'échelle de la photo paysage. */
+  @media (max-width: 700px) {
+    .page-hero :global(.page-hero__photo) {
+      border-radius: 40px 40px 16px 16px;
     }
   }
 </style>

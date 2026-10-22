@@ -48,7 +48,7 @@ const en: Dictionary = {
       { title: 'The NGO', links: ['Our approach', 'Our history', 'Partners and funders'] },
       { title: 'Our sites', links: ['Madagascar', 'Burkina Faso'] },
       { title: 'Our projects', links: ['Conservation', 'Reforestation', 'Health', 'Aromatic plants', 'All projects'] },
-      { title: 'Get involved', links: ['Individuals', 'Come to the field', 'Companies'] },
+      { title: 'Get involved', links: ['Individuals', 'Internships and volunteering', 'Companies'] },
       { title: 'Resources', links: ['Reports and studies', 'Photo gallery', 'Contact'] },
     ],
     legal: ['Legal notice', 'Privacy'],
@@ -65,6 +65,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Nos projets » encore en français (copie de fr.ts).
   projets: structuredClone(fr.projets),
+
+  // TODO traduction : page « Stages et volontariat » encore en français (copie de fr.ts).
+  stages: structuredClone(fr.stages),
 };
 
 export default en;

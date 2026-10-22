@@ -2,25 +2,32 @@
 import ArrowDown from '@lucide/astro/icons/arrow-down';
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Heart from '@lucide/astro/icons/heart';
+import Mail from '@lucide/astro/icons/mail';
 
 interface Props {
   href: string;
-  /** don : pêche, réservé à « Faire un don ». secondary : contour basalte. on-dark : contour blanc sur photo. */
-  variant?: 'don' | 'secondary' | 'on-dark';
+  /**
+   * don : pêche, réservé à « Faire un don ». primary : fond basalte, action principale d'une page.
+   * secondary : contour basalte. on-dark : contour blanc sur photo.
+   */
+  variant?: 'don' | 'primary' | 'secondary' | 'on-dark';
   /** md : hero. sm : header et footer. */
   size?: 'md' | 'sm';
   /** Flèche des variantes secondaires : vers le bas pour une ancre dans la page. */
   arrow?: 'right' | 'down';
+  /** mail : enveloppe avant le libellé, à la place de la flèche (lien mailto). */
+  icon?: 'mail';
   class?: string;
 }
 
-const { href, variant = 'secondary', size = 'md', arrow = 'right', class: className } = Astro.props;
+const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, class: className } = Astro.props;
 ---
 
 <a href={href} class:list={['btn', 'btn-motion', `btn--${variant}`, `btn--${size}`, className]}>
   {variant === 'don' && <Heart size={18} />}
+  {icon === 'mail' && <Mail size={20} />}
   <slot />
-  {variant !== 'don' && (arrow === 'down' ? <ArrowDown size={20} /> : <ArrowRight size={20} />)}
+  {variant !== 'don' && !icon && (arrow === 'down' ? <ArrowDown size={20} /> : <ArrowRight size={20} />)}
 </a>
 
 <style>
@@ -48,6 +55,16 @@ const { href, variant = 'secondary', size = 'md', arrow = 'right', class: classN
   .btn--don:hover {
     color: var(--noir-95);
     background: color-mix(in srgb, var(--peche) 88%, var(--noir-95));
+  }
+
+  .btn--primary {
+    background: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .btn--primary:hover {
+    background: var(--noir-95);
+    color: var(--blanc);
   }
 
   .btn--secondary,

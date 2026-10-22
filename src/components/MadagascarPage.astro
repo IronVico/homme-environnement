@@ -5,10 +5,11 @@
  * collections (src/content), chiffres dans src/data/chiffres.ts.
  */
 import { getCollection } from 'astro:content';
-import { MADAGASCAR, SITE_FIGURES } from '../data/chiffres';
-import { DON_URL, projectPath, sitePath } from '../data/navigation';
+import { MADAGASCAR } from '../data/chiffres';
+import { DON_URL, projectPath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getExplorerSites } from '../lib/explorer-sites';
 import Breadcrumb from './Breadcrumb.astro';
 import Button from './Button.astro';
 import Footer from './Footer.astro';
@@ -27,15 +28,10 @@ const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const page = dict.madagascar;
 
-const NBSP = '\u00a0';
-const numberLocale = lang === 'en' ? 'en-GB' : 'fr-FR';
-const formatNumber = (value: number) => value.toLocaleString(numberLocale).replace(/\s/g, NBSP);
 const withCount = (text: string, count: number) => text.replace('{count}', String(count));
 
-const sites = (await getCollection('sites', ({ data }) => data.country === 'madagascar')).sort(
-  (a, b) => a.data.order - b.data.order,
-);
-const siteNames = new Map(sites.map((site) => [site.id, site.data.name]));
+const sites = await getExplorerSites(lang);
+const siteNames = new Map(sites.map((site) => [site.id, site.name]));
 
 // Projets menés à Madagascar ; leurs cartes ne citent que les sites malgaches.
 const projects = (await getCollection('projets', ({ data }) => data.countries.includes('madagascar'))).sort(
@@ -58,12 +54,6 @@ const stats = statValues.map((stat, i) => {
   const text = page.stats[i]!;
   return { ...stat, unit: text.unit, text: text.text, illustrationLabel: text.illustrationLabel };
 });
-
-// Surface protégée de chaque site, formatée dans la langue de la page (les autres chiffres iront sur les fiches).
-const siteHectares = (id: string) => {
-  const hectares = SITE_FIGURES[id]?.hectares;
-  return hectares === undefined ? undefined : `${formatNumber(hectares)}${NBSP}${page.sites.hectares}`;
-};
 
 const breadcrumb = [
   { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
@@ -98,20 +88,7 @@ const breadcrumb = [
         />
         <SitesExplorer
           map={page.sites.map}
-          sites={sites.map((site) => ({
-            id: site.id,
-            num: site.data.order,
-            name: site.data.name,
-            region: site.data.region,
-            summary: site.data.summary,
-            image: site.data.photo,
-            imagePosition: site.data.photoPosition,
-            mapPosition: site.data.mapPosition,
-            figure: siteHectares(site.id),
-            figureMissing: page.sites.figuresMissing,
-            href: sitePath(lang, site.id),
-            linkLabel: page.sites.link,
-          }))}
+          sites={sites}
         />
       </div>
     </section>

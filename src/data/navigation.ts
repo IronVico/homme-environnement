@@ -24,7 +24,11 @@ export interface NavColumn {
 export const PAGES = {
   madagascar: 'sites/madagascar',
   projets: 'projets',
+  stages: 's-engager/stages-volontariat',
 } as const;
+
+/** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
+export const STAGES_EMAIL = 'contact.vsc@homme-environnement.org';
 
 /** URL d'une page dans une langue : « sites/madagascar » → « /en/sites/madagascar ». */
 export function pagePath(lang: Lang, page: keyof typeof PAGES): string {
@@ -80,7 +84,7 @@ const FOOTER_HREFS = [
     projectsByTheme('filieres'),
     PAGES.projets,
   ],
-  ['#', '#', '#'],
+  ['#', PAGES.stages, '#'],
   ['#', '#', '#'],
 ];
 const LEGAL_HREFS = ['#', '#'];
