@@ -71,7 +71,8 @@ const faqItems = page.faq.items.map(({ question, answer }) => {
 
 const breadcrumb = [
   { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
-  { label: dict.nav.main[3]!, href: '#' }, // TODO page « S'engager »
+  // TODO page « S'engager » : en attendant, la section S'engager de l'accueil.
+  { label: dict.nav.main[3]!, href: `${localeUrl(lang)}#s-engager` },
 ];
 ---
 
