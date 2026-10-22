@@ -141,8 +141,10 @@ const { ui } = t(getLang(Astro.currentLocale));
     background: color-mix(in srgb, var(--accent) 88%, var(--noir-95));
   }
 
-  .newsletter-form__btn:focus-visible {
-    outline-color: var(--blanc);
+  /* Bouton dans la pilule blanche (dans les deux modes) : contour sombre, sinon invisible.
+     Sélecteur plus fort que le contour blanc des bandeaux photo (PhotoBanner). */
+  .newsletter-form__pill .newsletter-form__btn:focus-visible {
+    outline-color: var(--noir-95);
   }
 
   .newsletter-form__status:empty {
@@ -194,6 +196,11 @@ const { ui } = t(getLang(Astro.currentLocale));
     .newsletter-form__btn {
       justify-content: center;
       width: 100%;
+    }
+
+    /* Empilés : le bouton est sur la photo, hors de la pilule : contour blanc. */
+    .newsletter-form__pill .newsletter-form__btn:focus-visible {
+      outline-color: var(--blanc);
     }
   }
 </style>
