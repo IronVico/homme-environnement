@@ -20,6 +20,7 @@ const en: Dictionary = {
     logoAlt: 'Man & the Environment',
     donate: 'Donate',
     mainNav: 'Main navigation',
+    submenu: 'Submenu',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     langSwitcher: 'Language',

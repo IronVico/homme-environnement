@@ -51,18 +51,38 @@ const isCurrent = (href: string) => {
             );
           }
           const id = `sous-menu-${link.section}`;
+          // Rubrique qui a sa propre page (L'ONG, Nos projets) : le libellé mène à la page,
+          // la flèche ouvre le sous-menu. Sinon, tout le libellé ouvre le sous-menu.
+          const hasPage = link.href !== '#';
           return (
-            <li class="header__item" data-submenu>
-              <button
-                class="header__toggle"
-                type="button"
-                aria-expanded="false"
-                aria-controls={id}
-                aria-current={sectionCurrent ? 'true' : undefined}
-              >
-                {link.label}
-                <ChevronDown class="header__chevron" size={16} />
-              </button>
+            <li class:list={['header__item', { 'header__item--split': hasPage }]} data-submenu data-current={sectionCurrent ? '' : undefined}>
+              {hasPage ? (
+                <div class="header__split">
+                  <a class="header__link" href={link.href} aria-current={currentPath === link.href.replace(/\/$/, '') ? 'page' : undefined}>
+                    {link.label}
+                  </a>
+                  <button
+                    class="header__toggle header__toggle--icon"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls={id}
+                    aria-label={`${ui.submenu} ${link.label}`}
+                  >
+                    <ChevronDown class="header__chevron" size={16} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  class="header__toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls={id}
+                  aria-current={sectionCurrent ? 'true' : undefined}
+                >
+                  {link.label}
+                  <ChevronDown class="header__chevron" size={16} />
+                </button>
+              )}
               <ul id={id} class="header__submenu">
                 {link.children.map((child) => (
                   <li>
@@ -341,6 +361,44 @@ const isCurrent = (href: string) => {
     font-weight: 600;
   }
 
+  /*
+   * Rubrique avec sa propre page : lien (libellé) + bouton (flèche) dans une même
+   * pastille. Survol et rubrique en cours se dessinent sur la pastille entière.
+   */
+  .header__split {
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    transition: background-color 150ms ease-out;
+  }
+
+  .header__split > .header__link,
+  .header__split > .header__link:hover,
+  .header__split > .header__link[aria-current],
+  .header__split > .header__toggle,
+  .header__split > .header__toggle:hover {
+    background: transparent;
+  }
+
+  .header__split > .header__link {
+    padding-right: 4px;
+  }
+
+  .header__split > .header__toggle {
+    align-self: stretch;
+    padding-left: 4px;
+  }
+
+  .header__split:hover,
+  .header__item[data-expanded] > .header__split {
+    background: var(--bordure-carte);
+  }
+
+  .header__item[data-current] > .header__split {
+    background: var(--section);
+    font-weight: 600;
+  }
+
   /* Desktop : pastille 8px 14px compensée par une marge négative, le menu ne bouge pas. */
   @media (min-width: 1381px) {
     .header__nav > ul {
@@ -348,9 +406,22 @@ const isCurrent = (href: string) => {
     }
 
     .header__nav > ul > li > a,
-    .header__toggle {
+    .header__nav > ul > li > .header__toggle,
+    .header__split {
       padding: 8px 14px;
       margin: -8px -14px;
+    }
+
+    .header__split {
+      padding: 0;
+    }
+
+    .header__split > .header__link {
+      padding: 8px 4px 8px 14px;
+    }
+
+    .header__split > .header__toggle {
+      padding: 8px 14px 8px 4px;
     }
 
     /* Sous-menu aligné sur la pastille (qui déborde de 14px à gauche et 8px en bas). */
@@ -367,7 +438,8 @@ const isCurrent = (href: string) => {
 
   @media (prefers-reduced-motion: reduce) {
     .header__nav a,
-    .header__toggle {
+    .header__toggle,
+    .header__split {
       transition: none;
     }
   }
@@ -570,6 +642,25 @@ const isCurrent = (href: string) => {
 
     :global(.js) .header__toggle {
       justify-content: space-between;
+    }
+
+    /* Rubrique avec page : le lien prend la ligne, la flèche reste un bouton carré à droite. */
+    :global(.js) .header__split {
+      width: 100%;
+      border-radius: 14px;
+    }
+
+    :global(.js) .header__nav .header__split > .header__link {
+      flex: 1 1 auto;
+      width: auto;
+      padding-right: 8px;
+    }
+
+    :global(.js) .header__nav .header__split > .header__toggle {
+      flex: 0 0 auto;
+      width: 52px;
+      justify-content: center;
+      padding: 12px 16px;
     }
 
     /* Sous-menus en accordéon dans le panneau. Sans JS, ils restent dépliés. */

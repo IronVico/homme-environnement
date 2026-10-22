@@ -16,6 +16,7 @@ const fr = {
     logoAlt: "L'Homme & l'Environnement",
     donate: 'Faire un don',
     mainNav: 'Navigation principale',
+    submenu: 'Sous-menu',
     openMenu: 'Ouvrir le menu',
     closeMenu: 'Fermer le menu',
     langSwitcher: 'Choix de la langue',
