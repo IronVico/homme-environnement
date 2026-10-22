@@ -59,12 +59,11 @@ const projectsByTheme = (theme: string) => `${PAGES.projets}?theme=${theme}`;
 export const DON_URL = '#'; // TODO HelloAsso
 
 /**
- * « Venir sur le terrain » depuis la fiche d'un site visitable : l'offre de séjour du site.
- * TODO page S'engager › Venir sur le terrain, puis renvoyer vers sa section du site
- * (par ex. localeUrl(lang, `s-engager/venir-sur-le-terrain#${site}`)).
+ * « Venir sur le terrain » : la page Stages et volontariat, à la section des sites.
+ * TODO offre de séjour (écotourisme) : renvoyer vers la section du site (`site` est déjà passé).
  */
-export function fieldPath(_lang: Lang, _site: string): string {
-  return '#';
+export function fieldPath(lang: Lang, _site?: string): string {
+  return `${pagePath(lang, 'stages')}#sites`;
 }
 
 export const SOCIAL_URLS = {

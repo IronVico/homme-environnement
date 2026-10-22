@@ -6,7 +6,7 @@
  */
 import { getCollection } from 'astro:content';
 import { MADAGASCAR } from '../data/chiffres';
-import { DON_URL, projectPath } from '../data/navigation';
+import { DON_URL, fieldPath, projectPath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getExplorerSites } from '../lib/explorer-sites';
@@ -127,7 +127,7 @@ const breadcrumb = [
     >
       <div class="cta__buttons">
         <Button href={DON_URL} variant="don">{dict.ui.donate}</Button>
-        <Button href="#" variant="on-dark">{page.cta.field}</Button>
+        <Button href={fieldPath(lang)} variant="on-dark">{page.cta.field}</Button>
       </div>
     </PhotoBanner>
   </main>
