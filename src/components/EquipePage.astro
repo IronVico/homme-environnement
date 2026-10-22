@@ -131,7 +131,7 @@ const breadcrumb = [
       spaced
     >
       <div class="join__buttons">
-        <Button href={pagePath(lang, 'stages')} variant="primary" class="btn--white">{page.join.missions}</Button>
+        <Button href={pagePath(lang, 'stages')} variant="on-dark-primary">{page.join.missions}</Button>
         <Button href="#" variant="on-dark">{page.join.contact}</Button>
         {/* TODO page Contact */}
       </div>
@@ -333,16 +333,5 @@ const breadcrumb = [
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-  }
-
-  /* Bouton principal blanc sur photo assombrie. */
-  .join__buttons :global(.btn--white),
-  .join__buttons :global(.btn--white:hover) {
-    background: var(--blanc);
-    color: var(--noir-95);
-  }
-
-  .join__buttons :global(.btn--white:hover) {
-    background: var(--vert-clair);
   }
 </style>

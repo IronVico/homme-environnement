@@ -9,8 +9,9 @@ interface Props {
   /**
    * don : pêche, réservé à « Faire un don ». primary : fond basalte, action principale d'une page.
    * secondary : contour basalte. on-dark : contour blanc sur photo.
+   * on-dark-primary : fond blanc sur photo, action principale d'une carte sur photo.
    */
-  variant?: 'don' | 'primary' | 'secondary' | 'on-dark';
+  variant?: 'don' | 'primary' | 'secondary' | 'on-dark' | 'on-dark-primary';
   /** md : hero. sm : header et footer. */
   size?: 'md' | 'sm';
   /** Flèche des variantes secondaires : vers le bas pour une ancre dans la page. */
@@ -67,6 +68,16 @@ const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current
   .btn--primary:hover {
     background: var(--noir-95);
     color: var(--blanc);
+  }
+
+  .btn--on-dark-primary {
+    background: var(--blanc);
+    color: var(--noir-95);
+  }
+
+  .btn--on-dark-primary:hover {
+    background: var(--vert-clair);
+    color: var(--noir-95);
   }
 
   .btn--secondary,
