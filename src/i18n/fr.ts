@@ -228,11 +228,10 @@ const fr = {
     title: '{name}, Madagascar',
     /** Pastille du hero : pays · région. */
     country: 'Madagascar',
-    /** Légende de la photo du hero ; {credit} : crédit photo. */
-    photoCaption: '{name}, Madagascar — {credit}',
+    /** Légende de la photo du hero (lieu seulement : pas de crédit photo sur le site). */
+    photoCaption: '{name}, Madagascar',
     /** Valeur ou texte pas encore fourni par l'ONG (affiché tel quel sur la page). */
     missing: '[à fournir]',
-    photoCreditMissing: '[crédit photo à fournir]',
     photoMissing: '[Photo à fournir]',
     donate: 'Soutenir {name}',
     field: 'Venir sur le terrain',
@@ -308,7 +307,7 @@ const fr = {
       titleLight: 'au service du vivant et des communautés.',
       lead: 'Chaque projet allie protection de la nature et revenus pour les habitants. Ils sont menés avec les communautés locales, sur nos sites à Madagascar et au Burkina Faso.',
       imageAlt: 'Réunion des habitants sous un arbre, village de Kollo, Burkina Faso',
-      caption: 'Kollo, Burkina Faso — [crédit photo]',
+      caption: 'Kollo, Burkina Faso',
     },
     list: {
       titleStrong: 'Tous nos projets',
@@ -357,7 +356,6 @@ const fr = {
       apply: 'Candidater',
       faq: 'Questions fréquentes',
       imageAlt: "Volontaires et équipe de l'ONG partageant un repas sur le terrain",
-      caption: 'Madagascar — [crédit photo]',
     },
     why: {
       titleStrong: 'Pourquoi',
@@ -379,7 +377,6 @@ const fr = {
         'Vari noir et blanc dans la canopée',
         'Lac de cratère du Mont Passot au petit matin, Nosy Be',
       ],
-      credit: 'Vari et lac du Mont Passot © Olivier Behra',
     },
     missions: {
       titleStrong: 'Nos missions',

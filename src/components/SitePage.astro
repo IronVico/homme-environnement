@@ -170,7 +170,7 @@ const breadcrumb = [
       image={data.photo}
       imageAlt={data.photoAlt ?? ''}
       imagePosition={data.photoPosition}
-      caption={fill(page.photoCaption, { name: data.name, credit: data.photoCredit ?? page.photoCreditMissing })}
+      caption={fill(page.photoCaption, { name: data.name })}
       donate={{ label: withName(page.donate), href: donatePath(lang) }}
       cta={data.visitable ? { label: page.field, href: fieldPath(lang, site.id) } : undefined}
     />

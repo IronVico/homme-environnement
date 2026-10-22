@@ -91,7 +91,6 @@ const breadcrumb = [
       imagePosition="50% 40%"
       primary={{ label: page.hero.apply, href: '#candidater' }}
       cta={{ label: page.hero.faq, href: '#faq' }}
-      caption={page.hero.caption}
     />
 
     <section class="section section--tinted" aria-labelledby="pourquoi-titre">
@@ -132,7 +131,6 @@ const breadcrumb = [
               ))
             }
           </div>
-          <figcaption class="mosaic__credit">{page.why.credit}</figcaption>
         </figure>
       </div>
     </section>
@@ -453,10 +451,6 @@ const breadcrumb = [
   }
 
   /* Sur vert clair : légende en basalte (l'ardoise est réservée au fond blanc). */
-  .mosaic__credit {
-    font-size: var(--fs-caption);
-  }
-
   @media (max-width: 900px) {
     .mosaic {
       min-height: 420px;
