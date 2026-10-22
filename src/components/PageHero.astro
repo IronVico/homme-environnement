@@ -338,23 +338,25 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
   }
 
   /*
-   * Variante portrait : la carte citation chevauche le bas de la photo et déborde
-   * à gauche ; la marge basse de la figure lui laisse la place.
+   * Variante portrait : la carte citation chevauche le bas de la photo et déborde à
+   * gauche ; la marge basse de la figure lui laisse la place. Photo et citation sont
+   * superposées dans la même cellule de grille : la figure n'est pas positionnée, le
+   * motif reste donc ancré comme sur les autres pages (derrière la photo).
    */
   .page-hero--portrait .page-hero__figure {
-    position: relative;
+    display: grid;
     margin-bottom: 32px;
   }
 
-  .page-hero__portrait {
-    position: relative;
+  .page-hero__portrait,
+  .page-hero__quote {
+    grid-area: 1 / 1;
   }
 
   .page-hero__quote {
-    position: absolute;
-    left: -16px;
-    right: 48px;
-    bottom: -32px;
+    z-index: 1;
+    align-self: end;
+    margin: 0 48px -32px -16px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -404,10 +406,7 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
     }
 
     .page-hero__quote {
-      position: relative;
-      left: auto;
-      right: auto;
-      bottom: auto;
+      grid-area: 2 / 1;
       /* Chevauche la photo de 40px (en comptant l'écart de 10px de la figure). */
       margin: -50px 12px 0;
     }
