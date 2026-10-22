@@ -685,12 +685,90 @@ const fr = {
       ],
       partners: 'Nos partenaires de recherche',
       newTab: '(nouvel onglet)',
+      allPartners: 'Tous nos partenaires et bailleurs',
     },
     cta: {
       titleStrong: 'Les solutions',
       titleLight: 'se trouvent au sein du vivant.',
       text: 'Soutenez nos programmes par un don, ou venez les découvrir sur le terrain avec nos équipes.',
       field: 'Venir sur le terrain',
+    },
+  },
+  partenaires: {
+    title: 'Partenaires et bailleurs',
+    description:
+      "Bailleurs, chercheurs, entreprises et associations : les partenaires qui font avancer les programmes de L'Homme & l'Environnement à Madagascar et au Burkina Faso.",
+    hero: {
+      titleStrong: 'Ils agissent',
+      titleLight: 'à nos côtés.',
+      lead: 'Bailleurs, chercheurs, entreprises et associations : nos programmes avancent grâce à des partenaires qui partagent une même conviction, protéger la nature avec ceux qui en vivent.',
+      become: 'Devenir partenaire',
+      list: 'Voir nos partenaires',
+      imageAlt: 'Un vari noir et blanc dans la canopée',
+      caption: 'Vari noir et blanc, forêt de Vohimana',
+    },
+    ways: {
+      titleStrong: 'Trois façons',
+      titleLight: 'de travailler ensemble',
+      cards: [
+        {
+          title: 'Financer un site',
+          text: "Les bailleurs et fondations financent la protection d'une forêt, le reboisement ou l'équipement des patrouilleurs, sur plusieurs années.",
+        },
+        {
+          title: 'Mener la recherche',
+          text: "Universités et instituts inventorient les espèces, étudient les plantes et mesurent l'effet de nos actions sur le terrain.",
+        },
+        {
+          title: 'Développer une filière',
+          text: 'Les entreprises achètent et valorisent les productions locales, comme les huiles essentielles, qui font vivre les villages sans entamer la forêt.',
+        },
+      ],
+    },
+    list: {
+      titleStrong: 'Nos partenaires',
+      titleLight: 'et bailleurs',
+      // TODO ONG : chapeau à remplacer quand la liste et les logos seront complets.
+      lead: "Les logos seront ajoutés dès que l'ONG les aura transmis.",
+      filtersLabel: 'Filtrer par type de partenaire',
+      all: 'Tous',
+      /** {count} : nombre de partenaires affichés. */
+      countOne: '{count} partenaire',
+      countMany: '{count} partenaires',
+      sitesLabel: 'Site concerné',
+      website: 'Site web',
+      /** Lu par les lecteurs d'écran après « Site web ». */
+      newTab: '(nouvel onglet)',
+      /** {name} : nom du partenaire, lu par les lecteurs d'écran. */
+      websiteOf: 'de {name}',
+      join: {
+        title: 'Votre organisation ici ?',
+        text: "Fondation, entreprise ou laboratoire : construisons un partenariat autour d'un site ou d'un projet.",
+        link: 'Devenir partenaire',
+      },
+    },
+    /** Libellés des types de partenaires (src/data/partenaires.ts). */
+    types: {
+      bailleurs: 'Bailleurs et fondations',
+      recherche: 'Recherche',
+      entreprises: 'Entreprises et filières',
+      associations: 'Associations',
+    },
+    featured: {
+      eyebrow: 'Partenariat à la une',
+      titleStrong: 'Ambalakalanoro,',
+      titleLight: 'un programme pilote',
+      text: "Dans l'ouest de Madagascar, nous portons avec un nombre croissant de partenaires scientifiques un programme qui associe les communautés locales et les entreprises à la restauration de la biodiversité. Objectif : un modèle à reproduire ailleurs.",
+      imageAlt: "Le cirque d'Ambalakalanoro et sa forêt",
+      link: 'Découvrir le site',
+    },
+    cta: {
+      titleStrong: 'Devenir partenaire,',
+      titleLight: 'parlons-en.',
+      text: 'Mécénat financier ou de compétences, programme Net Positive Impact, partenariat de recherche : nous construisons chaque partenariat avec vous.',
+      write: 'Nous écrire',
+      /** Objet du mail prérempli par le bouton « Nous écrire ». */
+      mailSubject: 'Proposition de partenariat',
     },
   },
   don: {
