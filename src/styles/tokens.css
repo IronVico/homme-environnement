@@ -92,6 +92,8 @@
   --nudge-arrow-hover: 4px; /* décalage des flèches au survol des cartes */
 
   /* Voiles sur photo */
-  --voile: rgba(35, 31, 32, 0.55);
+  /* 62 % (55 % dans la maquette) : le texte courant blanc garde 4,5:1 même sur les zones
+     les plus claires des photos (WCAG 1.4.3). À reporter dans le design system. */
+  --voile: rgba(35, 31, 32, 0.62);
   --voile-degrade: linear-gradient(to top, rgba(35, 31, 32, 0.85), rgba(35, 31, 32, 0));
 }
