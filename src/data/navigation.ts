@@ -22,6 +22,7 @@ export interface NavColumn {
 
 /** Chemins des pages existantes, sans préfixe de langue (voir pagePath). */
 export const PAGES = {
+  ong: 'ong',
   madagascar: 'sites/madagascar',
   projets: 'projets',
   stages: 's-engager/stages-volontariat',
@@ -87,9 +88,17 @@ export const SOCIAL_URLS = {
   facebook: '#', // TODO URL de la page Facebook de l'ONG
 };
 
-const MAIN_HREFS = ['#', '#', PAGES.projets, HOME_ENGAGE, '#', '#'];
+/** Sections de la page L'ONG (ancres) : footer, sous-menu du header et accueil. */
+export const ONG_ANCHORS = { approach: 'approche', history: 'histoire' } as const;
+
+/** URL d'une section de la page L'ONG : « /ong/#histoire ». */
+export function ongPath(lang: Lang, section: keyof typeof ONG_ANCHORS): string {
+  return `${pagePath(lang, 'ong')}#${ONG_ANCHORS[section]}`;
+}
+
+const MAIN_HREFS = [PAGES.ong, '#', PAGES.projets, HOME_ENGAGE, '#', '#'];
 const FOOTER_HREFS = [
-  ['#', '#', PAGES.equipe, '#'],
+  [`${PAGES.ong}#${ONG_ANCHORS.approach}`, `${PAGES.ong}#${ONG_ANCHORS.history}`, PAGES.equipe, '#'],
   [PAGES.madagascar, '#'],
   // « Plantes aromatiques » : thème Filières durables (ylang-ylang), en attendant d'aligner le libellé.
   [
