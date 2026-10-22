@@ -43,7 +43,7 @@ const sites = defineCollection({
       photo: image(),
       /** Texte alternatif de la photo, lu sur la fiche (la carte de la page pays la traite en décor). */
       photoAlt: z.string().optional(),
-      /** Crédit de la photo, en légende sous la photo de la fiche. */
+      /** Crédit de la photo (conservé, pas affiché sur le site). */
       photoCredit: z.string().optional(),
       /** Cadrage de la photo dans la carte (object-position). */
       photoPosition: z.string().default('50% 40%'),
@@ -94,7 +94,7 @@ const sites = defineCollection({
           photoPosition: z.string().default('50% 50%'),
           /**
            * Crédit de la photo. Photo sous licence libre : auteur, licence et liens obligatoires.
-           * Photo de l'ONG (« © auteur ») : l'auteur seul.
+           * Photo de l'ONG (« © auteur ») : l'auteur seul, conservé mais pas affiché.
            */
           credit: z
             .union([

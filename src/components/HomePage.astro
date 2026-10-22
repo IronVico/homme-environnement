@@ -4,7 +4,7 @@
  * la langue de Astro.currentLocale (/ = français, /en/ = anglais).
  */
 import { getCollection } from 'astro:content';
-import { DON_URL, pagePath } from '../data/navigation';
+import { donatePath, pagePath } from '../data/navigation';
 import { getLang, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CountryCard from './CountryCard.astro';
@@ -49,7 +49,7 @@ const pillarImages = [pilierBiodiversite, pilierEconomie, pilierResponsabilisati
 const pillars = home.approach.pillars.map((pillar, i) => ({ ...pillar, image: pillarImages[i]! }));
 
 const engageMedia = [
-  { href: DON_URL, image: engagerDonner, imagePosition: '40% 60%' },
+  { href: donatePath(lang), image: engagerDonner, imagePosition: '40% 60%' },
   { href: pagePath(lang, 'stages'), image: engagerTerrain, imagePosition: '50% 30%' },
   { href: '#', image: engagerEntreprises, imagePosition: '50% 40%' },
 ];

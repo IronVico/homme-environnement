@@ -39,6 +39,12 @@ const en: Dictionary = {
     newsletterEmailLabel: 'Your email address',
     newsletterPlaceholder: 'Your email address',
     newsletterSubmit: 'Subscribe',
+    shareFacebook: 'Share on Facebook',
+    shareLinkedin: 'Share on LinkedIn',
+    shareWhatsapp: 'Share on WhatsApp',
+    shareEmail: 'Share by email',
+    shareCopy: 'Copy link',
+    shareCopied: 'Link copied',
     newsletterPending: 'Thank you. Sign-ups open very soon: your address has not been saved yet.',
   },
 
@@ -68,6 +74,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Stages et volontariat » encore en français (copie de fr.ts).
   stages: structuredClone(fr.stages),
+
+  // TODO traduction : page « Faire un don » encore en français (copie de fr.ts).
+  don: structuredClone(fr.don),
 };
 
 export default en;

@@ -1,0 +1,161 @@
+---
+/**
+ * Boutons de partage d'une page : Facebook, LinkedIn, WhatsApp, email et copie du lien.
+ * Simples liens de partage (aucun script tiers, aucun traceur). L'adresse partagée est
+ * celle de la page ; le script la remplace par l'adresse réellement visitée (preview…).
+ */
+import Check from '@lucide/astro/icons/check';
+import Link from '@lucide/astro/icons/link';
+import Mail from '@lucide/astro/icons/mail';
+import MessageCircle from '@lucide/astro/icons/message-circle';
+import { getLang, t } from '../i18n';
+import { shareLinks } from '../lib/share';
+
+interface Props {
+  /** Libellé au-dessus des boutons : « Partager la collecte ». */
+  label: string;
+  /** Texte d'accompagnement (email, WhatsApp). */
+  text: string;
+  class?: string;
+}
+
+const { label, text, class: className } = Astro.props;
+const { ui } = t(getLang(Astro.currentLocale));
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+
+const href = shareLinks(pageUrl, label, text);
+---
+
+<div class:list={['share', className]} data-share data-text={text} data-subject={label}>
+  <p class="share__label">{label}</p>
+  <ul class="share__list">
+    <li>
+      <a class="share__btn btn-motion" href={href.facebook} data-share-to="facebook" target="_blank" rel="noopener" aria-label={ui.shareFacebook} data-tooltip={ui.shareFacebook} data-tooltip-align="start">
+        <!-- Tracé de l'ancienne icône Lucide « facebook » (ISC), comme dans le footer. -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+        </svg>
+      </a>
+    </li>
+    <li>
+      <a class="share__btn btn-motion" href={href.linkedin} data-share-to="linkedin" target="_blank" rel="noopener" aria-label={ui.shareLinkedin} data-tooltip={ui.shareLinkedin}>
+        <!-- Tracé de l'ancienne icône Lucide « linkedin » (ISC), comme dans le footer. -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+          <rect width="4" height="12" x="2" y="9"></rect>
+          <circle cx="4" cy="4" r="2"></circle>
+        </svg>
+      </a>
+    </li>
+    <li>
+      <a class="share__btn btn-motion" href={href.whatsapp} data-share-to="whatsapp" target="_blank" rel="noopener" aria-label={ui.shareWhatsapp} data-tooltip={ui.shareWhatsapp}>
+        <MessageCircle size={20} />
+      </a>
+    </li>
+    <li>
+      <a class="share__btn btn-motion" href={href.email} data-share-to="email" aria-label={ui.shareEmail} data-tooltip={ui.shareEmail}>
+        <Mail size={20} />
+      </a>
+    </li>
+    <li>
+      <button class="share__btn btn-motion" type="button" data-share-copy aria-label={ui.shareCopy} data-tooltip={ui.shareCopy}>
+        <Link class="share__icon-copy" size={20} />
+        <Check class="share__icon-done" size={20} />
+      </button>
+    </li>
+  </ul>
+  <p class="visually-hidden" aria-live="polite" data-share-status data-done={ui.shareCopied}></p>
+</div>
+
+<script>
+  import { shareLinks } from '../lib/share';
+
+  document.querySelectorAll<HTMLElement>('[data-share]').forEach((root) => {
+    // Adresse réellement visitée (preview, autre domaine), sans ancre ni paramètres.
+    const url = `${location.origin}${location.pathname}`;
+    const targets = shareLinks(url, root.dataset.subject ?? '', root.dataset.text ?? '');
+    root.querySelectorAll<HTMLAnchorElement>('[data-share-to]').forEach((link) => {
+      const target = targets[link.dataset.shareTo ?? ''];
+      if (target) link.href = target;
+    });
+
+    const copy = root.querySelector<HTMLButtonElement>('[data-share-copy]');
+    const status = root.querySelector<HTMLElement>('[data-share-status]');
+    if (!copy) return;
+    if (!navigator.clipboard) {
+      copy.closest('li')?.remove();
+      return;
+    }
+    let timer: number | undefined;
+    copy.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        return;
+      }
+      const done = status?.dataset.done ?? '';
+      copy.toggleAttribute('data-copied', true);
+      copy.dataset.tooltip = done;
+      if (status) status.textContent = done;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        copy.removeAttribute('data-copied');
+        copy.dataset.tooltip = copy.getAttribute('aria-label') ?? '';
+        if (status) status.textContent = '';
+      }, 2500);
+    });
+  });
+</script>
+
+<style>
+  .share {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .share__label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .share__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Même pastille que les réseaux sociaux du footer. */
+  .share__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--bordure);
+    border-radius: var(--radius-pill);
+    background: var(--blanc);
+    color: var(--basalte);
+    cursor: pointer;
+  }
+
+  .share__btn:hover,
+  .share__btn:focus-visible {
+    border-color: var(--basalte);
+    background: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .share :global(.share__icon-done),
+  .share__btn[data-copied] :global(.share__icon-copy) {
+    display: none;
+  }
+
+  .share__btn[data-copied] :global(.share__icon-done) {
+    display: block;
+  }
+</style>
