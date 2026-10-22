@@ -173,7 +173,6 @@ const breadcrumb = [
       caption={fill(page.photoCaption, { name: data.name, credit: data.photoCredit ?? page.photoCreditMissing })}
       donate={{ label: withName(page.donate), href: DON_URL }}
       cta={data.visitable ? { label: page.field, href: fieldPath(lang, site.id) } : undefined}
-      portrait
     />
 
     <section class="figures" aria-label={withName(page.statsLabel)}>
