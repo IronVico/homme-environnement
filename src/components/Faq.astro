@@ -114,9 +114,11 @@ const { items } = Astro.props;
     transform: rotate(45deg);
   }
 
+  /* Espace du bas en padding, pas en marge : une marge sortirait de la zone animée
+     et s'ajouterait d'un coup à la fin de l'ouverture. */
   .faq__answer {
     max-width: 820px;
-    margin-bottom: 20px;
+    padding-bottom: 20px;
     font-size: 16px;
     line-height: 1.6;
   }
