@@ -350,6 +350,17 @@ const isCurrent = (href: string) => {
       padding: 8px 14px;
       margin: -8px -14px;
     }
+
+    /* Sous-menu aligné sur la pastille (qui déborde de 14px à gauche et 8px en bas). */
+    .header__item > .header__submenu {
+      top: calc(100% + 16px);
+      left: -14px;
+    }
+
+    .header__item > .header__submenu::before {
+      inset: -17px 0 auto;
+      height: 17px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
