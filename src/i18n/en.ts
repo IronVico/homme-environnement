@@ -68,6 +68,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Stages et volontariat » encore en français (copie de fr.ts).
   stages: structuredClone(fr.stages),
+
+  // TODO traduction : page « Faire un don » encore en français (copie de fr.ts).
+  don: structuredClone(fr.don),
 };
 
 export default en;

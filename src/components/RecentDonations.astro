@@ -1,0 +1,127 @@
+---
+/**
+ * Bandeau « derniers dons » au-dessus du formulaire de don : une carte à la fois,
+ * qui tourne toutes les 4 s. N'affiche rien si la liste est vide.
+ * Ne recevoir que de vrais dons (prénom et ville avec l'accord du donateur).
+ * Avec prefers-reduced-motion : pas de rotation, seul le premier don s'affiche.
+ */
+import Heart from '@lucide/astro/icons/heart';
+import type { RecentDonation } from '../data/don';
+import { getLang, t } from '../i18n';
+
+interface Props {
+  donations: RecentDonation[];
+}
+
+const { donations } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const { recent } = t(lang).don;
+const euros = new Intl.NumberFormat(lang, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+
+// Le texte est découpé autour des valeurs, mises en gras.
+const parts = (donation: RecentDonation) =>
+  recent.text.split(/(\{amount\}|\{name\}|\{city\})/).map((part) => {
+    if (part === '{amount}') return { strong: euros.format(donation.amount) };
+    if (part === '{name}') return { strong: donation.firstName };
+    if (part === '{city}') return { text: donation.city };
+    return { text: part };
+  });
+---
+
+{
+  donations.length > 0 && (
+    <section class="recent" aria-label={recent.label} data-recent>
+      <span class="recent__stack" aria-hidden="true" />
+      {donations.map((donation, i) => (
+        <p class:list={['recent__item', { 'is-active': i === 0 }]}>
+          <span class="recent__icon">
+            <Heart size={22} />
+          </span>
+          <span>{parts(donation).map((part) => ('strong' in part ? <strong>{part.strong}</strong> : part.text))}</span>
+        </p>
+      ))}
+    </section>
+  )
+}
+
+<script>
+  const ROTATE_MS = 4000;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-recent]').forEach((root) => {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('.recent__item'));
+    if (items.length < 2) return;
+    let current = 0;
+    window.setInterval(() => {
+      if (reduceMotion.matches || document.hidden) return;
+      items[current]!.classList.remove('is-active');
+      current = (current + 1) % items.length;
+      items[current]!.classList.add('is-active');
+    }, ROTATE_MS);
+  });
+</script>
+
+<style>
+  .recent {
+    position: relative;
+    height: 92px;
+  }
+
+  /* Carte fantôme derrière la carte active : effet de pile. */
+  .recent__stack {
+    position: absolute;
+    inset: 18px 16px auto;
+    height: 72px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: 18px;
+    background: var(--blanc);
+    opacity: 0.7;
+  }
+
+  .recent__item {
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: 18px;
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+    font-size: var(--fs-body-sm);
+    line-height: 1.4;
+    opacity: 0;
+    translate: 0 8px;
+    transition:
+      opacity 400ms ease-out,
+      translate 400ms ease-out;
+  }
+
+  .recent__item.is-active {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .recent__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-pill);
+    background: var(--vert-clair);
+    color: var(--peche);
+  }
+
+  .recent__icon :global(svg) {
+    fill: currentColor;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .recent__item {
+      transition: none;
+    }
+  }
+</style>

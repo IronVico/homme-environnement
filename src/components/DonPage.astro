@@ -1,0 +1,821 @@
+---
+/**
+ * Page « Faire un don » (S'engager), commune aux deux langues
+ * (/s-engager/faire-un-don et /en/s-engager/faire-un-don).
+ * Textes dans src/i18n (clé `don`), montants, liens HelloAsso et points
+ * à confirmer dans src/data/don.ts. Les dons passent par HelloAsso.
+ */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import { getImage, Picture } from 'astro:assets';
+import { AMOUNTS, CAMPAIGN, DEFAULT_AMOUNT_INDEX, HELLOASSO, HERO_VIDEO, IMPACTS, IMPACTS_CONFIRMED, SPENDING } from '../data/don';
+import { engagePath, pagePath } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { fill, formatEuros } from '../lib/don';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import DonationForm from './DonationForm.astro';
+import Faq from './Faq.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import SectionHeading from './SectionHeading.astro';
+
+import campagnePhoto from '../assets/photos/don/campagne-ambalakalanoro.jpg';
+import otherBoutique from '../assets/photos/hero-artisane-vohimana.jpg';
+import otherEntreprise from '../assets/photos/site-mont-passot.jpg';
+import otherService from '../assets/photos/engager-entreprises.jpg';
+import heroPhoto from '../assets/photos/pays-madagascar.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.don;
+const euros = (value: number) => formatEuros(lang, value);
+
+const heroPoster = HERO_VIDEO ? await getImage({ src: heroPhoto, width: 1920, format: 'jpg' }) : undefined;
+
+const impacts = IMPACTS.map((impact, i) => ({ ...impact, ...page.impact.cards[i]!, amount: AMOUNTS.once[i]! }));
+
+const spending = SPENDING.map((item, i) => ({ ...item, label: page.spending.items[i]! }));
+
+const campaignProgress =
+  CAMPAIGN.collected !== null && CAMPAIGN.goal ? Math.min(100, Math.round((CAMPAIGN.collected / CAMPAIGN.goal) * 100)) : null;
+
+const otherCards = [
+  { href: '#', image: otherBoutique, position: '50% 40%' }, // TODO URL de la boutique solidaire
+  { href: pagePath(lang, 'stages'), image: otherService, position: '50% 40%' },
+  { href: engagePath(lang), image: otherEntreprise, position: '50% 35%' }, // TODO page Entreprises
+].map((card, i) => ({ ...card, ...page.other.cards[i]! }));
+
+const faqItems = page.faq.items.map(({ question, answer }) => ({ question, answer: [answer] }));
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[3]!, href: engagePath(lang) }, // TODO page « S'engager »
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={heroPhoto} ogImageAlt={page.hero.imageAlt}>
+  <Header />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <main id="contenu">
+    <div class="container don-hero-wrap">
+      <div class="don-hero">
+        <Picture
+          class="don-hero__media"
+          src={heroPhoto}
+          alt={page.hero.imageAlt}
+          formats={['avif', 'webp']}
+          widths={[640, 960, 1280, 1920, 2000]}
+          sizes="(max-width: 1440px) 100vw, 1312px"
+          loading="eager"
+          fetchpriority="high"
+        />
+        {
+          HERO_VIDEO && heroPoster && (
+            <video class="don-hero__media don-hero__video" muted loop playsinline preload="none" poster={heroPoster.src} aria-hidden="true" data-hero-video>
+              <source data-src={HERO_VIDEO.src} type={HERO_VIDEO.type} />
+            </video>
+          )
+        }
+        <div class="don-hero__shade" aria-hidden="true"></div>
+        <div class="don-hero__text">
+          <p class="don-hero__eyebrow" data-reveal>{page.hero.eyebrow}</p>
+          <h1 class="don-hero__title" data-reveal>
+            <span class="don-hero__strong">{page.hero.titleStrong}</span><br />
+            <span class="don-hero__light">{page.hero.titleLight}</span>
+          </h1>
+          <p class="don-hero__lead" data-reveal>{page.hero.lead}</p>
+        </div>
+        <p class="don-hero__caption">{page.hero.caption}</p>
+      </div>
+    </div>
+
+    <div class="container don-grid">
+      <DonationForm />
+
+      <section class="don-impact" aria-labelledby="impact-titre">
+        <SectionHeading id="impact-titre" strong={page.impact.titleStrong} light={page.impact.titleLight} />
+        <p class="body-text" data-reveal>
+          {page.impact.text}
+          {!IMPACTS_CONFIRMED && <span class="todo"> {page.impact.todo}</span>}
+        </p>
+        <div class="impact-cards">
+          {
+            impacts.map((impact, i) => (
+              <button type="button" class="impact-card" data-impact-card aria-pressed={i === DEFAULT_AMOUNT_INDEX ? 'true' : 'false'} data-reveal>
+                <Picture
+                  class="impact-card__photo"
+                  src={impact.photo}
+                  alt={impact.imageAlt}
+                  style={`object-position: ${impact.position}`}
+                  formats={['avif', 'webp']}
+                  widths={[264, 400, 640]}
+                  sizes="(max-width: 700px) 100vw, 132px"
+                />
+                <span class="impact-card__body">
+                  <span class="impact-card__meta">
+                    <span class="impact-card__amount" data-card-amount>
+                      {euros(impact.amount)}
+                    </span>
+                    <span class="impact-card__theme">{impact.theme}</span>
+                  </span>
+                  <span class="impact-card__title">{impact.title}</span>
+                  <span class="impact-card__text">{impact.text}</span>
+                </span>
+              </button>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="don-spending" aria-labelledby="argent-titre">
+        <SectionHeading id="argent-titre" strong={page.spending.titleStrong} light={page.spending.titleLight} />
+        <p class="body-text" data-reveal>{page.spending.text}</p>
+        <ul class="bars" data-reveal>
+          {
+            spending.map((item) => (
+              <li class="bar">
+                <span class="bar__label">
+                  <span class="bar__name">{item.label}</span>
+                  <span>{item.percent === null ? page.spending.placeholder : `${item.percent} %`}</span>
+                </span>
+                <span class="bar__track" aria-hidden="true">
+                  <span class:list={['bar__fill', `bar__fill--${item.color}`]} style={`width: ${item.percent ?? item.placeholderWidth}%`} />
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        {spending.some((item) => item.percent === null) && <p class="caption-text">{page.spending.note}</p>}
+        <!-- TODO page « Rapports et études » -->
+        <a class="text-link" href="#" data-reveal>
+          {page.spending.reports}
+          <ArrowRight size={18} />
+        </a>
+      </section>
+    </div>
+
+    <section class="section section--tinted" aria-labelledby="plus-loin-titre">
+      <div class="container stack stack--40">
+        <SectionHeading id="plus-loin-titre" strong={page.further.titleStrong} light={page.further.titleLight} />
+        <div class="further">
+          <div class="card further__member" data-reveal>
+            <p class="eyebrow">{page.further.member.eyebrow}</p>
+            <h3 class="further__title">{page.further.member.title}</h3>
+            <p class="further__text">{page.further.member.text}</p>
+            <div class="further__cta">
+              <Button href={HELLOASSO.membership || '#'}>{page.further.member.cta}</Button>
+            </div>
+          </div>
+          <div class="card further__campaign" data-reveal>
+            <Picture
+              class="further__photo"
+              src={campagnePhoto}
+              alt={page.further.campaign.imageAlt}
+              formats={['avif', 'webp']}
+              widths={[400, 640, 960]}
+              sizes="(max-width: 700px) 100vw, 320px"
+            />
+            <div class="further__campaign-body">
+              <p class="further__badge">{page.further.campaign.badge}</p>
+              <h3 class="further__title">{page.further.campaign.title}</h3>
+              <div class="progress">
+                {
+                  campaignProgress !== null && (
+                    <div
+                      class="progress__track"
+                      role="progressbar"
+                      aria-label={page.further.campaign.progressLabel}
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      aria-valuenow={campaignProgress}
+                    >
+                      <span class="progress__fill" style={`width: ${campaignProgress}%`} />
+                    </div>
+                  )
+                }
+                <p class="caption-text">
+                  {
+                    campaignProgress !== null
+                      ? fill(page.further.campaign.progress, { collected: euros(CAMPAIGN.collected!), goal: euros(CAMPAIGN.goal!) })
+                      : page.further.campaign.progressTodo
+                  }
+                </p>
+              </div>
+              <a class="text-link" href={HELLOASSO.campaign || '#'}>
+                {page.further.campaign.cta}
+                <ArrowRight size={18} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="autrement-titre">
+      <div class="container stack stack--40">
+        <SectionHeading id="autrement-titre" strong={page.other.titleStrong} light={page.other.titleLight} />
+        <ul class="other">
+          {
+            otherCards.map((card) => (
+              <li data-reveal>
+                <a class="card other-card card-lift" href={card.href}>
+                  <Picture
+                    class="other-card__photo"
+                    src={card.image}
+                    alt=""
+                    style={`object-position: ${card.position}`}
+                    formats={['avif', 'webp']}
+                    widths={[400, 640, 960]}
+                    sizes="(max-width: 900px) 100vw, 420px"
+                  />
+                  <span class="other-card__body">
+                    <span class="other-card__title">{card.title}</span>
+                    <span class="other-card__text">{card.text}</span>
+                    <span class="other-card__link">
+                      {card.cta}
+                      <ArrowRight class="other-card__arrow" size={18} />
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section id="faq" class="section section--tinted" aria-labelledby="faq-titre">
+      <div class="container stack stack--32">
+        <SectionHeading id="faq-titre" strong={page.faq.titleStrong} light={page.faq.titleLight} />
+        <Faq items={faqItems} />
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Vidéo de fond facultative : chargée seulement sans prefers-reduced-motion.
+  const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+  if (video && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    video.querySelectorAll<HTMLSourceElement>('source[data-src]').forEach((source) => {
+      source.src = source.dataset.src ?? '';
+    });
+    video.load();
+    video.play().catch(() => {});
+  }
+</script>
+
+<style>
+  .section--tinted {
+    background: var(--vert-clair);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stack--32 {
+    gap: var(--space-8);
+  }
+
+  .stack--40 {
+    gap: 40px;
+  }
+
+  .body-text {
+    max-width: 640px;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .caption-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ardoise);
+  }
+
+  .todo {
+    color: var(--ardoise);
+  }
+
+  .card {
+    border: 1px solid var(--bordure-douce);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Lien texte avec flèche (« Consulter nos rapports → »). */
+  .text-link {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--fs-body);
+    font-weight: 600;
+  }
+
+  .text-link :global(svg) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .text-link:hover :global(svg) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  /* ---------- Haut de page : grande photo en carte arrondie ---------- */
+
+  .don-hero-wrap {
+    padding-top: 20px;
+  }
+
+  .don-hero {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    border-radius: var(--radius-block);
+    background: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .don-hero :global(.don-hero__media) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+
+  .don-hero__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(35, 31, 32, 0.78) 0%, rgba(35, 31, 32, 0.35) 45%, rgba(35, 31, 32, 0) 75%);
+  }
+
+  /* À droite, la place du formulaire qui chevauche la photo. */
+  .don-hero__text {
+    position: absolute;
+    left: clamp(20px, 4vw, 56px);
+    right: 540px;
+    bottom: clamp(24px, 4vw, 56px);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .don-hero__eyebrow {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .don-hero__title {
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+  }
+
+  .don-hero__strong {
+    font-weight: 800;
+  }
+
+  .don-hero__light {
+    font-weight: 300;
+  }
+
+  .don-hero__lead {
+    max-width: 560px;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  .don-hero__caption {
+    position: absolute;
+    right: 20px;
+    bottom: 14px;
+    font-size: var(--fs-caption);
+    opacity: 0.85;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .don-hero__video {
+      display: none;
+    }
+  }
+
+  /* ---------- Formulaire collant + impact + dépenses ---------- */
+
+  .don-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    gap: 40px 64px;
+    align-items: start;
+    padding-bottom: var(--space-section);
+  }
+
+  /* Le formulaire remonte sur la photo, à droite, et reste à l'écran au défilement. */
+  .don-grid > :global(.don-form) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    position: relative;
+    z-index: 2;
+    margin-top: -560px;
+    margin-right: clamp(0px, 2vw, 32px);
+  }
+
+  /* Collant sous le header ; sur un écran bas, --sticky-top (src/scripts/don.ts)
+     remonte le point d'accroche pour que le bas du formulaire reste visible. */
+  .don-grid > :global(.don-form) {
+    position: sticky;
+    top: var(--sticky-top, 100px);
+  }
+
+  .don-impact,
+  .don-spending {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .don-impact {
+    grid-row: 1;
+    gap: var(--space-7);
+    padding-top: clamp(48px, 6vw, 80px);
+  }
+
+  .don-spending {
+    grid-row: 2;
+    gap: 22px;
+    padding-top: var(--space-6);
+  }
+
+  .impact-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .impact-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    width: 100%;
+    padding: 14px 20px 14px 14px;
+    border: 2px solid var(--bordure-douce);
+    border-radius: var(--radius-card);
+    background: var(--blanc);
+    box-shadow: 0 1px 2px rgba(67, 72, 64, 0.06), 0 10px 28px rgba(67, 72, 64, 0.08);
+    color: var(--basalte);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color var(--transition-ui),
+      box-shadow var(--transition-ui);
+  }
+
+  .impact-card:hover {
+    border-color: var(--bordure);
+  }
+
+  .impact-card[aria-pressed='true'] {
+    border-color: var(--basalte);
+    box-shadow: 0 1px 2px rgba(67, 72, 64, 0.06), 0 14px 32px rgba(67, 72, 64, 0.16);
+  }
+
+  /* Montant libre : la carte du palier atteint est signalée plus discrètement. */
+  .impact-card.is-near {
+    border-color: var(--sauge);
+  }
+
+  .impact-card :global(.impact-card__photo) {
+    flex-shrink: 0;
+    width: 132px;
+    height: 132px;
+    border-radius: var(--radius-card-sm);
+    object-fit: cover;
+  }
+
+  .impact-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .impact-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+  }
+
+  .impact-card__amount {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: var(--ls-h2);
+  }
+
+  .impact-card__theme {
+    font-size: var(--fs-eyebrow);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ardoise);
+  }
+
+  .impact-card__title {
+    font-size: var(--fs-body-lg);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .impact-card__text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 640px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .bar__label {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 16px;
+  }
+
+  .bar__name {
+    font-weight: 600;
+  }
+
+  .bar__track {
+    display: block;
+    height: 12px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--grille);
+  }
+
+  .bar__fill {
+    display: block;
+    height: 100%;
+  }
+
+  .bar__fill--basalte {
+    background: var(--basalte);
+  }
+
+  .bar__fill--sauge {
+    background: var(--sauge);
+  }
+
+  .bar__fill--ardoise {
+    background: var(--ardoise);
+  }
+
+  /* ---------- Deux façons d'aller plus loin ---------- */
+
+  .further {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: var(--space-6);
+  }
+
+  .further__member,
+  .further__campaign-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--space-8);
+  }
+
+  .further__member,
+  .further__campaign {
+    border-radius: var(--radius-card-lg);
+  }
+
+  .further__campaign {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+  }
+
+  .further__campaign :global(.further__photo) {
+    flex: 1 1 200px;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    min-height: 220px;
+    object-fit: cover;
+  }
+
+  .further__campaign-body {
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+
+  .further__title {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: var(--ls-h2);
+  }
+
+  .further__text {
+    font-size: 16px;
+    line-height: var(--lh-body);
+  }
+
+  .further__cta {
+    margin-top: 6px;
+  }
+
+  .further__badge {
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--peche);
+    color: var(--noir-95);
+    font-size: var(--fs-eyebrow);
+    font-weight: 600;
+  }
+
+  .progress {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .progress__track {
+    height: 10px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--grille);
+  }
+
+  .progress__fill {
+    display: block;
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: var(--basalte);
+  }
+
+  /* ---------- Aider autrement ---------- */
+
+  .other {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .other > li {
+    display: flex;
+  }
+
+  .other-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-card-sm);
+    color: var(--basalte);
+    text-decoration: none;
+  }
+
+  .other-card:hover {
+    color: var(--basalte);
+  }
+
+  .other-card :global(.other-card__photo) {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  /* Liens alignés en bas des cartes, quelle que soit la longueur du texte. */
+  .other-card__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 28px 28px;
+  }
+
+  .other-card__title {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .other-card__text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .other-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .other-card :global(.other-card__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .other-card:hover :global(.other-card__arrow),
+  .other-card:focus-visible :global(.other-card__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .impact-card,
+    .text-link :global(svg),
+    .other-card :global(.other-card__arrow) {
+      transition: none;
+    }
+
+    .text-link:hover :global(svg),
+    .other-card:hover :global(.other-card__arrow),
+    .other-card:focus-visible :global(.other-card__arrow) {
+      transform: none;
+    }
+  }
+
+  /* ---------- Tablette : le formulaire passe sous la photo ---------- */
+
+  @media (max-width: 1100px) {
+    .don-hero__text {
+      right: clamp(20px, 4vw, 56px);
+    }
+
+    .don-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .don-grid > :global(.don-form) {
+      grid-column: 1;
+      grid-row: auto;
+      position: relative;
+      top: auto;
+      width: 100%;
+      max-width: 520px;
+      margin: 24px auto 0;
+    }
+
+    .don-impact,
+    .don-spending {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+
+  /* ---------- Mobile ---------- */
+
+  @media (max-width: 700px) {
+    .don-hero {
+      height: 460px;
+      border-radius: var(--radius-card-lg);
+    }
+
+    .don-hero__caption {
+      display: none;
+    }
+
+    .impact-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .impact-card :global(.impact-card__photo) {
+      width: 100%;
+      height: 160px;
+    }
+  }
+</style>

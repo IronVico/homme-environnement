@@ -29,7 +29,7 @@ import Trees from '@lucide/astro/icons/trees';
 import Users from '@lucide/astro/icons/users';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { SITE_FIGURES, type SiteFigures } from '../data/chiffres';
-import { DON_URL, fieldPath, pagePath, projectPath, sitePath } from '../data/navigation';
+import { donatePath, fieldPath, pagePath, projectPath, sitePath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ActionCard from './ActionCard.astro';
@@ -171,7 +171,7 @@ const breadcrumb = [
       imageAlt={data.photoAlt ?? ''}
       imagePosition={data.photoPosition}
       caption={fill(page.photoCaption, { name: data.name, credit: data.photoCredit ?? page.photoCreditMissing })}
-      donate={{ label: withName(page.donate), href: DON_URL }}
+      donate={{ label: withName(page.donate), href: donatePath(lang) }}
       cta={data.visitable ? { label: page.field, href: fieldPath(lang, site.id) } : undefined}
     />
 
@@ -397,7 +397,7 @@ const breadcrumb = [
       spaced
     >
       <div class="cta__buttons">
-        <Button href={DON_URL} variant="don">{dict.ui.donate}</Button>
+        <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
         {data.visitable && <Button href={fieldPath(lang, site.id)} variant="on-dark">{page.field}</Button>}
       </div>
     </PhotoBanner>

@@ -1,0 +1,339 @@
+---
+/**
+ * Formulaire de don (page « Faire un don ») : fréquence, 4 montants, ligne d'impact,
+ * montant libre, coût après réduction d'impôt et bouton vers HelloAsso.
+ * Rendu avec le montant par défaut ; src/scripts/don.ts le rend interactif et
+ * le relie aux cartes « Ce que permet votre don ». Données : src/data/don.ts.
+ */
+import Lock from '@lucide/astro/icons/lock';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import { Picture } from 'astro:assets';
+import {
+  AMOUNTS,
+  DEFAULT_AMOUNT_INDEX,
+  HELLOASSO,
+  IMPACTS,
+  MIN_AMOUNT,
+  RECENT_DONATIONS,
+  TAX_REDUCTION_RATE,
+} from '../data/don';
+import { getLang, t } from '../i18n';
+import { donationHref, fill, formatEuros, formatPercent, netCost } from '../lib/don';
+import Button from './Button.astro';
+import InfoNote from './InfoNote.astro';
+import RecentDonations from './RecentDonations.astro';
+
+const lang = getLang(Astro.currentLocale);
+const { don } = t(lang);
+const { form } = don;
+
+const amount = AMOUNTS.once[DEFAULT_AMOUNT_INDEX]!;
+const euros = (value: number) => formatEuros(lang, value);
+const impactTitle = (i: number) => {
+  const title = don.impact.cards[i]!.title;
+  return `${title.charAt(0).toLocaleLowerCase(lang)}${title.slice(1)}.`;
+};
+
+// Tout ce dont le script a besoin pour recalculer les libellés.
+const config = {
+  lang,
+  amounts: AMOUNTS,
+  defaultIndex: DEFAULT_AMOUNT_INDEX,
+  min: MIN_AMOUNT,
+  rate: TAX_REDUCTION_RATE,
+  helloasso: HELLOASSO,
+  texts: {
+    perMonth: form.perMonth,
+    impactLead: form.impactLead,
+    taxTitle: form.taxTitle,
+    submit: form.submit,
+    impacts: don.impact.cards.map((_, i) => impactTitle(i)),
+  },
+};
+---
+
+<aside class="don-form" id="don" aria-label={form.label}>
+  <RecentDonations donations={RECENT_DONATIONS} />
+
+  <div class="don-form__card" data-don-form data-config={JSON.stringify(config)}>
+    <div class="don-form__head">
+      <h2 class="don-form__title">{form.title}</h2>
+      <span class="don-form__secure">
+        <Lock size={16} />
+        {form.secure}
+      </span>
+    </div>
+
+    <div class="don-form__freq" role="group" aria-label={form.frequencyLabel}>
+      <button type="button" class="don-form__freq-btn" data-freq="once" aria-pressed="true">{form.once}</button>
+      <button type="button" class="don-form__freq-btn" data-freq="monthly" aria-pressed="false">{form.monthly}</button>
+    </div>
+
+    <div class="don-form__amounts" role="group" aria-label={form.amountLabel}>
+      {
+        AMOUNTS.once.map((value, i) => (
+          <button type="button" class="don-form__amount" data-amount-index={i} aria-pressed={i === DEFAULT_AMOUNT_INDEX ? 'true' : 'false'}>
+            {euros(value)}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="don-form__impact" aria-live="polite" data-impact-line>
+      {
+        IMPACTS.map((impact, i) => (
+          <Picture
+            class="don-form__impact-photo"
+            src={impact.photo}
+            alt=""
+            style={`object-position: ${impact.position}`}
+            data-impact-photo={i}
+            hidden={i !== DEFAULT_AMOUNT_INDEX}
+            formats={['avif', 'webp']}
+            widths={[144]}
+            sizes="72px"
+          />
+        ))
+      }
+      <span class="don-form__impact-text">
+        <strong data-impact-lead>{fill(form.impactLead, { amount: euros(amount) })}</strong>
+        {' '}
+        <span data-impact-text>{impactTitle(DEFAULT_AMOUNT_INDEX)}</span>
+      </span>
+    </div>
+
+    <label class="don-form__custom">
+      <span class="visually-hidden">{form.customLabel}</span>
+      <input
+        class="don-form__custom-input"
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+        placeholder={form.customPlaceholder}
+        data-custom-amount
+      />
+      <span class="don-form__custom-unit" aria-hidden="true">€</span>
+    </label>
+
+    <div data-tax>
+      <InfoNote
+        icon={ShieldCheck}
+        title={fill(form.taxTitle, {
+          net: euros(netCost(amount, TAX_REDUCTION_RATE)),
+          rate: formatPercent(lang, TAX_REDUCTION_RATE),
+        })}
+        text={form.taxText}
+      />
+    </div>
+
+    <Button href={donationHref(HELLOASSO.donation, HELLOASSO.amountParam, amount)} variant="don" class="don-form__submit">
+      <span data-submit-label>{fill(form.submit, { amount: euros(amount) })}</span>
+    </Button>
+
+    <p class="don-form__footnote">{form.footnote}</p>
+  </div>
+</aside>
+
+<script>
+  import { initDonationForm } from '../scripts/don';
+  initDonationForm();
+</script>
+
+<style>
+  .don-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .don-form__card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: var(--space-7);
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-lg);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+  }
+
+  .don-form__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+  }
+
+  .don-form__title {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .don-form__secure {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ardoise);
+  }
+
+  .don-form__secure :global(svg) {
+    flex-shrink: 0;
+  }
+
+  /* Interrupteur Une fois / Chaque mois. */
+  .don-form__freq {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--vert-clair);
+  }
+
+  .don-form__freq-btn {
+    min-height: 44px;
+    padding: 10px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--basalte);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      box-shadow var(--transition-ui);
+  }
+
+  .don-form__freq-btn[aria-pressed='true'] {
+    background: var(--blanc);
+    font-weight: 700;
+    box-shadow: 0 1px 2px rgba(67, 72, 64, 0.12);
+  }
+
+  .don-form__amounts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .don-form__amount {
+    min-height: 52px;
+    padding: 0 6px;
+    border: 1.5px solid var(--bordure);
+    border-radius: 14px;
+    background: var(--blanc);
+    color: var(--basalte);
+    font-size: 18px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui),
+      color var(--transition-ui);
+  }
+
+  .don-form__amount:hover {
+    border-color: var(--basalte);
+  }
+
+  .don-form__amount[aria-pressed='true'] {
+    border-color: var(--basalte);
+    background: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .don-form__impact {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card-sm);
+    background: var(--blanc);
+  }
+
+  .don-form__impact[hidden] {
+    display: none;
+  }
+
+  .don-form :global(.don-form__impact-photo) {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .don-form :global(.don-form__impact-photo[hidden]) {
+    display: none;
+  }
+
+  .don-form__impact-text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.45;
+  }
+
+  .don-form__custom {
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    border: 1.5px solid var(--bordure);
+    border-radius: 14px;
+    font-size: 16px;
+  }
+
+  .don-form__custom:focus-within {
+    border-color: var(--basalte);
+    outline: 2px solid var(--basalte);
+    outline-offset: 2px;
+  }
+
+  .don-form__custom-input {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 18px;
+    border: 0;
+    background: transparent;
+    color: var(--basalte);
+    outline: none;
+  }
+
+  .don-form__custom-input::placeholder {
+    color: var(--ardoise);
+  }
+
+  .don-form__custom-unit {
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    border-left: 1.5px solid var(--bordure);
+    background: var(--menthe);
+    font-weight: 600;
+  }
+
+  .don-form :global(.don-form__submit) {
+    justify-content: center;
+    padding: 18px 28px;
+    font-size: 18px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .don-form__footnote {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ardoise);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .don-form__freq-btn,
+    .don-form__amount {
+      transition: none;
+    }
+  }
+</style>

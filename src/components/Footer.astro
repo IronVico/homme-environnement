@@ -1,7 +1,7 @@
 ---
 import logoEn from '../assets/logos/logo-couleur-en.svg';
 import logoFr from '../assets/logos/logo-couleur.svg';
-import { DON_URL, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
+import { donatePath, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
 import { getLang, localeUrl, pathWithoutLocale, t } from '../i18n';
 import Button from './Button.astro';
 import ContourPattern from './ContourPattern.astro';
@@ -24,7 +24,7 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
       <div class="footer__brand">
         <img class="footer__logo" src={logo.src} width={logo.width} height={logo.height} alt={ui.logoAlt} loading="lazy" />
         <p class="footer__pitch">{ui.footerPitch}</p>
-        <Button href={DON_URL} variant="don" size="sm" class="footer__don">{ui.donate}</Button>
+        <Button href={donatePath(lang)} variant="don" size="sm" class="footer__don">{ui.donate}</Button>
         <ul class="footer__social" aria-label={ui.social}>
           <li>
             <a class="btn-motion" href={SOCIAL_URLS.linkedin} aria-label={ui.socialLinkedin} rel="noopener">

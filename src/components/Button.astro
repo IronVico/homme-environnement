@@ -17,13 +17,15 @@ interface Props {
   arrow?: 'right' | 'down';
   /** mail : enveloppe avant le libellé, à la place de la flèche (lien mailto). */
   icon?: 'mail';
+  /** Lien vers la page affichée (aria-current="page"). */
+  current?: boolean;
   class?: string;
 }
 
-const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, class: className } = Astro.props;
+const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current, class: className } = Astro.props;
 ---
 
-<a href={href} class:list={['btn', 'btn-motion', `btn--${variant}`, `btn--${size}`, className]}>
+<a href={href} aria-current={current ? 'page' : undefined} class:list={['btn', 'btn-motion', `btn--${variant}`, `btn--${size}`, className]}>
   {variant === 'don' && <Heart size={18} />}
   {icon === 'mail' && <Mail size={20} />}
   <slot />
