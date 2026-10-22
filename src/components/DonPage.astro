@@ -19,6 +19,7 @@ import Faq from './Faq.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
 import SectionHeading from './SectionHeading.astro';
+import ShareButtons from './ShareButtons.astro';
 
 import campagnePhoto from '../assets/photos/don/campagne-ambalakalanoro.jpg';
 import otherBoutique from '../assets/photos/hero-artisane-vohimana.jpg';
@@ -207,6 +208,7 @@ const breadcrumb = [
                 {page.further.campaign.cta}
                 <ArrowRight size={18} />
               </a>
+              <ShareButtons class="further__share" label={page.further.campaign.share} text={page.further.campaign.shareText} />
             </div>
           </div>
         </div>
@@ -664,6 +666,12 @@ const breadcrumb = [
 
   .further__cta {
     margin-top: 6px;
+  }
+
+  .further__campaign-body :global(.further__share) {
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--bordure-douce);
   }
 
   .further__badge {

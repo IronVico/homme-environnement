@@ -35,6 +35,12 @@ const fr = {
     newsletterEmailLabel: 'Votre adresse email',
     newsletterPlaceholder: 'Votre adresse email',
     newsletterSubmit: "Je m'inscris",
+    shareFacebook: 'Partager sur Facebook',
+    shareLinkedin: 'Partager sur LinkedIn',
+    shareWhatsapp: 'Partager sur WhatsApp',
+    shareEmail: 'Partager par email',
+    shareCopy: 'Copier le lien',
+    shareCopied: 'Lien copié',
     newsletterPending: "Merci. Les inscriptions ouvriront très bientôt : votre adresse n'a pas encore été enregistrée.",
   },
 
@@ -628,6 +634,8 @@ const fr = {
         /** TODO ONG : objectif et montant collecté de la campagne. */
         progressTodo: '[X] € collectés sur [objectif] €',
         cta: 'Soutenir la campagne',
+        share: 'Partager la collecte',
+        shareText: "Aidez L'Homme & l'Environnement à sauvegarder la forêt d'Ambalakalanoro, à Madagascar :",
       },
     },
     other: {
