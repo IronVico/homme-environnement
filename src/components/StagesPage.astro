@@ -20,7 +20,7 @@ import Sprout from '@lucide/astro/icons/sprout';
 import Users from '@lucide/astro/icons/users';
 import X from '@lucide/astro/icons/x';
 import { Picture } from 'astro:assets';
-import { STAGES_EMAIL } from '../data/navigation';
+import { engagePath, STAGES_EMAIL } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getExplorerSites } from '../lib/explorer-sites';
@@ -71,8 +71,7 @@ const faqItems = page.faq.items.map(({ question, answer }) => {
 
 const breadcrumb = [
   { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
-  // TODO page « S'engager » : en attendant, la section S'engager de l'accueil.
-  { label: dict.nav.main[3]!, href: `${localeUrl(lang)}#s-engager` },
+  { label: dict.nav.main[3]!, href: engagePath(lang) }, // TODO page « S'engager »
 ];
 ---
 
