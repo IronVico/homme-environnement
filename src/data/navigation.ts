@@ -26,6 +26,7 @@ export const PAGES = {
   projets: 'projets',
   stages: 's-engager/stages-volontariat',
   equipe: 'ong/equipe',
+  don: 's-engager/faire-un-don',
 } as const;
 
 /** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
@@ -68,7 +69,10 @@ const projectsByTheme = (theme: string) => `${PAGES.projets}?theme=${theme}`;
  * des chemins sans préfixe de langue, résolus pour la langue de la page.
  * Les libellés sont dans src/i18n ; ici, seulement les destinations, dans le même ordre.
  */
-export const DON_URL = '#'; // TODO HelloAsso
+/** Boutons « Faire un don » (pêche) : la page Faire un don, qui envoie ensuite vers HelloAsso. */
+export function donatePath(lang: Lang): string {
+  return pagePath(lang, 'don');
+}
 
 /**
  * « Venir sur le terrain » : la page Stages et volontariat, à la section des sites.

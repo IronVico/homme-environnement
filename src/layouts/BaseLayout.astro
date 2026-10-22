@@ -75,7 +75,9 @@ const ogUrl = new URL(og.src, Astro.site);
     </div>
     <script>
       import { initReveal } from '../scripts/reveal';
+      import { initTooltips } from '../scripts/tooltip';
       initReveal();
+      initTooltips();
     </script>
   </body>
 </html>

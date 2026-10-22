@@ -4,7 +4,7 @@ import Menu from '@lucide/astro/icons/menu';
 import X from '@lucide/astro/icons/x';
 import logoEn from '../assets/logos/logo-couleur-en.svg';
 import logoFr from '../assets/logos/logo-couleur.svg';
-import { DON_URL, getMainNav, type MainSection } from '../data/navigation';
+import { donatePath, getMainNav, type MainSection } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import Button from './Button.astro';
 import LangSwitcher from './LangSwitcher.astro';
@@ -83,7 +83,7 @@ const isCurrent = (href: string) => {
 
   <LangSwitcher class="header__lang" />
 
-  <Button href={DON_URL} variant="don" size="sm" class="header__don">{ui.donate}</Button>
+  <Button href={donatePath(lang)} variant="don" size="sm" class="header__don" current={isCurrent(donatePath(lang))}>{ui.donate}</Button>
 
   <button class="header__burger" type="button" aria-controls="menu-principal" aria-expanded="false" aria-label={ui.openMenu} data-label-open={ui.openMenu} data-label-close={ui.closeMenu}>
     <Menu class="header__icon-open" size={28} />

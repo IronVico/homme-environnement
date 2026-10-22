@@ -35,6 +35,12 @@ const fr = {
     newsletterEmailLabel: 'Votre adresse email',
     newsletterPlaceholder: 'Votre adresse email',
     newsletterSubmit: "Je m'inscris",
+    shareFacebook: 'Partager sur Facebook',
+    shareLinkedin: 'Partager sur LinkedIn',
+    shareWhatsapp: 'Partager sur WhatsApp',
+    shareEmail: 'Partager par email',
+    shareCopy: 'Copier le lien',
+    shareCopied: 'Lien copié',
     newsletterPending: "Merci. Les inscriptions ouvriront très bientôt : votre adresse n'a pas encore été enregistrée.",
   },
 
@@ -222,11 +228,10 @@ const fr = {
     title: '{name}, Madagascar',
     /** Pastille du hero : pays · région. */
     country: 'Madagascar',
-    /** Légende de la photo du hero ; {credit} : crédit photo. */
-    photoCaption: '{name}, Madagascar — {credit}',
+    /** Légende de la photo du hero (lieu seulement : pas de crédit photo sur le site). */
+    photoCaption: '{name}, Madagascar',
     /** Valeur ou texte pas encore fourni par l'ONG (affiché tel quel sur la page). */
     missing: '[à fournir]',
-    photoCreditMissing: '[crédit photo à fournir]',
     photoMissing: '[Photo à fournir]',
     donate: 'Soutenir {name}',
     field: 'Venir sur le terrain',
@@ -302,7 +307,7 @@ const fr = {
       titleLight: 'au service du vivant et des communautés.',
       lead: 'Chaque projet allie protection de la nature et revenus pour les habitants. Ils sont menés avec les communautés locales, sur nos sites à Madagascar et au Burkina Faso.',
       imageAlt: 'Réunion des habitants sous un arbre, village de Kollo, Burkina Faso',
-      caption: 'Kollo, Burkina Faso — [crédit photo]',
+      caption: 'Kollo, Burkina Faso',
     },
     list: {
       titleStrong: 'Tous nos projets',
@@ -351,7 +356,6 @@ const fr = {
       apply: 'Candidater',
       faq: 'Questions fréquentes',
       imageAlt: "Volontaires et équipe de l'ONG partageant un repas sur le terrain",
-      caption: 'Madagascar — [crédit photo]',
     },
     why: {
       titleStrong: 'Pourquoi',
@@ -373,7 +377,6 @@ const fr = {
         'Vari noir et blanc dans la canopée',
         'Lac de cratère du Mont Passot au petit matin, Nosy Be',
       ],
-      credit: 'Vari et lac du Mont Passot © Olivier Behra',
     },
     missions: {
       titleStrong: 'Nos missions',
@@ -567,6 +570,161 @@ const fr = {
       text: 'Missions de service civique, stages, mécénat de compétences.',
       missions: 'Voir les missions',
       contact: 'Nous contacter',
+    },
+  },
+  don: {
+    title: 'Faire un don',
+    description:
+      "Faites un don à L'Homme & l'Environnement : il finance la protection des forêts de Madagascar et du Burkina Faso, et les activités qui permettent aux communautés locales d'en vivre.",
+    hero: {
+      eyebrow: 'Faire un don',
+      titleStrong: 'Votre don',
+      titleLight: 'agit directement sur le terrain.',
+      lead: "Il finance la protection des forêts de Madagascar et du Burkina Faso, et les activités qui permettent aux communautés locales d'en vivre.",
+      imageAlt: "Forêts et mangroves d'Ambohidravy, vues du ciel",
+      caption: "Forêts et mangroves d'Ambohidravy",
+    },
+    recent: {
+      label: 'Derniers dons',
+      /** {amount} : montant, {name} : prénom, {city} : ville. */
+      text: 'Un don de {amount} de la part de {name}, de {city}. Merci !',
+    },
+    form: {
+      label: 'Formulaire de don',
+      title: 'Je fais un don',
+      secure: 'Paiement sécurisé',
+      frequencyLabel: 'Fréquence du don',
+      once: 'Une fois',
+      monthly: 'Chaque mois',
+      amountLabel: 'Montant',
+      /** Ajouté après un montant mensuel : « 20 € par mois ». */
+      perMonth: ' par mois',
+      /** {amount} : montant choisi, suivi de « par mois » le cas échéant. */
+      impactLead: 'Avec {amount} :',
+      customLabel: 'Montant libre en euros',
+      customPlaceholder: 'Montant libre',
+      /** {net} : coût réel après réduction d'impôt, {rate} : taux. TODO ONG : éligibilité aux reçus fiscaux. */
+      taxTitle: "Soit {net} après réduction d'impôt de {rate}.",
+      taxText: '[À confirmer : éligibilité aux reçus fiscaux]',
+      /** {amount} : montant, suivi de « par mois » le cas échéant. */
+      submit: 'Donner {amount}',
+      footnote: 'Paiement par HelloAsso. Reçu envoyé par email.',
+    },
+    impact: {
+      titleStrong: 'Ce que permet',
+      titleLight: 'votre don',
+      text: "Choisissez un montant : la carte correspondante s'allume. Les équivalences sont données à titre d'exemple.",
+      todo: "[À confirmer avec l'ONG]",
+      /** Une carte par montant, dans l'ordre des montants. TODO ONG : équivalences à confirmer. */
+      cards: [
+        {
+          theme: 'Reboisement',
+          title: 'Des plants pour reboiser une parcelle',
+          text: "Environ 30 jeunes arbres produits en pépinière et plantés avec les villages d'Ambalakalanoro.",
+          imageAlt: 'Villageoises portant des brassées de jeunes plants',
+        },
+        {
+          theme: 'Conservation',
+          title: 'Une journée de patrouille en forêt',
+          text: 'Un garde forestier recruté au village surveille la forêt de Vohimana et suit la faune.',
+          imageAlt: 'Indri dans la forêt de Vohimana',
+        },
+        {
+          theme: 'Filières durables',
+          title: 'Une filière qui remplace le brûlis',
+          text: "Formation et matériel pour une famille qui cultive l'ylang-ylang sans entamer la forêt, à Mont-Passot.",
+          imageAlt: "Cueillette des fleurs d'ylang-ylang",
+        },
+        {
+          theme: 'Éducation',
+          title: 'Une classe sensibilisée à la forêt',
+          text: "Des animations et des fournitures pour une classe d'un village voisin de Vohimana.",
+          imageAlt: "Élèves d'une classe pendant une animation",
+        },
+      ],
+    },
+    spending: {
+      titleStrong: 'Où va',
+      titleLight: 'votre argent',
+      text: "Nos comptes sont publics. Chaque année, nous publions un rapport d'activité et un rapport financier.",
+      items: ['Actions de terrain', 'Formation et sensibilisation', 'Fonctionnement'],
+      placeholder: '[X] %',
+      note: 'Répartition indicative, à remplacer par les chiffres du dernier rapport financier.',
+      reports: 'Consulter nos rapports',
+    },
+    further: {
+      titleStrong: 'Deux façons',
+      titleLight: "d'aller plus loin",
+      member: {
+        eyebrow: 'Soutien régulier',
+        title: 'Soutenir chaque mois',
+        text: "Devenez membre de l'association (de 18 à 25 € par an) et ajoutez la contribution mensuelle de votre choix. Un soutien régulier permet de planifier les actions sur plusieurs années.",
+        cta: 'Devenir membre',
+      },
+      campaign: {
+        badge: 'Campagne en cours',
+        title: "Sauvegarder la forêt d'Ambalakalanoro",
+        imageAlt: "Le cirque d'Ambalakalanoro et sa forêt",
+        progressLabel: 'Avancement de la collecte',
+        /** {collected}, {goal} : montants. */
+        progress: '{collected} collectés sur {goal}',
+        /** TODO ONG : objectif et montant collecté de la campagne. */
+        progressTodo: '[X] € collectés sur [objectif] €',
+        cta: 'Soutenir la campagne',
+        share: 'Partager la collecte',
+        shareText: "Aidez L'Homme & l'Environnement à sauvegarder la forêt d'Ambalakalanoro, à Madagascar :",
+      },
+    },
+    other: {
+      titleStrong: 'Aider',
+      titleLight: 'autrement',
+      cards: [
+        {
+          title: 'Boutique solidaire',
+          text: 'Huiles essentielles Aroma Forest et produits du Burkina Faso : chaque achat soutient les communautés.',
+          cta: 'Voir la boutique',
+        },
+        {
+          title: 'Partir en service civique',
+          text: 'Donnez de votre temps sur nos sites, à Madagascar ou au Burkina Faso.',
+          cta: 'Voir les missions',
+        },
+        {
+          title: 'Engager son entreprise',
+          text: 'Mécénat financier ou de compétences, programme Net Positive Impact.',
+          cta: 'Devenir partenaire',
+        },
+      ],
+    },
+    faq: {
+      titleStrong: 'Questions',
+      titleLight: 'fréquentes',
+      items: [
+        {
+          question: 'Le paiement est-il sécurisé ?',
+          answer:
+            "Oui. Les dons passent par HelloAsso, plateforme de paiement agréée dédiée aux associations. Nous n'avons jamais accès à vos coordonnées bancaires.",
+        },
+        {
+          question: 'Pourquoi HelloAsso me propose une contribution ?',
+          answer:
+            'HelloAsso est gratuit pour les associations et se finance grâce à une contribution volontaire des donateurs. Elle est facultative : vous pouvez la mettre à 0 € avant de valider.',
+        },
+        {
+          question: 'Vais-je recevoir un reçu fiscal ?',
+          // TODO ONG : délivrance et délai d'envoi des reçus fiscaux.
+          answer: "[À confirmer avec l'ONG : délivrance et délai d'envoi des reçus fiscaux.]",
+        },
+        {
+          question: 'Comment arrêter un soutien mensuel ?',
+          answer: "Depuis votre espace HelloAsso, ou en nous écrivant : nous l'arrêtons sans condition.",
+        },
+        {
+          question: 'Mon nom apparaîtra-t-il sur la page ?',
+          answer:
+            "Seulement si vous l'acceptez au moment du don : votre prénom et votre ville s'affichent alors dans les derniers dons. Sinon, rien n'apparaît.",
+        },
+      ],
     },
   },
 };
