@@ -47,7 +47,7 @@ const fr = {
   nav: {
     main: ["L'ONG", 'Nos sites', 'Nos projets', "S'engager", 'Ressources', 'Contact'],
     footer: [
-      { title: "L'ONG", links: ['Notre approche', 'Notre histoire', 'Partenaires et bailleurs'] },
+      { title: "L'ONG", links: ['Notre approche', 'Notre histoire', 'Équipe', 'Partenaires et bailleurs'] },
       { title: 'Nos sites', links: ['Madagascar', 'Burkina Faso'] },
       {
         title: 'Nos projets',
@@ -530,6 +530,46 @@ const fr = {
             "Envoyez votre CV, une lettre de motivation, vos dates de disponibilité et la durée souhaitée à {email}. Après un premier échange, nous construisons ensemble une mission adaptée à votre profil, puis nous vous accompagnons jusqu'à votre arrivée à Madagascar.",
         },
       ],
+    },
+  },
+  // Page « Équipe » (maquette PageEquipe). Les membres sont dans src/data/equipe.ts.
+  equipe: {
+    title: 'Équipe',
+    description:
+      "Le bureau, l'équipe et le comité d'experts de L'Homme & l'Environnement : des gens de terrain et des experts reconnus, entre la France, Madagascar et le Burkina Faso.",
+    hero: {
+      titleStrong: 'Une équipe',
+      titleLight: 'entre la France, Madagascar et le Burkina Faso.',
+      lead: 'Des gens de terrain et des experts reconnus, réunis depuis 1993 pour que la protection de la nature profite d\'abord à ceux qui y vivent.',
+    },
+    team: {
+      titleStrong: 'Le bureau',
+      titleLight: "et l'équipe",
+      lead: "Ils pilotent l'association et ses projets, en France et sur le terrain.",
+    },
+    gallery: {
+      label: "L'équipe sur le terrain",
+      /** Dans l'ordre de la maquette. */
+      photos: [
+        'Visite en forêt avec un guide local',
+        'Collectrices de plantes à Vohimana',
+        "Une classe d'un village voisin de Vohimana",
+        "Femmes et paniers de fleurs d'ylang-ylang, Mont-Passot",
+        'Une artisane tresse des fibres végétales, Vohimana',
+        'Fête de village à Ambohidravy',
+      ],
+    },
+    experts: {
+      titleStrong: 'Le comité',
+      titleLight: "d'experts",
+      lead: "Chercheurs, pharmaciens, spécialistes des filières et du climat : ils conseillent l'ONG et apportent la rigueur scientifique à ses projets.",
+    },
+    join: {
+      titleStrong: "Rejoindre l'équipe,",
+      titleLight: 'sur le terrain ou à distance.',
+      text: 'Missions de service civique, stages, mécénat de compétences.',
+      missions: 'Voir les missions',
+      contact: 'Nous contacter',
     },
   },
   don: {

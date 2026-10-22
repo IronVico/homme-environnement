@@ -4,6 +4,8 @@
  * un bouton secondaire, photo verticale en arche à droite (même format sur toutes les pages).
  * Options des fiches site : pastille de lieu, bouton Don avant le bouton secondaire, légende.
  * Options des pages S'engager : étiquettes, second paragraphe, bouton principal (basalte).
+ * Variante portrait (page Équipe) : portrait d'une personne, avatar aux initiales sans photo,
+ * carte citation qui chevauche le bas de la photo ; reste vertical (4:5) une fois empilé.
  * Le motif « courbes de niveau » passe derrière la photo, ancré en haut à droite.
  */
 import MapPin from '@lucide/astro/icons/map-pin';
@@ -11,13 +13,15 @@ import type { ImageMetadata } from 'astro';
 import { Picture } from 'astro:assets';
 import Button from './Button.astro';
 import ContourPattern from './ContourPattern.astro';
+import Portrait from './Portrait.astro';
 
 interface Props {
   titleStrong: string;
   titleLight: string;
   lead: string;
-  image: ImageMetadata;
-  imageAlt: string;
+  /** Photo du hero ; facultative en variante portrait (avatar aux initiales). */
+  image?: ImageMetadata;
+  imageAlt?: string;
   /** Cadrage de la photo (object-position). */
   imagePosition?: string;
   /** Bouton secondaire, facultatif ; une ancre (« #sites ») affiche une flèche vers le bas. */
@@ -34,6 +38,11 @@ interface Props {
   badge?: string;
   /** Légende sous la photo (crédit). */
   caption?: string;
+  /**
+   * Variante portrait : la photo (`image`, facultative) est le portrait de `name`.
+   * Citation facultative, dans une carte qui chevauche le bas de la photo.
+   */
+  portrait?: { name: string; role: string; quote?: string };
 }
 
 const {
@@ -50,16 +59,19 @@ const {
   text,
   badge,
   caption,
+  portrait,
 } = Astro.props;
 
 // La photo remplit un cadre de 460 × 575 px (4:5) : une photo plus large que haute y est
 // affichée plus large que le cadre (puis rognée). On annonce cette largeur au navigateur,
 // sinon il télécharge une version trop petite et la photo paraît floue sur écran Retina.
-const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height));
+const coverWidth = image ? Math.round(Math.max(460, (575 * image.width) / image.height)) : 460;
+const photoWidths = [460, 640, 900, 1260, 1800, 2400];
+const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
 ---
 
 <div class="page-hero-wrap">
-  <section class="page-hero container">
+  <section class:list={['page-hero', 'container', { 'page-hero--portrait': portrait }]}>
     <div class="page-hero__text">
       {
         badge && (
@@ -102,18 +114,47 @@ const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height))
     <!-- Pas de data-reveal sur la figure : son animation (transform) déplacerait le repère du motif. -->
     <figure class="page-hero__figure">
       <ContourPattern variant="hero" class="page-hero__contours" />
-      <Picture
-        data-reveal
-        class="page-hero__photo"
-        src={image}
-        alt={imageAlt}
-        style={`object-position: ${imagePosition}`}
-        formats={['avif', 'webp']}
-        widths={[460, 640, 900, 1260, 1800, 2400]}
-        sizes={`(max-width: 1100px) 100vw, ${coverWidth}px`}
-        loading="eager"
-        fetchpriority="high"
-      />
+      {
+        portrait ? (
+          <div class="page-hero__portrait" data-reveal>
+            <Portrait
+              class="page-hero__photo"
+              name={portrait.name}
+              photo={image}
+              position={imagePosition}
+              widths={photoWidths}
+              sizes={photoSizes}
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+        ) : (
+          image && (
+            <Picture
+              data-reveal
+              class="page-hero__photo"
+              src={image}
+              alt={imageAlt ?? ''}
+              style={`object-position: ${imagePosition}`}
+              formats={['avif', 'webp']}
+              widths={photoWidths}
+              sizes={photoSizes}
+              loading="eager"
+              fetchpriority="high"
+            />
+          )
+        )
+      }
+      {
+        portrait?.quote && (
+          <figcaption class="page-hero__quote" data-reveal>
+            <blockquote class="page-hero__quote-text">« {portrait.quote} »</blockquote>
+            <span class="page-hero__quote-author">
+              <strong>{portrait.name}</strong> · {portrait.role}
+            </span>
+          </figcaption>
+        )
+      }
       {caption && <figcaption class="page-hero__caption" data-reveal>{caption}</figcaption>}
     </figure>
   </section>
@@ -293,6 +334,81 @@ const coverWidth = Math.round(Math.max(460, (575 * image.width) / image.height))
   @media (max-width: 700px) {
     .page-hero :global(.page-hero__photo) {
       border-radius: 40px 40px 16px 16px;
+    }
+  }
+
+  /*
+   * Variante portrait : la carte citation chevauche le bas de la photo et déborde à
+   * gauche ; la marge basse de la figure lui laisse la place. Photo et citation sont
+   * superposées dans la même cellule de grille : la figure n'est pas positionnée, le
+   * motif reste donc ancré comme sur les autres pages (derrière la photo).
+   */
+  .page-hero--portrait .page-hero__figure {
+    display: grid;
+    margin-bottom: 32px;
+  }
+
+  .page-hero__portrait,
+  .page-hero__quote {
+    grid-area: 1 / 1;
+  }
+
+  .page-hero__quote {
+    z-index: 1;
+    align-self: end;
+    margin: 0 48px -32px -16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 22px;
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+  }
+
+  .page-hero__quote-text {
+    margin: 0;
+    font-size: var(--fs-body);
+    font-weight: 300;
+    line-height: 1.4;
+  }
+
+  .page-hero__quote-author {
+    font-size: 14px;
+  }
+
+  .page-hero__quote-author strong {
+    font-weight: 700;
+  }
+
+  /* Empilé : le portrait reste vertical (4:5), sans dépasser la largeur du desktop. */
+  @media (max-width: 1080px) {
+    .page-hero--portrait .page-hero__figure {
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .page-hero--portrait :global(.page-hero__photo) {
+      aspect-ratio: 4 / 5;
+    }
+  }
+
+  /* Mobile : portrait pleine largeur, arche 120px, citation passée sous la photo. */
+  @media (max-width: 700px) {
+    .page-hero--portrait .page-hero__figure {
+      max-width: none;
+      margin-bottom: 0;
+    }
+
+    .page-hero--portrait :global(.page-hero__photo) {
+      border-radius: var(--radius-arch) var(--radius-arch) 16px 16px;
+    }
+
+    .page-hero__quote {
+      grid-area: 2 / 1;
+      /* Chevauche la photo de 40px (en comptant l'écart de 10px de la figure). */
+      margin: -50px 12px 0;
     }
   }
 </style>

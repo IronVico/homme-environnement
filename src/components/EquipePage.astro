@@ -1,0 +1,337 @@
+---
+/**
+ * Page « Équipe » (L'ONG), commune aux deux langues (/ong/equipe et /en/ong/equipe).
+ * Textes dans src/i18n (clé `equipe`), membres dans src/data/equipe.ts.
+ * Portraits : avatars aux initiales tant que l'ONG n'a pas fourni les vraies photos.
+ */
+import { EXPERTS, FOUNDER, TEAM } from '../data/equipe';
+import { pagePath } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import PhotoMarquee from './PhotoMarquee.astro';
+import Portrait from './Portrait.astro';
+import SectionHeading from './SectionHeading.astro';
+
+import galleryCollectrices from '../assets/photos/equipe-collectrices-vohimana.jpg';
+import galleryYlang from '../assets/photos/equipe-ylang-mont-passot.jpg';
+import joinPhoto from '../assets/photos/engager-entreprises.jpg';
+import galleryGuide from '../assets/photos/engager-terrain.jpg';
+import galleryArtisane from '../assets/photos/hero-artisane-vohimana.jpg';
+import galleryFete from '../assets/photos/pilier-economie-fete-ambohidravy.jpg';
+import galleryClasse from '../assets/photos/pilier-responsabilisation-classe.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.equipe;
+
+const gallery = [
+  { image: galleryGuide },
+  { image: galleryCollectrices },
+  { image: galleryClasse },
+  { image: galleryYlang, position: '50% 35%' },
+  { image: galleryArtisane },
+  { image: galleryFete },
+].map((photo, i) => ({ ...photo, alt: page.gallery.photos[i]! }));
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[0]!, href: '#' }, // TODO page « L'ONG »
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={galleryGuide} ogImageAlt={page.gallery.photos[0]}>
+  <Header current="ong" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <main id="contenu">
+    <PageHero
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      image={FOUNDER.photo}
+      imagePosition={FOUNDER.photoPosition ?? '50% 20%'}
+      portrait={{ name: FOUNDER.name, role: FOUNDER.role, quote: FOUNDER.quote }}
+    />
+
+    <section class="team-section" aria-labelledby="equipe-titre">
+      <div class="container stack">
+        <SectionHeading id="equipe-titre" strong={page.team.titleStrong} light={page.team.titleLight} lead={page.team.lead} />
+        <ul class="team">
+          {
+            TEAM.map((member) => (
+              <li class="card member" data-reveal>
+                <div class="member__photo-frame">
+                  <Portrait
+                    class="member__photo"
+                    name={member.name}
+                    photo={member.photo}
+                    position={member.photoPosition}
+                    widths={[240, 360, 480, 720]}
+                    sizes="(max-width: 800px) 50vw, (max-width: 1200px) 33vw, 250px"
+                  />
+                </div>
+                <div class="member__body">
+                  <h3 class="member__name">{member.name}</h3>
+                  <p class="member__role">{member.role}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <PhotoMarquee label={page.gallery.label} photos={gallery} />
+
+    <section class="section section--tinted" aria-labelledby="experts-titre">
+      <div class="container stack stack--40">
+        <SectionHeading
+          id="experts-titre"
+          strong={page.experts.titleStrong}
+          light={page.experts.titleLight}
+          lead={page.experts.lead}
+        />
+        <ul class="experts">
+          {
+            EXPERTS.map((expert) => (
+              <li class="card expert" data-reveal>
+                <Portrait
+                  class="expert__photo"
+                  name={expert.name}
+                  photo={expert.photo}
+                  position={expert.photoPosition}
+                  widths={[64, 128, 192]}
+                  sizes="64px"
+                />
+                <div class="expert__head">
+                  <h3 class="expert__name">{expert.name}</h3>
+                  <span class="expert__domain">{expert.domain}</span>
+                </div>
+                <p class="expert__text">{expert.description}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="rejoindre-titre"
+      titleStrong={page.join.titleStrong}
+      titleLight={page.join.titleLight}
+      text={page.join.text}
+      image={joinPhoto}
+      imagePosition="50% 40%"
+      spaced
+    >
+      <div class="join__buttons">
+        <Button href={pagePath(lang, 'stages')} variant="on-dark-primary">{page.join.missions}</Button>
+        <Button href="#" variant="on-dark">{page.join.contact}</Button>
+        {/* TODO page Contact */}
+      </div>
+    </PhotoBanner>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .section--tinted {
+    background: var(--vert-clair);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .stack--40 {
+    gap: 40px;
+  }
+
+  .card {
+    border: 1px solid var(--bordure-douce);
+    border-radius: var(--radius-card);
+    background: var(--blanc);
+    box-shadow: var(--shadow-card);
+  }
+
+  /*
+   * Survol des cartes non cliquables, comme StatCard : pas d'élévation (qui suggérerait
+   * un clic), seulement le portrait qui grossit légèrement, avec un petit rebond.
+   */
+  .card :global(.portrait) {
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .member:hover :global(.member__photo) {
+    transform: scale(1.04);
+  }
+
+  .expert:hover :global(.expert__photo) {
+    transform: scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .member:hover :global(.member__photo),
+    .expert:hover :global(.expert__photo) {
+      transform: none;
+    }
+  }
+
+  /* Le bureau et l'équipe : la galerie suit directement, sans espacement de section entre les deux. */
+  .team-section {
+    padding-block: clamp(40px, 5vw, 64px) 40px;
+  }
+
+  .team,
+  .experts {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .team {
+    gap: 20px;
+  }
+
+  @media (max-width: 1200px) {
+    .team {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 800px) {
+    .team {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .team {
+      gap: 12px;
+    }
+  }
+
+  .member {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .member__photo-frame {
+    overflow: hidden;
+  }
+
+  .member :global(.member__photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+  }
+
+  .member__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px 22px;
+  }
+
+  .member__name {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .member__role {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 520px) {
+    .member__body {
+      padding: 14px 14px 18px;
+    }
+
+    .member__name {
+      font-size: 18px;
+    }
+  }
+
+  /* Comité d'experts : 5 colonnes, 2 en tablette, 1 en mobile. */
+  .experts {
+    gap: 16px;
+  }
+
+  @media (max-width: 1200px) {
+    .experts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 600px) {
+    .experts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .expert {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 22px;
+  }
+
+  .expert :global(.expert__photo) {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-pill);
+  }
+
+  .expert__head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .expert__name {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  /* Étiquette de domaine ; passe à la ligne si la colonne est trop étroite. */
+  .expert__domain {
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--vert-clair);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .expert__text {
+    margin-top: 2px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Rejoindre l'équipe */
+  .join__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

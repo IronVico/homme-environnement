@@ -1,0 +1,70 @@
+---
+/**
+ * Portrait d'une personne (page Équipe, hero en variante portrait).
+ * Sans photo : avatar neutre, les initiales sur fond vert clair, au même format
+ * (le parent donne la taille et la forme via `class`). Les initiales s'adaptent
+ * à la largeur de l'avatar (container query).
+ * Le nom est toujours écrit à côté du portrait : la photo et l'avatar sont décoratifs.
+ */
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import { initials } from '../data/equipe';
+
+interface Props {
+  name: string;
+  photo?: ImageMetadata;
+  /** Cadrage de la photo (object-position), par défaut sur le visage. */
+  position?: string;
+  class?: string;
+  widths: number[];
+  sizes: string;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'auto';
+}
+
+const { name, photo, position = '50% 25%', class: className, widths, sizes, loading = 'lazy', fetchpriority } = Astro.props;
+---
+
+{
+  photo ? (
+    <Picture
+      class:list={['portrait', className]}
+      src={photo}
+      alt=""
+      style={`object-position: ${position}`}
+      formats={['avif', 'webp']}
+      widths={widths}
+      sizes={sizes}
+      loading={loading}
+      fetchpriority={fetchpriority}
+    />
+  ) : (
+    <span class:list={['portrait', 'portrait--initials', className]} aria-hidden="true">
+      <span class="portrait__initials">{initials(name)}</span>
+    </span>
+  )
+}
+
+<style>
+  /* :global : la classe est aussi posée sur l'image du composant Picture. */
+  :global(.portrait) {
+    display: block;
+    object-fit: cover;
+    background: var(--vert-clair);
+  }
+
+  .portrait--initials {
+    display: grid;
+    place-items: center;
+    container-type: inline-size;
+    color: var(--basalte);
+    user-select: none;
+  }
+
+  .portrait__initials {
+    font-size: 30cqi;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+</style>

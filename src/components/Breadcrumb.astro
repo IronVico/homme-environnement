@@ -3,7 +3,10 @@ import { getLang, t } from '../i18n';
 import type { NavLink } from '../data/navigation';
 
 interface Props {
-  /** Pages parentes, de l'accueil à la rubrique ; la page courante est `current`. */
+  /**
+   * Pages parentes, de l'accueil à la rubrique ; la page courante est `current`.
+   * Une rubrique sans page (href « # ») est affichée sans lien.
+   */
   items: NavLink[];
   current: string;
 }
@@ -17,7 +20,7 @@ const { ui } = t(getLang(Astro.currentLocale));
     {
       items.map((item) => (
         <li>
-          <a href={item.href}>{item.label}</a>
+          {item.href === '#' ? <span>{item.label}</span> : <a href={item.href}>{item.label}</a>}
           <span class="breadcrumb__sep" aria-hidden="true">/</span>
         </li>
       ))

@@ -25,6 +25,7 @@ export const PAGES = {
   madagascar: 'sites/madagascar',
   projets: 'projets',
   stages: 's-engager/stages-volontariat',
+  equipe: 'ong/equipe',
   don: 's-engager/faire-un-don',
 } as const;
 
@@ -88,7 +89,7 @@ export const SOCIAL_URLS = {
 
 const MAIN_HREFS = ['#', '#', PAGES.projets, HOME_ENGAGE, '#', '#'];
 const FOOTER_HREFS = [
-  ['#', '#', '#'],
+  ['#', '#', PAGES.equipe, '#'],
   [PAGES.madagascar, '#'],
   // « Plantes aromatiques » : thème Filières durables (ylang-ylang), en attendant d'aligner le libellé.
   [
