@@ -108,8 +108,9 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     align-items: center;
     justify-content: center;
     gap: 10px;
-    /* Gris des logos placeholders de la maquette (pas un token : à retirer avec les vrais logos). */
-    color: #8a9199;
+    /* Logos placeholders en texte : ardoise (4,8:1 sur blanc) plutôt que le gris de la
+       maquette (#8a9199, 3,2:1). À revoir avec les vrais logos, exemptés de contraste. */
+    color: var(--ardoise);
     line-height: 1;
   }
 
