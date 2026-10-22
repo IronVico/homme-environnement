@@ -28,8 +28,11 @@ interface Props {
   cta?: { label: string; href: string };
   /** Bouton Don (pêche), placé avant le bouton secondaire. */
   donate?: { label: string; href: string };
-  /** Bouton principal (basalte), placé avant le bouton secondaire ; flèche vers la droite par défaut. */
-  primary?: { label: string; href: string; arrow?: 'right' | 'down' };
+  /**
+   * Bouton principal (basalte), placé avant le bouton secondaire ; flèche vers la droite par défaut,
+   * enveloppe à la place de la flèche pour un lien mailto (icon: 'mail').
+   */
+  primary?: { label: string; href: string; arrow?: 'right' | 'down'; icon?: 'mail' };
   /** Étiquettes au-dessus du titre : « Volontariat », « Stage »… */
   tags?: string[];
   /** Second paragraphe, sous le chapeau, en texte courant. */
@@ -100,7 +103,7 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
         (donate || primary || cta) && (
           <div class="page-hero__ctas" data-reveal>
             {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
-            {primary && <Button href={primary.href} variant="primary" arrow={primary.arrow}>{primary.label}</Button>}
+            {primary && <Button href={primary.href} variant="primary" arrow={primary.arrow} icon={primary.icon}>{primary.label}</Button>}
             {cta && (
               <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>
                 {cta.label}
