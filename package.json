@@ -5,7 +5,7 @@
   "private": true,
   "description": "Site de l'ONG L'Homme & l'Environnement (Astro, statique)",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "astro dev",

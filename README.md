@@ -6,7 +6,7 @@ Site **statique** et **bilingue** (français par défaut à la racine, anglais s
 
 ## Lancer le projet
 
-Prérequis : Node.js 22 (22.22 minimum pour Astro 7). La version majeure est figée à `22.x` dans `package.json` pour que Vercel ne passe pas tout seul à une nouvelle version majeure de Node.
+Prérequis : Node.js 24 (Astro 7 demande 22.22 minimum). La version majeure est figée à `24.x` dans `package.json`, la même que dans les réglages du projet Vercel, pour que Vercel ne passe pas tout seul à une nouvelle version majeure de Node.
 
 ```bash
 npm install
