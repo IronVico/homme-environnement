@@ -719,25 +719,6 @@ const breadcrumb = [
     height: 44px;
     border-radius: var(--radius-pill);
     background: var(--disque);
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /*
-   * Carte non cliquable : comme les cartes chiffres, pas d'élévation (réservée
-   * aux liens), seulement l'icône qui grossit avec un petit rebond.
-   */
-  .group:hover .group__icon {
-    transform: scale(1.08);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .group__icon {
-      transition: none;
-    }
-
-    .group:hover .group__icon {
-      transform: none;
-    }
   }
 
   .group__text {

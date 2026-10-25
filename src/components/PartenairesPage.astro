@@ -332,11 +332,6 @@ const breadcrumb = [
     border-radius: var(--radius-pill);
     background: var(--menthe);
     color: var(--basalte);
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .way-card:hover .icon-disc {
-    transform: scale(1.08);
   }
 
   .way-card__title {
@@ -437,39 +432,7 @@ const breadcrumb = [
     border-radius: var(--radius-card);
   }
 
-  /*
-   * Survol : la carte se soulève (comme les cartes cliquables) et la zone logo se teinte.
-   * Les cartes ne sont pas des liens (lien « Site web » à l'intérieur) : même effet au focus
-   * de ce lien.
-   */
-  .partner-card,
-  .join-card {
-    transition:
-      transform var(--transition-ui),
-      box-shadow var(--transition-ui);
-  }
-
-  .partner-card:hover,
-  .partner-card:focus-within {
-    transform: translateY(var(--lift-card-hover));
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .join-card:hover,
-  .join-card:focus-within {
-    transform: translateY(var(--lift-card-hover));
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .partner-card__logo {
-    transition: background-color var(--transition-ui);
-  }
-
-  .partner-card:hover .partner-card__logo,
-  .partner-card:focus-within .partner-card__logo {
-    background: var(--vert-clair);
-  }
-
+  /* Les cartes ne sont pas des liens (lien « Site web » à l'intérieur) : pas de survol de carte. */
   .partner-card[hidden] {
     display: none;
   }
@@ -751,10 +714,6 @@ const breadcrumb = [
   @media (prefers-reduced-motion: reduce) {
     .text-link__label,
     .partner-card__link :global(.partner-card__external),
-    .partner-card,
-    .join-card,
-    .partner-card__logo,
-    .icon-disc,
     .filters__pill,
     .join-card__link :global(.join-card__arrow),
     .featured__link :global(.featured__arrow) {
@@ -762,12 +721,7 @@ const breadcrumb = [
     }
 
     .partner-card__link:hover :global(.partner-card__external),
-    .partner-card__link:focus-visible :global(.partner-card__external),
-    .way-card:hover .icon-disc,
-    .partner-card:hover,
-    .partner-card:focus-within,
-    .join-card:hover,
-    .join-card:focus-within {
+    .partner-card__link:focus-visible :global(.partner-card__external) {
       transform: none;
     }
 
