@@ -95,6 +95,12 @@ const en: Dictionary = {
 
   // TODO traduction : page « Faire un don » encore en français (copie de fr.ts).
   don: structuredClone(fr.don),
+
+  // TODO traduction : page « Mentions légales » encore en français (copie de fr.ts).
+  mentionsLegales: structuredClone(fr.mentionsLegales),
+
+  // TODO traduction : page « Confidentialité » encore en français (copie de fr.ts).
+  confidentialite: structuredClone(fr.confidentialite),
 };
 
 export default en;
