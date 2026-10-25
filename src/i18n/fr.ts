@@ -650,7 +650,7 @@ const fr = {
     },
     history: {
       titleStrong: 'Notre histoire,',
-      titleLight: 'plus de trente ans de terrain.',
+      titleLight: 'sur le terrain depuis 1993.',
       /** Dans l'ordre de la frise ; les dates sont dans src/data/chiffres.ts (ONG.dates). */
       events: [
         {
@@ -668,6 +668,10 @@ const fr = {
         {
           title: 'Aroma Forest',
           text: 'Première entreprise sociale et solidaire fondée sur la nature : une cinquantaine de salariés et des revenus pour plus de {farmers} paysans.',
+        },
+        {
+          title: 'ONG à Madagascar',
+          text: "L'association, créée en 1993, est enregistrée comme ONG à Madagascar.",
         },
         {
           title: 'Vohimana protégée',

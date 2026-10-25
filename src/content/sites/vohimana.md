@@ -9,7 +9,7 @@ summary: "Le site historique de l'ONG, ouvert à la visite. Un sanctuaire écoto
 
 # ---- Fiche du site (maquette FicheVohimana) ----
 tagline: la forêt qui a déjoué les pronostics.
-intro: "Notre site historique, ouvert à la visite. Un sanctuaire où 12 espèces de lémuriens cohabitent, protégé depuis 30 ans avec les communautés et en partenariat avec le Muséum national d'Histoire naturelle."
+intro: "Notre site historique, ouvert à la visite. Un sanctuaire où 12 espèces de lémuriens cohabitent, protégé avec les communautés et en partenariat avec le Muséum national d'Histoire naturelle."
 story:
   titleStrong: Une forêt condamnée
   titleLight: qui a tenu bon.
