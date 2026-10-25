@@ -926,6 +926,67 @@ const fr = {
       ],
     },
   },
+  mentionsLegales: {
+    title: 'Mentions légales',
+    description:
+      "Mentions légales du site de L'Homme & l'Environnement : éditeur, hébergement, conception, propriété intellectuelle et crédits photos.",
+    hero: {
+      titleStrong: 'Mentions',
+      titleLight: 'légales',
+      lead: "Qui édite ce site, qui l'héberge, et à qui appartiennent ses contenus.",
+      updated: 'Mise à jour : {date}',
+    },
+    /** Valeur pas encore fournie par l'ONG, et valeur à faire confirmer. */
+    missing: '[à fournir]',
+    toConfirm: '[à confirmer]',
+    toc: 'Sommaire',
+    publisher: {
+      title: 'Éditeur du site',
+      intro: "Ce site est édité par l'association L'Homme & l'Environnement.",
+      legalForm: 'Forme juridique',
+      legalFormValue: 'Association loi 1901',
+      headOffice: 'Siège social',
+      rna: 'Numéro RNA',
+      siret: 'Numéro SIRET',
+      director: 'Directeur de la publication',
+      phone: 'Téléphone',
+      contact: 'Contact',
+    },
+    hosting: {
+      title: 'Hébergement',
+      intro: 'Le site est hébergé par :',
+      country: 'États-Unis',
+    },
+    design: {
+      title: 'Conception',
+      text: "Le site a été entièrement repensé lors de la refonte de 2026. Il s'agit d'un site statique, construit avec le framework Astro.",
+      credit: 'Conception et réalisation :',
+    },
+    property: {
+      title: 'Propriété intellectuelle',
+      paragraphs: [
+        "L'ensemble des contenus de ce site (textes, logo, illustrations, cartes et photographies) est protégé par le Code de la propriété intellectuelle. Sauf mention contraire, ils appartiennent à L'Homme & l'Environnement ou à leurs auteurs respectifs.",
+        'Toute reproduction, représentation ou adaptation, totale ou partielle, sans autorisation écrite préalable est interdite.',
+      ],
+      note: {
+        title: 'Vous souhaitez réutiliser une photo ou un texte ?',
+        text: "Écrivez-nous avant toute utilisation : nous vous indiquerons l'auteur à créditer et les conditions de réutilisation.",
+      },
+    },
+    credits: {
+      title: 'Crédits photos',
+      intro: "Les photographies de ce site sont l'œuvre de :",
+      commons:
+        "Contributeurs de Wikimedia Commons, sous licences Creative Commons : l'auteur et la licence sont précisés en légende de chaque image concernée.",
+    },
+    links: {
+      title: 'Liens externes',
+      paragraphs: [
+        "Ce site contient des liens vers d'autres sites, notamment HelloAsso pour les dons et les sites de nos partenaires. L'Homme & l'Environnement n'exerce aucun contrôle sur leur contenu et ne peut en être tenue responsable.",
+        "Vous pouvez librement créer un lien vers ce site, à condition qu'il ne porte pas atteinte à l'image de l'association.",
+      ],
+    },
+  },
 };
 
 export default fr;

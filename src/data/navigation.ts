@@ -29,6 +29,7 @@ export const PAGES = {
   equipe: 'ong/equipe',
   partenaires: 'ong/partenaires',
   don: 's-engager/faire-un-don',
+  mentionsLegales: 'mentions-legales',
 } as const;
 
 /** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
@@ -119,7 +120,8 @@ const FOOTER_HREFS = [
   [HOME_ENGAGE, PAGES.stages, HOME_ENGAGE],
   ['#', '#', '#'],
 ];
-const LEGAL_HREFS = ['#', '#'];
+// TODO page Confidentialité.
+const LEGAL_HREFS = [PAGES.mentionsLegales, '#'];
 
 /**
  * Sous-menus du header : les sous-pages de chaque rubrique sont celles de la
