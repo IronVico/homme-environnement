@@ -3,6 +3,7 @@ name: Fohisokina
 country: madagascar
 region: Centre-Sud
 photo: ../../assets/photos/site-fohisokina.jpg
+photoAlt: "Une grenouille arlequin noire et orange posée sur la roche"
 summary: "Sur quelques hectares vit la grenouille arlequin, l'une des plus rares au monde. Dès 1988, Olivier Behra alertait pour interdire son commerce international."
 
 # ---- Fiche du site (source : présentation PDF de l'ONG, 2026) ----

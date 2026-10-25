@@ -15,7 +15,7 @@ interface Config {
   min: number;
   rate: number;
   helloasso: { donation: string; donationMonthly: string; amountParam: string };
-  texts: { perMonth: string; impactLead: string; taxTitle: string; submit: string; impacts: string[] };
+  texts: { customError: string; perMonth: string; impactLead: string; taxTitle: string; submit: string; impacts: string[] };
 }
 
 export function initDonationForm() {
@@ -30,6 +30,7 @@ export function initDonationForm() {
   const impactLead = form.querySelector<HTMLElement>('[data-impact-lead]');
   const impactText = form.querySelector<HTMLElement>('[data-impact-text]');
   const custom = form.querySelector<HTMLInputElement>('[data-custom-amount]');
+  const customError = form.querySelector<HTMLElement>('[data-custom-error]');
   const taxTitle = form.querySelector<HTMLElement>('[data-tax] .info-note__title');
   const submit = form.querySelector<HTMLAnchorElement>('.don-form__submit');
   const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]');
@@ -89,6 +90,7 @@ export function initDonationForm() {
     state.index = index;
     state.custom = null;
     if (custom) custom.value = '';
+    setCustomError(false);
     render();
   }
 
@@ -101,10 +103,23 @@ export function initDonationForm() {
 
   amountButtons.forEach((button, i) => button.addEventListener('click', () => pickAmount(i)));
 
+  // Montant libre invalide : message sous le champ (WCAG 3.3.1), affiché quand on quitte
+  // le champ ou valide la saisie, retiré dès que la saisie redevient valide ou vide.
+  const setCustomError = (invalid: boolean) => {
+    if (!custom || !customError) return;
+    custom.setAttribute('aria-invalid', String(invalid));
+    customError.textContent = invalid ? config.texts.customError : '';
+  };
+
   custom?.addEventListener('input', () => {
     // Saisie vide ou invalide : on revient au dernier montant proposé.
     state.custom = parseAmount(custom.value, config.min);
+    if (state.custom !== null || custom.value.trim() === '') setCustomError(false);
     render();
+  });
+
+  custom?.addEventListener('change', () => {
+    setCustomError(custom.value.trim() !== '' && state.custom === null);
   });
 
   // Une carte choisit le montant ; si le formulaire n'est pas à l'écran (mobile), on y remonte.

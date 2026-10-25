@@ -267,7 +267,7 @@ const breadcrumb = [
 
 <style>
   .section--tinted {
-    background: var(--vert-clair);
+    background: var(--section);
   }
 
   .stack {
@@ -288,8 +288,8 @@ const breadcrumb = [
   }
 
   .card {
-    border: 1px solid var(--bordure-douce);
-    background: var(--blanc);
+    border: 1px solid var(--bordure-carte);
+    background: var(--surface);
     box-shadow: var(--shadow-card);
   }
 
@@ -328,15 +328,10 @@ const breadcrumb = [
     justify-content: center;
     width: 56px;
     height: 56px;
-    border: 1px solid var(--vert-clair);
+    border: 1px solid var(--section);
     border-radius: var(--radius-pill);
-    background: var(--menthe);
-    color: var(--basalte);
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .way-card:hover .icon-disc {
-    transform: scale(1.08);
+    background: var(--disque);
+    color: var(--texte);
   }
 
   .way-card__title {
@@ -378,10 +373,10 @@ const breadcrumb = [
   .filters__pill {
     min-height: 44px;
     padding: 0 18px;
-    border: 2px solid var(--blanc);
+    border: 2px solid var(--surface);
     border-radius: var(--radius-pill);
-    background: var(--blanc);
-    color: var(--basalte);
+    background: var(--surface);
+    color: var(--texte);
     font-size: var(--fs-body-sm);
     font-weight: 600;
     cursor: pointer;
@@ -392,13 +387,13 @@ const breadcrumb = [
   }
 
   .filters__pill:hover {
-    border-color: var(--basalte);
+    border-color: var(--texte);
   }
 
   .filters__pill[aria-pressed='true'] {
-    background: var(--basalte);
-    border-color: var(--basalte);
-    color: var(--blanc);
+    background: var(--bouton-plein);
+    border-color: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
   /* Grille des partenaires : 4 colonnes, puis 3, 2 et 1. */
@@ -437,39 +432,7 @@ const breadcrumb = [
     border-radius: var(--radius-card);
   }
 
-  /*
-   * Survol : la carte se soulève (comme les cartes cliquables) et la zone logo se teinte.
-   * Les cartes ne sont pas des liens (lien « Site web » à l'intérieur) : même effet au focus
-   * de ce lien.
-   */
-  .partner-card,
-  .join-card {
-    transition:
-      transform var(--transition-ui),
-      box-shadow var(--transition-ui);
-  }
-
-  .partner-card:hover,
-  .partner-card:focus-within {
-    transform: translateY(var(--lift-card-hover));
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .join-card:hover,
-  .join-card:focus-within {
-    transform: translateY(var(--lift-card-hover));
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  .partner-card__logo {
-    transition: background-color var(--transition-ui);
-  }
-
-  .partner-card:hover .partner-card__logo,
-  .partner-card:focus-within .partner-card__logo {
-    background: var(--vert-clair);
-  }
-
+  /* Les cartes ne sont pas des liens (lien « Site web » à l'intérieur) : pas de survol de carte. */
   .partner-card[hidden] {
     display: none;
   }
@@ -481,7 +444,7 @@ const breadcrumb = [
     height: 88px;
     padding: 8px 12px;
     border-radius: 14px;
-    background: var(--menthe);
+    background: var(--disque);
   }
 
   .partner-card__logo :global(.partner-card__logo-img) {
@@ -495,7 +458,7 @@ const breadcrumb = [
   .partner-card__logo-svg {
     display: flex;
     max-width: 100%;
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .partner-card__logo-svg :global(svg) {
@@ -516,7 +479,7 @@ const breadcrumb = [
     align-self: flex-start;
     padding: 4px 10px;
     border-radius: var(--radius-pill);
-    background: var(--vert-clair);
+    background: var(--section);
     font-size: 12px;
     font-weight: 600;
   }
@@ -577,13 +540,13 @@ const breadcrumb = [
    * filet sauge au repos, trait tracé de gauche à droite au survol, icône qui glisse.
    */
   .text-link {
-    --trait: var(--basalte);
-    color: var(--basalte);
+    --trait: var(--texte);
+    color: var(--texte);
     text-decoration: none;
   }
 
   .text-link:hover {
-    color: var(--basalte);
+    color: var(--texte);
   }
 
   .text-link--on-dark {
@@ -751,10 +714,6 @@ const breadcrumb = [
   @media (prefers-reduced-motion: reduce) {
     .text-link__label,
     .partner-card__link :global(.partner-card__external),
-    .partner-card,
-    .join-card,
-    .partner-card__logo,
-    .icon-disc,
     .filters__pill,
     .join-card__link :global(.join-card__arrow),
     .featured__link :global(.featured__arrow) {
@@ -762,12 +721,7 @@ const breadcrumb = [
     }
 
     .partner-card__link:hover :global(.partner-card__external),
-    .partner-card__link:focus-visible :global(.partner-card__external),
-    .way-card:hover .icon-disc,
-    .partner-card:hover,
-    .partner-card:focus-within,
-    .join-card:hover,
-    .join-card:focus-within {
+    .partner-card__link:focus-visible :global(.partner-card__external) {
       transform: none;
     }
 
