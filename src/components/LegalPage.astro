@@ -1,0 +1,291 @@
+---
+/**
+ * Gabarit des pages juridiques (Mentions légales, Confidentialité) : fil d'Ariane, titre
+ * 800 + 300 avec date de mise à jour, sommaire collant à gauche et sections à droite
+ * (contenu passé en slot, une `<section class="legal-section">` par entrée de `sections`).
+ * Empilés sous 900px (sommaire au-dessus). Un petit script marque la rubrique lue dans le
+ * sommaire ; sans JS, la première reste marquée.
+ */
+import CalendarIcon from '@lucide/astro/icons/calendar';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex: boolean;
+  hero: {
+    titleStrong: string;
+    titleLight: string;
+    /** Partie légère du titre sur sa propre ligne. */
+    stacked?: boolean;
+    lead: string;
+    /** Texte « Mise à jour : … », déjà rempli. */
+    updated: string;
+  };
+  toc: string;
+  /** Sections du sommaire, dans l'ordre ; `id` : ancre de la section correspondante. */
+  sections: { id: string; title: string }[];
+}
+
+const { title, description, noindex, hero, toc, sections } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const breadcrumb = [{ label: t(lang).ui.breadcrumbHome, href: localeUrl(lang) }];
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <Header />
+  <Breadcrumb items={breadcrumb} current={title} />
+
+  <main id="contenu">
+    <section class="legal-hero container">
+      <div class="legal-hero__text">
+        <h1 class="legal-hero__title" data-reveal>
+          <span class="legal-hero__strong">{hero.titleStrong}</span>
+          {' '}
+          <span class:list={['legal-hero__light', { 'legal-hero__light--stacked': hero.stacked }]}>
+            {hero.titleLight}
+          </span>
+        </h1>
+        <p class="legal-hero__lead" data-reveal>{hero.lead}</p>
+        <p class="legal-hero__updated" data-reveal>
+          <CalendarIcon size={18} />
+          {hero.updated}
+        </p>
+      </div>
+    </section>
+
+    <div class="legal container">
+      <nav class="legal-toc" aria-labelledby="sommaire-titre" data-legal-toc>
+        <h2 id="sommaire-titre" class="legal-toc__title">{toc}</h2>
+        <ol class="legal-toc__list">
+          {
+            sections.map((section, i) => (
+              <li>
+                <a href={`#${section.id}`} aria-current={i === 0 ? 'true' : undefined}>
+                  {section.title}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      <article class="legal-body">
+        <slot />
+      </article>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  /*
+   * Sommaire : marque (aria-current) la dernière section dont le titre est passé sous le
+   * header (88px) ; en bas de page, la dernière section.
+   */
+  document.querySelectorAll<HTMLElement>('[data-legal-toc]').forEach((toc) => {
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+    const sections = links
+      .map((link) => document.getElementById(link.hash.slice(1)))
+      .filter((section): section is HTMLElement => section !== null);
+    if (sections.length !== links.length) return;
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      let active = 0;
+      sections.forEach((section, i) => {
+        if (section.getBoundingClientRect().top <= 120) active = i;
+      });
+      if (atBottom) active = sections.length - 1;
+      links.forEach((link, i) => {
+        if (i === active) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    update();
+  });
+</script>
+
+<style>
+  .legal-hero {
+    padding-top: clamp(24px, 4vw, 48px);
+    padding-bottom: clamp(32px, 4vw, 56px);
+  }
+
+  .legal-hero__text {
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .legal-hero__title {
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+  }
+
+  .legal-hero__strong {
+    font-weight: 800;
+  }
+
+  .legal-hero__light {
+    font-weight: 300;
+  }
+
+  .legal-hero__light--stacked {
+    display: block;
+  }
+
+  .legal-hero__lead {
+    max-width: 640px;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  .legal-hero__updated {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    background: var(--section);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+  }
+
+  .legal-hero__updated :global(svg) {
+    flex-shrink: 0;
+  }
+
+  /* Sommaire 280px + texte 760px max. */
+  .legal {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 760px);
+    gap: clamp(40px, 6vw, 96px);
+    align-items: start;
+    padding-top: clamp(16px, 2vw, 24px);
+    padding-bottom: var(--space-section);
+  }
+
+  /* Collant sous le header fixé (pilule ~76px), comme le formulaire de la page Don. */
+  .legal-toc {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: 20px 12px;
+    border: 1px solid var(--section);
+    border-radius: var(--radius-card-lg);
+  }
+
+  .legal-toc__title {
+    padding: 0 16px;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .legal-toc__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  /* Rubrique lue : pastille section, comme la rubrique en cours du menu ; survol en bordure-carte. */
+  .legal-toc__list a {
+    display: block;
+    padding: 10px 16px;
+    border-radius: var(--radius-pill);
+    color: var(--texte);
+    text-decoration: none;
+    transition: background-color 150ms ease-out;
+  }
+
+  .legal-toc__list a:hover {
+    background: var(--bordure-carte);
+  }
+
+  .legal-toc__list a[aria-current] {
+    background: var(--section);
+    font-weight: 600;
+  }
+
+  /* Contenu passé en slot : styles globaux limités au corps de la page. */
+  .legal-body {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .legal-body :global(a) {
+    text-underline-offset: 3px;
+  }
+
+  .legal-body :global(.legal-section) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .legal-body :global(.legal-section + .legal-section) {
+    padding-top: 40px;
+    border-top: 1px solid var(--section);
+  }
+
+  .legal-body :global(.legal-section__title) {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .legal-body :global(.legal-section__subtitle) {
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .legal-body :global(.legal-list) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding-left: 24px;
+  }
+
+  /* Empilé : le sommaire passe au-dessus et ne colle plus. */
+  @media (max-width: 900px) {
+    .legal {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .legal-toc {
+      position: static;
+    }
+  }
+</style>

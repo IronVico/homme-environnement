@@ -1,0 +1,18 @@
+---
+/** Valeur à fournir ou à confirmer par l'ONG (« [à fournir] ») : pastille en pointillés. */
+---
+
+<span class="todo-pill"><slot /></span>
+
+<style>
+  .todo-pill {
+    display: inline-block;
+    padding: 1px 10px;
+    border: 1px dashed var(--accent);
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+    font-size: 0.88em;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+</style>

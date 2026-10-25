@@ -3,10 +3,8 @@
  * Page « Mentions légales » (maquettes MentionsLegales / MentionsLegalesMobile), commune aux
  * deux langues (/mentions-legales et /en/mentions-legales). Textes dans src/i18n (clé
  * `mentionsLegales`), informations légales dans src/data/mentions-legales.ts.
- * Sommaire collant à gauche, sections à droite ; empilés sous 900px (sommaire au-dessus).
- * Un petit script marque la rubrique lue dans le sommaire ; sans JS, la première reste marquée.
+ * Gabarit commun (fil d'Ariane, titre, sommaire collant) : LegalPage.
  */
-import CalendarIcon from '@lucide/astro/icons/calendar';
 import ImageIcon from '@lucide/astro/icons/image';
 import {
   HOST,
@@ -16,13 +14,11 @@ import {
   PUBLISHER,
   SITE_DESIGNER,
 } from '../data/mentions-legales';
-import { getLang, localeUrl, t } from '../i18n';
-import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLang, t } from '../i18n';
 import { fill } from '../lib/don';
-import Breadcrumb from './Breadcrumb.astro';
-import Footer from './Footer.astro';
-import Header from './Header.astro';
 import InfoNote from './InfoNote.astro';
+import LegalPage from './LegalPage.astro';
+import TodoPill from './TodoPill.astro';
 
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
@@ -50,292 +46,84 @@ const publisherRows = [
 // Page encore incomplète : pas d'indexation (comme les fiches site).
 const complete = [...Object.values(PUBLISHER), LEGAL_UPDATED, SITE_DESIGNER].every((value) => value !== null);
 
-const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
+const hero = { ...page.hero, updated: fill(page.hero.updated, { date: LEGAL_UPDATED ?? page.missing }) };
 ---
 
-<BaseLayout title={page.title} description={page.description} noindex={!complete}>
-  <Header />
-  <Breadcrumb items={breadcrumb} current={page.title} />
-
-  <main id="contenu">
-    <section class="legal-hero container">
-      <div class="legal-hero__text">
-        <h1 class="legal-hero__title" data-reveal>
-          <span class="legal-hero__strong">{page.hero.titleStrong}</span>
+<LegalPage
+  title={page.title}
+  description={page.description}
+  noindex={!complete}
+  hero={hero}
+  toc={page.toc}
+  sections={SECTIONS}
+>
+  <section id="editeur" class="legal-section" aria-labelledby="editeur-t">
+    <h2 id="editeur-t" class="legal-section__title">{page.publisher.title}</h2>
+    <p>{page.publisher.intro}</p>
+    <dl class="legal-table">
+      {
+        publisherRows.map((row) => (
+          <div class="legal-table__row">
+            <dt>{row.label}</dt>
+            <dd>{row.value ?? <TodoPill>{page.missing}</TodoPill>}</dd>
+          </div>
+        ))
+      }
+      <div class="legal-table__row">
+        <dt>{page.publisher.contact}</dt>
+        <dd>
+          <a href={`mailto:${LEGAL_CONTACT_EMAIL}`}>{LEGAL_CONTACT_EMAIL}</a>
           {' '}
-          <span class="legal-hero__light">{page.hero.titleLight}</span>
-        </h1>
-        <p class="legal-hero__lead" data-reveal>{page.hero.lead}</p>
-        <p class="legal-hero__updated" data-reveal>
-          <CalendarIcon size={18} />
-          {fill(page.hero.updated, { date: LEGAL_UPDATED ?? page.missing })}
-        </p>
+          <TodoPill>{page.toConfirm}</TodoPill>
+        </dd>
       </div>
-    </section>
+    </dl>
+  </section>
 
-    <div class="legal container">
-      <nav class="legal-toc" aria-labelledby="sommaire-titre" data-legal-toc>
-        <h2 id="sommaire-titre" class="legal-toc__title">{page.toc}</h2>
-        <ol class="legal-toc__list">
-          {
-            SECTIONS.map((section, i) => (
-              <li>
-                <a href={`#${section.id}`} aria-current={i === 0 ? 'true' : undefined}>
-                  {section.title}
-                </a>
-              </li>
-            ))
-          }
-        </ol>
-      </nav>
+  <section id="hebergement" class="legal-section" aria-labelledby="hebergement-t">
+    <h2 id="hebergement-t" class="legal-section__title">{page.hosting.title}</h2>
+    <p>{page.hosting.intro}</p>
+    <address class="legal-address">
+      <strong>{HOST.name}</strong>
+      {HOST.address.map((line) => [<br />, line])}
+      <br />
+      {page.hosting.country}
+      <br />
+      <a href={HOST.url} lang="en">{HOST.urlLabel}</a>
+    </address>
+  </section>
 
-      <article class="legal-body">
-        <section id="editeur" class="legal-section" aria-labelledby="editeur-t">
-          <h2 id="editeur-t" class="legal-section__title">{page.publisher.title}</h2>
-          <p>{page.publisher.intro}</p>
-          <dl class="legal-table">
-            {
-              publisherRows.map((row) => (
-                <div class="legal-table__row">
-                  <dt>{row.label}</dt>
-                  <dd>{row.value ?? <span class="todo-pill">{page.missing}</span>}</dd>
-                </div>
-              ))
-            }
-            <div class="legal-table__row">
-              <dt>{page.publisher.contact}</dt>
-              <dd>
-                <a href={`mailto:${LEGAL_CONTACT_EMAIL}`}>{LEGAL_CONTACT_EMAIL}</a>
-                {' '}
-                <span class="todo-pill">{page.toConfirm}</span>
-              </dd>
-            </div>
-          </dl>
-        </section>
+  <section id="conception" class="legal-section" aria-labelledby="conception-t">
+    <h2 id="conception-t" class="legal-section__title">{page.design.title}</h2>
+    <p>{page.design.text}</p>
+    <p>
+      {page.design.credit}{' '}
+      {SITE_DESIGNER ?? <TodoPill>{page.missing}</TodoPill>}
+    </p>
+  </section>
 
-        <section id="hebergement" class="legal-section" aria-labelledby="hebergement-t">
-          <h2 id="hebergement-t" class="legal-section__title">{page.hosting.title}</h2>
-          <p>{page.hosting.intro}</p>
-          <address class="legal-address">
-            <strong>{HOST.name}</strong>
-            {HOST.address.map((line) => [<br />, line])}
-            <br />
-            {page.hosting.country}
-            <br />
-            <a href={HOST.url} lang="en">{HOST.urlLabel}</a>
-          </address>
-        </section>
+  <section id="propriete" class="legal-section" aria-labelledby="propriete-t">
+    <h2 id="propriete-t" class="legal-section__title">{page.property.title}</h2>
+    {page.property.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    <InfoNote icon={ImageIcon} title={page.property.note.title} text={page.property.note.text} />
+  </section>
 
-        <section id="conception" class="legal-section" aria-labelledby="conception-t">
-          <h2 id="conception-t" class="legal-section__title">{page.design.title}</h2>
-          <p>{page.design.text}</p>
-          <p>
-            {page.design.credit}{' '}
-            {SITE_DESIGNER ?? <span class="todo-pill">{page.missing}</span>}
-          </p>
-        </section>
+  <section id="credits" class="legal-section" aria-labelledby="credits-t">
+    <h2 id="credits-t" class="legal-section__title">{page.credits.title}</h2>
+    <p>{page.credits.intro}</p>
+    <ul class="legal-list">
+      {PHOTOGRAPHERS.map((name) => <li>{name}</li>)}
+      <li>{page.credits.commons}</li>
+    </ul>
+  </section>
 
-        <section id="propriete" class="legal-section" aria-labelledby="propriete-t">
-          <h2 id="propriete-t" class="legal-section__title">{page.property.title}</h2>
-          {page.property.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-          <InfoNote icon={ImageIcon} title={page.property.note.title} text={page.property.note.text} />
-        </section>
-
-        <section id="credits" class="legal-section" aria-labelledby="credits-t">
-          <h2 id="credits-t" class="legal-section__title">{page.credits.title}</h2>
-          <p>{page.credits.intro}</p>
-          <ul class="legal-list">
-            {PHOTOGRAPHERS.map((name) => <li>{name}</li>)}
-            <li>{page.credits.commons}</li>
-          </ul>
-        </section>
-
-        <section id="liens" class="legal-section" aria-labelledby="liens-t">
-          <h2 id="liens-t" class="legal-section__title">{page.links.title}</h2>
-          {page.links.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-        </section>
-      </article>
-    </div>
-  </main>
-
-  <Footer />
-</BaseLayout>
-
-<script>
-  /*
-   * Sommaire : marque (aria-current) la dernière section dont le titre est passé sous le
-   * header (88px) ; en bas de page, la dernière section.
-   */
-  document.querySelectorAll<HTMLElement>('[data-legal-toc]').forEach((toc) => {
-    const links = [...toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
-    const sections = links
-      .map((link) => document.getElementById(link.hash.slice(1)))
-      .filter((section): section is HTMLElement => section !== null);
-    if (sections.length !== links.length) return;
-
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-      let active = 0;
-      sections.forEach((section, i) => {
-        if (section.getBoundingClientRect().top <= 120) active = i;
-      });
-      if (atBottom) active = sections.length - 1;
-      links.forEach((link, i) => {
-        if (i === active) link.setAttribute('aria-current', 'true');
-        else link.removeAttribute('aria-current');
-      });
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    update();
-  });
-</script>
+  <section id="liens" class="legal-section" aria-labelledby="liens-t">
+    <h2 id="liens-t" class="legal-section__title">{page.links.title}</h2>
+    {page.links.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </section>
+</LegalPage>
 
 <style>
-  .legal-hero {
-    padding-top: clamp(24px, 4vw, 48px);
-    padding-bottom: clamp(32px, 4vw, 56px);
-  }
-
-  .legal-hero__text {
-    max-width: 800px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-  }
-
-  .legal-hero__title {
-    font-size: var(--fs-display);
-    line-height: var(--lh-display);
-    letter-spacing: var(--ls-display);
-  }
-
-  .legal-hero__strong {
-    font-weight: 800;
-  }
-
-  .legal-hero__light {
-    font-weight: 300;
-  }
-
-  .legal-hero__lead {
-    max-width: 640px;
-    font-size: var(--fs-body-lg);
-    line-height: var(--lh-body);
-  }
-
-  .legal-hero__updated {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: 8px 16px;
-    border-radius: var(--radius-pill);
-    background: var(--section);
-    font-size: var(--fs-body-sm);
-    font-weight: 500;
-  }
-
-  .legal-hero__updated :global(svg) {
-    flex-shrink: 0;
-  }
-
-  /* Sommaire 280px + texte 760px max. */
-  .legal {
-    display: grid;
-    grid-template-columns: 280px minmax(0, 760px);
-    gap: clamp(40px, 6vw, 96px);
-    align-items: start;
-    padding-top: clamp(16px, 2vw, 24px);
-    padding-bottom: var(--space-section);
-  }
-
-  /* Collant sous le header fixé (pilule ~76px), comme le formulaire de la page Don. */
-  .legal-toc {
-    position: sticky;
-    top: 100px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: 20px 12px;
-    border: 1px solid var(--section);
-    border-radius: var(--radius-card-lg);
-  }
-
-  .legal-toc__title {
-    padding: 0 16px;
-    font-size: var(--fs-eyebrow);
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .legal-toc__list {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  /* Rubrique lue : pastille section, comme la rubrique en cours du menu ; survol en bordure-carte. */
-  .legal-toc__list a {
-    display: block;
-    padding: 10px 16px;
-    border-radius: var(--radius-pill);
-    color: var(--texte);
-    text-decoration: none;
-    transition: background-color 150ms ease-out;
-  }
-
-  .legal-toc__list a:hover {
-    background: var(--bordure-carte);
-  }
-
-  .legal-toc__list a[aria-current] {
-    background: var(--section);
-    font-weight: 600;
-  }
-
-  .legal-body {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    font-size: var(--fs-body);
-    line-height: 1.6;
-  }
-
-  .legal-body a {
-    text-underline-offset: 3px;
-  }
-
-  .legal-section {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .legal-section + .legal-section {
-    padding-top: 40px;
-    border-top: 1px solid var(--section);
-  }
-
-  .legal-section__title {
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
-  }
-
   .legal-table {
     margin: 0;
     border-top: 1px solid var(--bordure-carte);
@@ -358,18 +146,6 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
     overflow-wrap: anywhere;
   }
 
-  /* Valeur à fournir ou à confirmer par l'ONG : pastille en pointillés. */
-  .todo-pill {
-    display: inline-block;
-    padding: 1px 10px;
-    border: 1px dashed var(--accent);
-    border-radius: var(--radius-pill);
-    background: var(--disque);
-    font-size: 0.88em;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
   .legal-address {
     padding: 20px 24px;
     border-radius: var(--radius-card);
@@ -379,25 +155,6 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
 
   .legal-address strong {
     font-weight: 700;
-  }
-
-  .legal-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    margin: 0;
-    padding-left: 24px;
-  }
-
-  /* Empilé : le sommaire passe au-dessus et ne colle plus. */
-  @media (max-width: 900px) {
-    .legal {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .legal-toc {
-      position: static;
-    }
   }
 
   /* Mobile : chaque ligne du tableau passe sur deux lignes (intitulé, puis valeur). */
