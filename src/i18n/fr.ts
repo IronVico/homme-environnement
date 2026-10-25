@@ -987,6 +987,91 @@ const fr = {
       ],
     },
   },
+  confidentialite: {
+    title: 'Confidentialité',
+    description:
+      "Politique de confidentialité de L'Homme & l'Environnement : données collectées, mesure d'audience sans cookies, durées de conservation et vos droits.",
+    hero: {
+      titleStrong: 'Vos données,',
+      titleLight: 'en toute transparence.',
+      lead: 'Ce que nous collectons, pourquoi, combien de temps, et comment exercer vos droits. Nous collectons le moins de données possible.',
+      updated: 'Mise à jour : {date}',
+    },
+    missing: '[à fournir]',
+    toConfirm: '[à confirmer]',
+    toc: 'Sommaire',
+    controller: {
+      title: 'Qui est responsable',
+      // Phrase coupée autour de l'adresse du siège.
+      text: "Le responsable du traitement de vos données est l'association L'Homme & l'Environnement, association loi 1901, dont le siège est situé ",
+      addressMissing: '[adresse à fournir]',
+      questions: 'Pour toute question sur vos données : ',
+    },
+    data: {
+      title: 'Données collectées',
+      intro: 'Nous ne collectons que les données nécessaires, et uniquement lorsque vous nous les transmettez.',
+      contact: {
+        title: 'Formulaire de contact',
+        text: "Nom, adresse e-mail, sujet et message. Ces données servent uniquement à répondre à votre demande, avec votre consentement donné au moment de l'envoi.",
+      },
+      newsletter: {
+        title: 'Newsletter',
+        text: "Votre adresse e-mail, pour vous envoyer nos nouvelles. Chaque envoi contient un lien de désinscription. Outil d'envoi : ",
+      },
+      donations: {
+        title: 'Dons',
+        // Phrase coupée autour du lien vers la politique de HelloAsso.
+        before: 'Les dons sont traités par HelloAsso, plateforme de paiement dédiée aux associations, qui agit selon sa propre ',
+        link: 'politique de confidentialité',
+        after:
+          ". Nous recevons de HelloAsso les informations nécessaires à l'émission de votre reçu fiscal ; nous n'avons jamais accès à vos coordonnées bancaires.",
+      },
+    },
+    audience: {
+      title: "Mesure d'audience sans cookies",
+      text: "Pour savoir quelles pages sont utiles, nous mesurons la fréquentation du site avec un outil qui ne dépose aucun cookie et ne vous suit pas d'un site à l'autre. Nous ne consultons que des statistiques globales : pages vues, sites de provenance, type d'appareil. Outil retenu : ",
+      note: {
+        title: 'Pas de bandeau cookies sur ce site',
+        text: "Comme aucun cookie de mesure ou de publicité n'est déposé, aucun consentement n'est nécessaire. ",
+        toConfirm: "[à confirmer selon l'outil retenu]",
+      },
+    },
+    retention: {
+      title: 'Durées de conservation',
+      intro: 'Vos données sont conservées le temps nécessaire à leur finalité, puis supprimées.',
+      dataHeader: 'Données',
+      durationHeader: 'Durée de conservation',
+      contact: 'Messages du formulaire de contact',
+      newsletter: 'Inscription à la newsletter',
+      newsletterValue: "Jusqu'à votre désinscription",
+      donations: 'Informations liées aux dons',
+      audience: "Statistiques d'audience",
+      audienceValue: 'Globales et anonymes',
+    },
+    rights: {
+      title: 'Vos droits',
+      intro:
+        'Conformément au Règlement général sur la protection des données (RGPD), vous disposez des droits suivants sur vos données :',
+      list: [
+        { name: 'Accès', text: ' : savoir quelles données nous détenons sur vous ;' },
+        { name: 'Rectification', text: ' : corriger des données inexactes ;' },
+        { name: 'Effacement', text: ' : demander la suppression de vos données ;' },
+        { name: 'Opposition', text: " : refuser qu'elles soient utilisées, par exemple pour la newsletter." },
+      ],
+      // Phrase coupée autour du lien vers la CNIL.
+      complaint: "Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la Commission nationale de l'informatique et des libertés (",
+      complaintLink: 'CNIL',
+      complaintAfter: ').',
+    },
+    contact: {
+      title: 'Nous contacter',
+      // Phrase coupée autour de l'adresse e-mail et du lien vers le formulaire.
+      before: 'Pour exercer vos droits ou poser une question, écrivez-nous à ',
+      middle: ' ou passez par notre ',
+      form: 'formulaire de contact',
+      after: ". Nous vous répondrons dans un délai d'un mois, comme le prévoit le RGPD.",
+    },
+  },
 };
 
 export default fr;

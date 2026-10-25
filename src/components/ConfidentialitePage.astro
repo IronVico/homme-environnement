@@ -1,0 +1,182 @@
+---
+/**
+ * Page « Confidentialité » (maquettes Confidentialite / ConfidentialiteMobile), commune aux
+ * deux langues (/confidentialite et /en/confidentialite). Textes dans src/i18n (clé
+ * `confidentialite`), informations à fournir dans src/data/confidentialite.ts.
+ * Gabarit commun (fil d'Ariane, titre, sommaire collant) : LegalPage.
+ */
+import ShieldCheckIcon from '@lucide/astro/icons/shield-check';
+import {
+  ANALYTICS_TOOL,
+  CNIL_URL,
+  HELLOASSO_PRIVACY_URL,
+  NEWSLETTER_TOOL,
+  PRIVACY_UPDATED,
+  RETENTION,
+} from '../data/confidentialite';
+import { LEGAL_CONTACT_EMAIL, PUBLISHER } from '../data/mentions-legales';
+import { getLang, t } from '../i18n';
+import { fill } from '../lib/don';
+import InfoNote from './InfoNote.astro';
+import LegalPage from './LegalPage.astro';
+import TodoPill from './TodoPill.astro';
+
+const lang = getLang(Astro.currentLocale);
+const page = t(lang).confidentialite;
+
+const SECTIONS = [
+  { id: 'responsable', title: page.controller.title },
+  { id: 'donnees', title: page.data.title },
+  { id: 'audience', title: page.audience.title },
+  { id: 'conservation', title: page.retention.title },
+  { id: 'droits', title: page.rights.title },
+  { id: 'nous-contacter', title: page.contact.title },
+];
+
+// Page encore incomplète : pas d'indexation (comme Mentions légales).
+const complete = [PUBLISHER.headOffice, PRIVACY_UPDATED, NEWSLETTER_TOOL, ANALYTICS_TOOL, ...Object.values(RETENTION)].every(
+  (value) => value !== null,
+);
+
+const hero = { ...page.hero, stacked: true, updated: fill(page.hero.updated, { date: PRIVACY_UPDATED ?? page.missing }) };
+const mail = `mailto:${LEGAL_CONTACT_EMAIL}`;
+---
+
+<LegalPage
+  title={page.title}
+  description={page.description}
+  noindex={!complete}
+  hero={hero}
+  toc={page.toc}
+  sections={SECTIONS}
+>
+  <section id="responsable" class="legal-section" aria-labelledby="responsable-t">
+    <h2 id="responsable-t" class="legal-section__title">{page.controller.title}</h2>
+    <p>
+      {page.controller.text}{PUBLISHER.headOffice ?? <TodoPill>{page.controller.addressMissing}</TodoPill>}.
+    </p>
+    <p>
+      {page.controller.questions}<a href={mail}>{LEGAL_CONTACT_EMAIL}</a>
+      {' '}<TodoPill>{page.toConfirm}</TodoPill>.
+    </p>
+  </section>
+
+  <section id="donnees" class="legal-section" aria-labelledby="donnees-t">
+    <h2 id="donnees-t" class="legal-section__title">{page.data.title}</h2>
+    <p>{page.data.intro}</p>
+    <h3 class="legal-section__subtitle">{page.data.contact.title}</h3>
+    <p>{page.data.contact.text}</p>
+    <h3 class="legal-section__subtitle">{page.data.newsletter.title}</h3>
+    <p>{page.data.newsletter.text}{NEWSLETTER_TOOL ?? <TodoPill>{page.missing}</TodoPill>}.</p>
+    <h3 class="legal-section__subtitle">{page.data.donations.title}</h3>
+    <p>
+      {page.data.donations.before}<a href={HELLOASSO_PRIVACY_URL}>{page.data.donations.link}</a>{
+        page.data.donations.after
+      }
+    </p>
+  </section>
+
+  <section id="audience" class="legal-section" aria-labelledby="audience-t">
+    <h2 id="audience-t" class="legal-section__title">{page.audience.title}</h2>
+    <p>{page.audience.text}{ANALYTICS_TOOL ?? <TodoPill>{page.missing}</TodoPill>}.</p>
+    <InfoNote icon={ShieldCheckIcon} title={page.audience.note.title}>
+      {page.audience.note.text}<TodoPill>{page.audience.note.toConfirm}</TodoPill>
+    </InfoNote>
+  </section>
+
+  <section id="conservation" class="legal-section" aria-labelledby="conservation-t">
+    <h2 id="conservation-t" class="legal-section__title">{page.retention.title}</h2>
+    <p>{page.retention.intro}</p>
+    <div class="retention">
+      <table class="retention__table">
+        <thead>
+          <tr>
+            <th scope="col">{page.retention.dataHeader}</th>
+            <th scope="col">{page.retention.durationHeader}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{page.retention.contact}</th>
+            <td>{RETENTION.contact ?? <TodoPill>{page.missing}</TodoPill>}</td>
+          </tr>
+          <tr>
+            <th scope="row">{page.retention.newsletter}</th>
+            <td>{page.retention.newsletterValue} <TodoPill>{page.toConfirm}</TodoPill></td>
+          </tr>
+          <tr>
+            <th scope="row">{page.retention.donations}</th>
+            <td>{RETENTION.donations ?? <TodoPill>{page.missing}</TodoPill>}</td>
+          </tr>
+          <tr>
+            <th scope="row">{page.retention.audience}</th>
+            <td>{page.retention.audienceValue} <TodoPill>{page.toConfirm}</TodoPill></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="droits" class="legal-section" aria-labelledby="droits-t">
+    <h2 id="droits-t" class="legal-section__title">{page.rights.title}</h2>
+    <p>{page.rights.intro}</p>
+    <ul class="legal-list">
+      {
+        page.rights.list.map((right) => (
+          <li>
+            <strong>{right.name}</strong>
+            {right.text}
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      {page.rights.complaint}<a href={CNIL_URL}>{page.rights.complaintLink}</a>{page.rights.complaintAfter}
+    </p>
+  </section>
+
+  <section id="nous-contacter" class="legal-section" aria-labelledby="nous-contacter-t">
+    <h2 id="nous-contacter-t" class="legal-section__title">{page.contact.title}</h2>
+    <!-- TODO page Contact : faire du « formulaire de contact » un lien vers la page. -->
+    <p>
+      {page.contact.before}<a href={mail}>{LEGAL_CONTACT_EMAIL}</a>
+      {' '}<TodoPill>{page.toConfirm}</TodoPill>{page.contact.middle}{page.contact.form}{page.contact.after}
+    </p>
+  </section>
+</LegalPage>
+
+<style>
+  /* Tableau des durées : en-tête vert clair, cadre arrondi ; défile seul s'il déborde. */
+  .retention {
+    overflow-x: auto;
+    border: 1px solid var(--section);
+    border-radius: var(--radius-card);
+  }
+
+  .retention__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .retention__table th,
+  .retention__table td {
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .retention__table thead th {
+    background: var(--section);
+    font-weight: 700;
+  }
+
+  .retention__table tbody th {
+    font-weight: 600;
+  }
+
+  .retention__table tbody tr > * {
+    border-top: 1px solid var(--bordure-carte);
+  }
+</style>
