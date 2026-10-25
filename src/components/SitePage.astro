@@ -255,18 +255,12 @@ const breadcrumb = [
           </div>
           <dl class="locator__facts">
             <div class="locator__fact">
-              <span class="locator__fact-icon"><MapPin size={20} /></span>
-              <div>
-                <dt>{page.location}</dt>
-                <dd>{data.location ?? page.missing}</dd>
-              </div>
+              <dt><span class="locator__fact-icon"><MapPin size={20} /></span>{page.location}</dt>
+              <dd>{data.location ?? page.missing}</dd>
             </div>
             <div class="locator__fact">
-              <span class="locator__fact-icon"><Trees size={20} /></span>
-              <div>
-                <dt>{page.habitat}</dt>
-                <dd>{data.habitat ?? page.missing}</dd>
-              </div>
+              <dt><span class="locator__fact-icon"><Trees size={20} /></span>{page.habitat}</dt>
+              <dd>{data.habitat ?? page.missing}</dd>
             </div>
           </dl>
         </div>
@@ -587,6 +581,11 @@ const breadcrumb = [
     opacity: 1;
   }
 
+  /* Échap masque l'étiquette, comme les infobulles (WCAG 1.4.13, src/scripts/tooltip.ts). */
+  :global([data-tooltips-off]) .locator__site .locator__label--tip {
+    opacity: 0;
+  }
+
   /* Repère : le point est au centre de la zone de 44px, l'étiquette s'en écarte de 20px. */
   .locator__label--tip.locator__label--left {
     transform: translate(calc(-100% - 16px), -50%);
@@ -643,15 +642,18 @@ const breadcrumb = [
     line-height: 1.5;
   }
 
+  /* Pastille à gauche, intitulé et valeur à sa droite (dt et dd restent enfants directs du groupe). */
   .locator__fact {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
+    position: relative;
+    min-height: 40px;
+    padding-left: 52px;
   }
 
   /* Pastille blanche : le bloc est sur vert clair. */
   .locator__fact-icon {
-    flex-shrink: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -717,25 +719,6 @@ const breadcrumb = [
     height: 44px;
     border-radius: var(--radius-pill);
     background: var(--disque);
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /*
-   * Carte non cliquable : comme les cartes chiffres, pas d'élévation (réservée
-   * aux liens), seulement l'icône qui grossit avec un petit rebond.
-   */
-  .group:hover .group__icon {
-    transform: scale(1.08);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .group__icon {
-      transition: none;
-    }
-
-    .group:hover .group__icon {
-      transform: none;
-    }
   }
 
   .group__text {

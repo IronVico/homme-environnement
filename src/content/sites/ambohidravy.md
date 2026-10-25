@@ -3,6 +3,7 @@ name: Ambohidravy
 country: madagascar
 region: Nord-Ouest
 photo: ../../assets/photos/pilier-economie-fete-ambohidravy.jpg
+photoAlt: "Deux femmes dansent lors d'une fête de village, Ambohidravy"
 summary: "Une forêt sacrée pour les populations locales, soumise à de fortes pressions extérieures, qui dispose désormais d'un statut de conservation."
 
 # ---- Fiche du site (source : présentation PDF de l'ONG, 2026) ----

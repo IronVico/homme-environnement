@@ -58,6 +58,13 @@ p {
   margin: 0;
 }
 
+/* Mot trop long pour l'écran (« Ambalakalanoro, » à 320px) : il passe à la ligne plutôt que de déborder. */
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+}
+
 a {
   color: var(--texte);
 }
@@ -278,6 +285,20 @@ a.card-lift:focus-visible {
   translate: 0 0;
 }
 
+/* Bouton en fin de rangée (bord droit de l'écran) : l'infobulle s'aligne sur son bord droit. */
+[data-tooltip-align='end']::after,
+[data-tooltip-align='end']:hover::after,
+[data-tooltip-align='end']:focus-visible::after {
+  left: auto;
+  right: 0;
+  translate: 0 4px;
+}
+
+[data-tooltip-align='end']:hover::after,
+[data-tooltip-align='end']:focus-visible::after {
+  translate: 0 0;
+}
+
 /* Bouton en haut de page (bascule du header) : l'infobulle s'ouvre dessous. */
 [data-tooltip-pos='below']::after {
   top: calc(100% + 8px);
@@ -297,7 +318,8 @@ a.card-lift:focus-visible {
     transition: none;
   }
 
-  [data-tooltip-align='start']::after {
+  [data-tooltip-align='start']::after,
+  [data-tooltip-align='end']::after {
     translate: 0 0;
   }
 

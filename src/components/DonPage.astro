@@ -354,10 +354,11 @@ const breadcrumb = [
     object-position: 50% 45%;
   }
 
+  /* Dégradé assez dense sous tout le bloc de texte, sur-titre compris : 4,5:1 minimum (WCAG 1.4.3). */
   .don-hero__shade {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(35, 31, 32, 0.78) 0%, rgba(35, 31, 32, 0.35) 45%, rgba(35, 31, 32, 0) 75%);
+    background: linear-gradient(to top, rgba(35, 31, 32, 0.8) 0%, rgba(35, 31, 32, 0.6) 45%, rgba(35, 31, 32, 0) 80%);
   }
 
   /* À droite, la place du formulaire qui chevauche la photo. */
@@ -833,6 +834,11 @@ const breadcrumb = [
 
     .don-hero__caption {
       display: none;
+    }
+
+    /* Le texte occupe plus de hauteur : le dégradé monte plus haut. */
+    .don-hero__shade {
+      background: linear-gradient(to top, rgba(35, 31, 32, 0.8) 0%, rgba(35, 31, 32, 0.66) 65%, rgba(35, 31, 32, 0) 100%);
     }
 
     .impact-card {

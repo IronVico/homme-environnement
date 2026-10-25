@@ -140,6 +140,32 @@ const isCurrent = (href: string) => {
 
     burger.addEventListener('click', () => setOpen(!header.hasAttribute('data-open')));
 
+    // Le burger suit le menu dans le code : panneau ouvert, Tab passe du burger aux
+    // rubriques, Maj+Tab de la première rubrique revient au burger, et Tab après la
+    // dernière rubrique referme le panneau (le focus continue vers le bouton Don).
+    const navLinks = () => [...nav.querySelectorAll<HTMLElement>('a, button')].filter((el) => el.offsetParent !== null);
+    burger.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab' || event.shiftKey || !header.hasAttribute('data-open')) return;
+      event.preventDefault();
+      navLinks()[0]?.focus();
+    });
+    nav.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab' || !header.hasAttribute('data-open')) return;
+      const links = navLinks();
+      if (event.shiftKey && event.target === links[0]) {
+        event.preventDefault();
+        burger.focus();
+      } else if (!event.shiftKey && event.target === links.at(-1)) {
+        setOpen(false);
+      }
+    });
+    // Le focus quitte le menu (Tab après la dernière rubrique) : le panneau se ferme
+    // pour ne pas masquer l'élément qui reçoit le focus.
+    header.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget as Node | null;
+      if (next && !header.contains(next) && header.hasAttribute('data-open')) setOpen(false);
+    });
+
     // Sous-menus : bouton à bascule (un seul ouvert à la fois en desktop).
     const items = [...nav.querySelectorAll<HTMLElement>('[data-submenu]')];
     const desktop = window.matchMedia('(min-width: 1381px)');
@@ -155,7 +181,7 @@ const isCurrent = (href: string) => {
     const hover = window.matchMedia('(hover: hover) and (pointer: fine)');
     const CLOSE_DELAY = 180;
     let closeTimer: number | undefined;
-    let hoverOpenedAt = 0;
+    let hoverOpenedAt = -Infinity;
 
     items.forEach((item) => {
       item.addEventListener('mouseenter', () => {
@@ -172,9 +198,11 @@ const isCurrent = (href: string) => {
         closeTimer = window.setTimeout(() => setSubmenu(item, false), CLOSE_DELAY);
       });
 
-      toggleOf(item)?.addEventListener('click', () => {
+      toggleOf(item)?.addEventListener('click', (event) => {
         // Clic juste après l'ouverture au survol : on garde le sous-menu ouvert.
-        if (desktop.matches && hover.matches && performance.now() - hoverOpenedAt < 400) return;
+        // Entrée ou Espace (event.detail === 0) basculent toujours.
+        const justHovered = performance.now() - hoverOpenedAt < 400;
+        if (event.detail !== 0 && desktop.matches && hover.matches && justHovered) return;
         const open = !item.hasAttribute('data-expanded');
         if (desktop.matches) closeSubmenus(item);
         setSubmenu(item, open);

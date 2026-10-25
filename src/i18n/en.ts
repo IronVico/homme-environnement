@@ -52,6 +52,8 @@ const en: Dictionary = {
     shareEmail: 'Share by email',
     shareCopy: 'Copy link',
     shareCopied: 'Link copied',
+    pauseMotion: 'Pause the animation',
+    playMotion: 'Resume the animation',
     newsletterPending: 'Thank you. Sign-ups open very soon: your address has not been saved yet.',
   },
 
@@ -88,8 +90,17 @@ const en: Dictionary = {
   // TODO traduction : page « L'ONG » encore en français (copie de fr.ts).
   ong: structuredClone(fr.ong),
 
+  // TODO traduction : page « Partenaires et bailleurs » encore en français (copie de fr.ts).
+  partenaires: structuredClone(fr.partenaires),
+
   // TODO traduction : page « Faire un don » encore en français (copie de fr.ts).
   don: structuredClone(fr.don),
+
+  // TODO traduction : page « Mentions légales » encore en français (copie de fr.ts).
+  mentionsLegales: structuredClone(fr.mentionsLegales),
+
+  // TODO traduction : page « Confidentialité » encore en français (copie de fr.ts).
+  confidentialite: structuredClone(fr.confidentialite),
 };
 
 export default en;

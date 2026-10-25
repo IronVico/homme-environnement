@@ -45,21 +45,6 @@ const { title, text, image, imageAlt } = Astro.props;
     height: auto;
     aspect-ratio: 3 / 2;
     object-fit: cover;
-    transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  /*
-   * Les piliers ne sont pas des liens : pas d'élévation (qui suggérerait un clic),
-   * seulement un lent zoom de la photo dans son arche.
-   */
-  .pillar:hover :global(.pillar__photo) {
-    transform: scale(1.05);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .pillar:hover :global(.pillar__photo) {
-      transform: none;
-    }
   }
 
   .pillar__title {

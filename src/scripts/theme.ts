@@ -50,7 +50,7 @@ function render() {
   const dark = isDark(choice);
   document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((button) => {
     const label = (dark ? button.dataset.labelLight : button.dataset.labelDark) ?? '';
-    button.setAttribute('aria-pressed', String(dark));
+    button.toggleAttribute('data-dark', dark);
     button.setAttribute('aria-label', label);
     button.dataset.tooltip = label;
   });

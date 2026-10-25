@@ -276,6 +276,10 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
               ))
             }
           </ul>
+          <a class="partners__all" href={pagePath(lang, 'partenaires')}>
+            <span class="partners__all-label">{page.models.allPartners}</span>
+            <ArrowRight class="partners__all-arrow" size={18} />
+          </a>
         </div>
       </div>
     </section>
@@ -375,17 +379,6 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
     border-radius: var(--radius-pill);
     background: var(--disque);
     color: var(--texte);
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .approach-card:hover .icon-disc {
-    transform: scale(1.08);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .approach-card:hover .icon-disc {
-      transform: none;
-    }
   }
 
   .approach-card__title {
@@ -609,13 +602,6 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
     border-radius: var(--radius-pill);
     background: var(--accent);
     box-shadow: 0 0 0 4px var(--section);
-    /* « scale » et non « transform » : l'animation d'apparition garde la main sur transform. */
-    transition: scale 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /* Survol d'une étape (non cliquable) : la pastille grossit, avec un petit rebond. */
-  .timeline__item:hover .timeline__dot {
-    scale: 1.25;
   }
 
   /* Dernière étape, point d'arrivée : pastille pêche qui pulse doucement. */
@@ -635,16 +621,6 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
   @media (prefers-reduced-motion: no-preference) {
     .timeline__item:last-child .timeline__dot::after {
       animation: timeline-pulse 2.4s ease-out 1s infinite;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .timeline__dot {
-      transition: none;
-    }
-
-    .timeline__item:hover .timeline__dot {
-      scale: none;
     }
   }
 
@@ -821,6 +797,54 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
 
     .partner--link:hover {
       transform: none;
+    }
+  }
+
+  .partners__all {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  .partners__all:hover {
+    color: var(--texte);
+  }
+
+  /* Même survol que les liens d'action des titres de section : filet sauge, trait couleur du texte tracé. */
+  .partners__all-label {
+    padding-bottom: 3px;
+    background:
+      linear-gradient(var(--texte), var(--texte)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .partners__all:hover .partners__all-label,
+  .partners__all:focus-visible .partners__all-label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  .partners__all :global(.partners__all-arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .partners__all:hover :global(.partners__all-arrow),
+  .partners__all:focus-visible :global(.partners__all-arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partners__all-label,
+    .partners__all :global(.partners__all-arrow) {
+      transition: none;
     }
   }
 

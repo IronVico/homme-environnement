@@ -9,7 +9,8 @@ interface Props {
   /** Icône Lucide (composant), affichée à 22px en basalte. */
   icon: AstroComponent;
   title: string;
-  text: string;
+  /** Texte simple ; sinon contenu passé en slot (texte avec pastille, lien…). */
+  text?: string;
 }
 
 const { icon: Icon, title, text } = Astro.props;
@@ -19,7 +20,7 @@ const { icon: Icon, title, text } = Astro.props;
   <Icon class="info-note__icon" size={22} />
   <span class="info-note__body">
     <span class="info-note__title">{title}</span>
-    <span class="info-note__text">{text}</span>
+    <span class="info-note__text"><slot>{text}</slot></span>
   </span>
 </div>
 

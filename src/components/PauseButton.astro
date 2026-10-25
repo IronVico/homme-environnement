@@ -1,0 +1,105 @@
+---
+/**
+ * Bouton Pause / Lecture d'un contenu qui bouge seul plus de 5 s (galerie qui défile,
+ * derniers dons qui tournent) : WCAG 2.2.2. Pastille comme les boutons de partage,
+ * infobulle data-tooltip reprenant l'aria-label.
+ * Il bascule l'attribut data-paused sur l'ancêtre [data-motion] : chaque composant
+ * arrête son animation quand cet attribut est présent.
+ * Masqué sans JS et avec prefers-reduced-motion (rien ne bouge alors).
+ */
+import Pause from '@lucide/astro/icons/pause';
+import Play from '@lucide/astro/icons/play';
+import { getLang, t } from '../i18n';
+
+interface Props {
+  /** md : 44px. sm : 32px, dans une carte. */
+  size?: 'md' | 'sm';
+  /** Bouton au bord droit de l'écran : infobulle alignée à droite. */
+  tooltipAlign?: 'end';
+  class?: string;
+}
+
+const { size = 'md', tooltipAlign, class: className } = Astro.props;
+const { ui } = t(getLang(Astro.currentLocale));
+---
+
+<button
+  type="button"
+  class:list={['pause-btn', `pause-btn--${size}`, className]}
+  aria-label={ui.pauseMotion}
+  data-tooltip={ui.pauseMotion}
+  data-tooltip-align={tooltipAlign}
+  data-label-pause={ui.pauseMotion}
+  data-label-play={ui.playMotion}
+  data-motion-toggle
+  hidden
+>
+  <Pause class="pause-btn__pause" size={size === 'sm' ? 14 : 18} />
+  <Play class="pause-btn__play" size={size === 'sm' ? 14 : 18} />
+</button>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-motion-toggle]').forEach((button) => {
+    const root = button.closest<HTMLElement>('[data-motion]');
+    if (!root) return;
+    button.hidden = false;
+    button.addEventListener('click', () => {
+      const paused = !root.hasAttribute('data-paused');
+      root.toggleAttribute('data-paused', paused);
+      const label = (paused ? button.dataset.labelPlay : button.dataset.labelPause) ?? '';
+      button.setAttribute('aria-label', label);
+      button.dataset.tooltip = label;
+    });
+  });
+</script>
+
+<style>
+  .pause-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui),
+      color var(--transition-ui);
+  }
+
+  .pause-btn--sm {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pause-btn[hidden] {
+    display: none;
+  }
+
+  .pause-btn:hover,
+  .pause-btn:focus-visible {
+    border-color: var(--texte);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .pause-btn :global(.pause-btn__play),
+  :global([data-paused]) .pause-btn :global(.pause-btn__pause) {
+    display: none;
+  }
+
+  :global([data-paused]) .pause-btn :global(.pause-btn__play) {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pause-btn {
+      display: none;
+    }
+  }
+</style>

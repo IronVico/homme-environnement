@@ -2,7 +2,8 @@
 /**
  * Bascule clair / sombre (composant ThemeToggle du design system, section « Mode sombre »).
  * - `button` (header desktop) : bouton rond de 44px, icône lune en clair, soleil en sombre.
- *   Libellé accessible et infobulle qui disent l'action, aria-pressed = mode sombre actif.
+ *   Libellé accessible et infobulle qui disent l'action (« Passer en mode clair »), sans
+ *   aria-pressed : « enfoncé » contredirait ce libellé. data-dark = mode sombre actif (icône).
  * - `segmented` (menu mobile) : ligne « Apparence », pilule à trois choix Auto · Clair · Sombre.
  * Le choix est enregistré sur l'appareil ; sans choix, le site suit l'appareil
  * (voir src/scripts/theme.ts et le script inline du <head> dans BaseLayout).
@@ -32,7 +33,6 @@ const choices = [
     <button
       class:list={['theme-toggle', className]}
       type="button"
-      aria-pressed="false"
       aria-label={ui.themeToDark}
       data-tooltip={ui.themeToDark}
       data-tooltip-pos="below"
@@ -96,11 +96,11 @@ const choices = [
   }
 
   .theme-toggle :global(.theme-toggle__sun),
-  .theme-toggle[aria-pressed='true'] :global(.theme-toggle__moon) {
+  .theme-toggle[data-dark] :global(.theme-toggle__moon) {
     display: none;
   }
 
-  .theme-toggle[aria-pressed='true'] :global(.theme-toggle__sun) {
+  .theme-toggle[data-dark] :global(.theme-toggle__sun) {
     display: block;
   }
 

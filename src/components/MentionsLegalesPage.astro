@@ -1,0 +1,166 @@
+---
+/**
+ * Page « Mentions légales » (maquettes MentionsLegales / MentionsLegalesMobile), commune aux
+ * deux langues (/mentions-legales et /en/mentions-legales). Textes dans src/i18n (clé
+ * `mentionsLegales`), informations légales dans src/data/mentions-legales.ts.
+ * Gabarit commun (fil d'Ariane, titre, sommaire collant) : LegalPage.
+ */
+import ImageIcon from '@lucide/astro/icons/image';
+import {
+  HOST,
+  LEGAL_CONTACT_EMAIL,
+  LEGAL_UPDATED,
+  PHOTOGRAPHERS,
+  PUBLISHER,
+  SITE_DESIGNER,
+} from '../data/mentions-legales';
+import { getLang, t } from '../i18n';
+import { fill } from '../lib/don';
+import InfoNote from './InfoNote.astro';
+import LegalPage from './LegalPage.astro';
+import TodoPill from './TodoPill.astro';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.mentionsLegales;
+
+const SECTIONS = [
+  { id: 'editeur', title: page.publisher.title },
+  { id: 'hebergement', title: page.hosting.title },
+  { id: 'conception', title: page.design.title },
+  { id: 'propriete', title: page.property.title },
+  { id: 'credits', title: page.credits.title },
+  { id: 'liens', title: page.links.title },
+];
+
+// Lignes du tableau de l'éditeur ; `null` : valeur à fournir.
+const publisherRows = [
+  { label: page.publisher.legalForm, value: page.publisher.legalFormValue },
+  { label: page.publisher.headOffice, value: PUBLISHER.headOffice },
+  { label: page.publisher.rna, value: PUBLISHER.rna },
+  { label: page.publisher.siret, value: PUBLISHER.siret },
+  { label: page.publisher.director, value: PUBLISHER.director },
+  { label: page.publisher.phone, value: PUBLISHER.phone },
+];
+
+// Page encore incomplète : pas d'indexation (comme les fiches site).
+const complete = [...Object.values(PUBLISHER), LEGAL_UPDATED, SITE_DESIGNER].every((value) => value !== null);
+
+const hero = { ...page.hero, updated: fill(page.hero.updated, { date: LEGAL_UPDATED ?? page.missing }) };
+---
+
+<LegalPage
+  title={page.title}
+  description={page.description}
+  noindex={!complete}
+  hero={hero}
+  toc={page.toc}
+  sections={SECTIONS}
+>
+  <section id="editeur" class="legal-section" aria-labelledby="editeur-t">
+    <h2 id="editeur-t" class="legal-section__title">{page.publisher.title}</h2>
+    <p>{page.publisher.intro}</p>
+    <dl class="legal-table">
+      {
+        publisherRows.map((row) => (
+          <div class="legal-table__row">
+            <dt>{row.label}</dt>
+            <dd>{row.value ?? <TodoPill>{page.missing}</TodoPill>}</dd>
+          </div>
+        ))
+      }
+      <div class="legal-table__row">
+        <dt>{page.publisher.contact}</dt>
+        <dd>
+          <a href={`mailto:${LEGAL_CONTACT_EMAIL}`}>{LEGAL_CONTACT_EMAIL}</a>
+          {' '}
+          <TodoPill>{page.toConfirm}</TodoPill>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section id="hebergement" class="legal-section" aria-labelledby="hebergement-t">
+    <h2 id="hebergement-t" class="legal-section__title">{page.hosting.title}</h2>
+    <p>{page.hosting.intro}</p>
+    <address class="legal-address">
+      <strong>{HOST.name}</strong>
+      {HOST.address.map((line) => [<br />, line])}
+      <br />
+      {page.hosting.country}
+      <br />
+      <a href={HOST.url} lang="en">{HOST.urlLabel}</a>
+    </address>
+  </section>
+
+  <section id="conception" class="legal-section" aria-labelledby="conception-t">
+    <h2 id="conception-t" class="legal-section__title">{page.design.title}</h2>
+    <p>{page.design.text}</p>
+    <p>
+      {page.design.credit}{' '}
+      {SITE_DESIGNER ?? <TodoPill>{page.missing}</TodoPill>}
+    </p>
+  </section>
+
+  <section id="propriete" class="legal-section" aria-labelledby="propriete-t">
+    <h2 id="propriete-t" class="legal-section__title">{page.property.title}</h2>
+    {page.property.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    <InfoNote icon={ImageIcon} title={page.property.note.title} text={page.property.note.text} />
+  </section>
+
+  <section id="credits" class="legal-section" aria-labelledby="credits-t">
+    <h2 id="credits-t" class="legal-section__title">{page.credits.title}</h2>
+    <p>{page.credits.intro}</p>
+    <ul class="legal-list">
+      {PHOTOGRAPHERS.map((name) => <li>{name}</li>)}
+      <li>{page.credits.commons}</li>
+    </ul>
+  </section>
+
+  <section id="liens" class="legal-section" aria-labelledby="liens-t">
+    <h2 id="liens-t" class="legal-section__title">{page.links.title}</h2>
+    {page.links.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </section>
+</LegalPage>
+
+<style>
+  .legal-table {
+    margin: 0;
+    border-top: 1px solid var(--bordure-carte);
+  }
+
+  .legal-table__row {
+    display: grid;
+    grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+    gap: 4px 24px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--bordure-carte);
+  }
+
+  .legal-table dt {
+    font-weight: 600;
+  }
+
+  .legal-table dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .legal-address {
+    padding: 20px 24px;
+    border-radius: var(--radius-card);
+    background: var(--disque);
+    font-style: normal;
+  }
+
+  .legal-address strong {
+    font-weight: 700;
+  }
+
+  /* Mobile : chaque ligne du tableau passe sur deux lignes (intitulé, puis valeur). */
+  @media (max-width: 600px) {
+    .legal-table__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

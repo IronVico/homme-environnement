@@ -1,6 +1,6 @@
 ---
 /**
- * Grande carte sur photo assombrie (voile noir-95 à 55 %) : titre en deux temps
+ * Grande carte sur photo assombrie (voile noir-95 à 62 %) : titre en deux temps
  * et phrase à gauche, contenu libre à droite (formulaire newsletter, boutons).
  */
 import type { ImageMetadata } from 'astro';
@@ -86,6 +86,11 @@ const { id, titleStrong, titleLight, text, image, imagePosition = '50% 40%', spa
     justify-content: space-between;
     gap: var(--space-8);
     padding: clamp(28px, 6vw, 72px);
+  }
+
+  /* Sur la photo assombrie, le contour de focus basalte ne se verrait pas : blanc. */
+  .photo-banner__content :global(:focus-visible) {
+    outline-color: var(--blanc);
   }
 
   .photo-banner__text {

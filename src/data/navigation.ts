@@ -27,11 +27,20 @@ export const PAGES = {
   projets: 'projets',
   stages: 's-engager/stages-volontariat',
   equipe: 'ong/equipe',
+  partenaires: 'ong/partenaires',
   don: 's-engager/faire-un-don',
+  mentionsLegales: 'mentions-legales',
+  confidentialite: 'confidentialite',
 } as const;
 
 /** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
 export const STAGES_EMAIL = 'contact.vsc@homme-environnement.org';
+
+/**
+ * Adresse des demandes de partenariat (bouton « Nous écrire » de la page Partenaires, mailto).
+ * TODO ONG : confirmer l'adresse (celle de la maquette).
+ */
+export const PARTNERS_EMAIL = 'contact@homme-environnement.org';
 
 /**
  * Section « S'engager » de l'accueil : destination des liens S'engager tant que la page
@@ -98,7 +107,7 @@ export function ongPath(lang: Lang, section: keyof typeof ONG_ANCHORS): string {
 
 const MAIN_HREFS = [PAGES.ong, '#', PAGES.projets, HOME_ENGAGE, '#', '#'];
 const FOOTER_HREFS = [
-  [`${PAGES.ong}#${ONG_ANCHORS.approach}`, `${PAGES.ong}#${ONG_ANCHORS.history}`, PAGES.equipe, '#'],
+  [`${PAGES.ong}#${ONG_ANCHORS.approach}`, `${PAGES.ong}#${ONG_ANCHORS.history}`, PAGES.equipe, PAGES.partenaires],
   [PAGES.madagascar, '#'],
   // « Plantes aromatiques » : thème Filières durables (ylang-ylang), en attendant d'aligner le libellé.
   [
@@ -112,7 +121,7 @@ const FOOTER_HREFS = [
   [HOME_ENGAGE, PAGES.stages, HOME_ENGAGE],
   ['#', '#', '#'],
 ];
-const LEGAL_HREFS = ['#', '#'];
+const LEGAL_HREFS = [PAGES.mentionsLegales, PAGES.confidentialite];
 
 /**
  * Sous-menus du header : les sous-pages de chaque rubrique sont celles de la

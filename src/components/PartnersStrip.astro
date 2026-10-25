@@ -3,9 +3,10 @@
  * Bande des partenaires et bailleurs.
  * Les logos sont des PLACEHOLDERS de la maquette (fictifs) : à remplacer par
  * les vrais logos (SVG, version monochrome) dès qu'ils sont validés par l'ONG.
- * En mobile (≤ 900px), la liste défile en boucle ; avec prefers-reduced-motion,
- * elle devient un défilement manuel.
+ * En mobile (≤ 900px), la liste défile en boucle, avec un bouton Pause ; avec
+ * prefers-reduced-motion, elle reste en grille.
  */
+import PauseButton from './PauseButton.astro';
 
 interface Props {
   title: string;
@@ -31,7 +32,7 @@ const partners: Partner[] = [
 const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((p) => ({ ...p, dup: true }))];
 ---
 
-<section class="partners" aria-labelledby="partenaires-titre">
+<section class="partners" aria-labelledby="partenaires-titre" data-motion>
   <div class="partners__inner container">
     <h2 id="partenaires-titre" class="partners__title eyebrow" data-reveal>{title}</h2>
     <div class="partners__marquee" data-reveal>
@@ -73,6 +74,9 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
         }
       </ul>
     </div>
+    <div class="partners__controls">
+      <PauseButton />
+    </div>
   </div>
 </section>
 
@@ -108,8 +112,9 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     align-items: center;
     justify-content: center;
     gap: 10px;
-    /* Gris des logos placeholders de la maquette (pas un token : à retirer avec les vrais logos). */
-    color: #8a9199;
+    /* Logos placeholders en texte : texte doux (ardoise, 4,8:1 sur blanc) plutôt que le gris
+       de la maquette (#8a9199, 3,2:1). À revoir avec les vrais logos, exemptés de contraste. */
+    color: var(--texte-doux);
     line-height: 1;
   }
 
@@ -130,11 +135,22 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     }
   }
 
-  @media (max-width: 900px) {
+  .partners__controls {
+    display: none;
+  }
+
+  /* Mobile : défilement en boucle, avec un bouton Pause (WCAG 2.2.2). Avec mouvement
+     réduit, la grille reste en place : tous les logos visibles, sans défilement. */
+  @media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
     .partners__track {
       display: flex;
       width: max-content;
       gap: 0;
+      animation: partners-scroll 20s linear infinite;
+    }
+
+    .partners[data-paused] .partners__track {
+      animation-play-state: paused;
     }
 
     .partners__logo {
@@ -142,20 +158,13 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
       width: 180px;
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .partners__track {
-        animation: partners-scroll 20s linear infinite;
-      }
-
-      .partners__logo--dup {
-        display: flex;
-      }
+    .partners__logo--dup {
+      display: flex;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .partners__marquee {
-        overflow-x: auto;
-      }
+    .partners__controls {
+      display: flex;
+      justify-content: center;
     }
   }
 </style>

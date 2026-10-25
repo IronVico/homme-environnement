@@ -163,29 +163,6 @@ const breadcrumb = [
     box-shadow: var(--shadow-card);
   }
 
-  /*
-   * Survol des cartes non cliquables, comme StatCard : pas d'élévation (qui suggérerait
-   * un clic), seulement le portrait qui grossit légèrement, avec un petit rebond.
-   */
-  .card :global(.portrait) {
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .member:hover :global(.member__photo) {
-    transform: scale(1.04);
-  }
-
-  .expert:hover :global(.expert__photo) {
-    transform: scale(1.08);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .member:hover :global(.member__photo),
-    .expert:hover :global(.expert__photo) {
-      transform: none;
-    }
-  }
-
   /* Le bureau et l'équipe : la galerie suit directement, sans espacement de section entre les deux. */
   .team-section {
     padding-block: clamp(40px, 5vw, 64px) 40px;

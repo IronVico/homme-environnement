@@ -91,25 +91,6 @@ const { name, status, text, photo, photoAlt = '', photoPosition = '50% 50%', pho
     width: 100%;
     height: 200px;
     object-fit: cover;
-    transition: transform 400ms ease-out;
-  }
-
-  /*
-   * Survol : la photo se rapproche légèrement dans son cadre. Pas d'élévation de
-   * la carte, réservée aux cartes cliquables (celle-ci n'est pas un lien).
-   */
-  .species-card:hover :global(.species-card__photo) {
-    transform: scale(1.05);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .species-card :global(.species-card__photo) {
-      transition: none;
-    }
-
-    .species-card:hover :global(.species-card__photo) {
-      transform: none;
-    }
   }
 
   .species-card__photo--missing {

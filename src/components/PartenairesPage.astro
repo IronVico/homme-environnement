@@ -1,0 +1,735 @@
+---
+/**
+ * Page « Partenaires et bailleurs » (maquettes Partenaires / PartenairesMobile), commune aux
+ * deux langues (/ong/partenaires et /en/ong/partenaires). Textes dans src/i18n (clé
+ * `partenaires`), partenaires dans src/data/partenaires.ts.
+ * Le filtre par type est un petit script : sans JS, les pastilles restent masquées et la
+ * liste complète s'affiche.
+ */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Coins from '@lucide/astro/icons/coins';
+import ExternalLink from '@lucide/astro/icons/external-link';
+import MapPin from '@lucide/astro/icons/map-pin';
+import Microscope from '@lucide/astro/icons/microscope';
+import Plus from '@lucide/astro/icons/plus';
+import Sprout from '@lucide/astro/icons/sprout';
+import { Image, Picture } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { donatePath, PARTNERS_EMAIL, pagePath, sitePath } from '../data/navigation';
+import { PARTNER_TYPES, PARTNERS, partnerMonogram, provisionalLogo } from '../data/partenaires';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { fill } from '../lib/don';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import SectionHeading from './SectionHeading.astro';
+
+import featuredPhoto from '../assets/photos/don/campagne-ambalakalanoro.jpg';
+import ctaPhoto from '../assets/photos/equipe-collectrices-vohimana.jpg';
+import heroPhoto from '../assets/photos/stages-vari-canopee.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.partenaires;
+
+const LIST_ID = 'liste';
+const CONTACT_ID = 'partenariat';
+
+const siteNames = new Map((await getCollection('sites')).map((site) => [site.id, site.data.name]));
+
+const partners = PARTNERS.map((partner) => ({
+  ...partner,
+  typeLabel: page.types[partner.type],
+  monogramText: partnerMonogram(partner),
+  logoSvg: partner.logo ? undefined : provisionalLogo(partner),
+  siteNames: (partner.sites ?? []).map((id) => {
+    const name = siteNames.get(id);
+    if (!name) throw new Error(`Site « ${id} » absent de src/content/sites (partenaire ${partner.id}).`);
+    return name;
+  }),
+}));
+
+// Pastilles de filtre : « Tous », puis chaque type présent dans la liste, avec son nombre.
+const filters = [
+  { value: 'all', label: page.list.all, count: partners.length },
+  ...PARTNER_TYPES.map((type) => ({
+    value: type,
+    label: page.types[type],
+    count: partners.filter((partner) => partner.type === type).length,
+  })).filter((filter) => filter.count > 0),
+];
+
+const countLabel = (count: number) => (count > 1 ? page.list.countMany : page.list.countOne).replace('{count}', String(count));
+
+const ways = page.ways.cards.map((card, i) => ({ ...card, Icon: [Coins, Microscope, Sprout][i]! }));
+
+const mailto = `mailto:${PARTNERS_EMAIL}?subject=${encodeURIComponent(page.cta.mailSubject)}`;
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[0]!, href: pagePath(lang, 'ong') },
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={heroPhoto} ogImageAlt={page.hero.imageAlt}>
+  <Header current="ong" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <main id="contenu">
+    <PageHero
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      image={heroPhoto}
+      imageAlt={page.hero.imageAlt}
+      caption={page.hero.caption}
+      primary={{ label: page.hero.become, href: mailto, icon: 'mail' }}
+      cta={{ label: page.hero.list, href: `#${LIST_ID}` }}
+    />
+
+    <section class="section" aria-labelledby="facons-titre">
+      <div class="container stack stack--40">
+        <SectionHeading id="facons-titre" strong={page.ways.titleStrong} light={page.ways.titleLight} />
+        <div class="ways">
+          {
+            ways.map(({ Icon, title, text }) => (
+              <div class="card way-card" data-reveal>
+                <span class="icon-disc">
+                  <Icon size={26} />
+                </span>
+                <h3 class="way-card__title">{title}</h3>
+                <p class="way-card__text">{text}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id={LIST_ID} class="section section--tinted" aria-labelledby="liste-titre">
+      <div
+        class="container stack stack--32"
+        data-partners
+        data-count-one={page.list.countOne}
+        data-count-many={page.list.countMany}
+      >
+        <div class="list-head">
+          <SectionHeading id="liste-titre" strong={page.list.titleStrong} light={page.list.titleLight} lead={page.list.lead} />
+          <p class="list-count" aria-live="polite" data-count>{countLabel(partners.length)}</p>
+        </div>
+
+        <div class="filters" role="group" aria-label={page.list.filtersLabel} data-filters hidden>
+          {
+            filters.map((filter) => (
+              <button
+                class="filters__pill"
+                type="button"
+                aria-pressed={filter.value === 'all' ? 'true' : 'false'}
+                data-value={filter.value}
+              >
+                {filter.label} ({filter.count})
+              </button>
+            ))
+          }
+        </div>
+
+        <ul class="partners-grid">
+          {
+            partners.map((partner) => (
+              <li class="card partner-card" data-type={partner.type}>
+                <span class="partner-card__logo">
+                  {partner.logo ? (
+                    <Image class="partner-card__logo-img" src={partner.logo} alt="" height={52} densities={[1, 2]} />
+                  ) : partner.logoSvg ? (
+                    <span class="partner-card__logo-svg" set:html={partner.logoSvg} />
+                  ) : (
+                    <span class="partner-card__monogram" aria-hidden="true">
+                      {partner.monogramText}
+                    </span>
+                  )}
+                </span>
+                <span class="partner-card__type">{partner.typeLabel}</span>
+                <h3 class="partner-card__name">{partner.name}</h3>
+                {partner.role && <p class="partner-card__role">{partner.role}</p>}
+                {(partner.siteNames.length > 0 || partner.url) && (
+                  <span class="partner-card__foot">
+                    {partner.siteNames.length > 0 && (
+                      <span class="partner-card__sites">
+                        <MapPin class="partner-card__pin" size={16} />
+                        <span class="visually-hidden">{page.list.sitesLabel} :</span>
+                        {partner.siteNames.join(', ')}
+                      </span>
+                    )}
+                    {partner.url && (
+                      <a class="partner-card__link text-link" href={partner.url} target="_blank" rel="noopener">
+                        <span class="text-link__label">{page.list.website}</span>
+                        <span class="visually-hidden">
+                          {' '}
+                          {fill(page.list.websiteOf, { name: partner.name })} {page.list.newTab}
+                        </span>
+                        <ExternalLink class="partner-card__external" size={14} />
+                      </a>
+                    )}
+                  </span>
+                )}
+              </li>
+            ))
+          }
+          <li class="join-card">
+            <span class="join-card__text">
+              <span class="join-card__icon" aria-hidden="true">
+                <Plus size={24} />
+              </span>
+              <span class="join-card__title">{page.list.join.title}</span>
+              <span class="join-card__lead">{page.list.join.text}</span>
+            </span>
+            <a class="join-card__link text-link text-link--on-dark" href={mailto}>
+              <span class="text-link__label">{page.list.join.link}</span>
+              <ArrowRight class="join-card__arrow" size={18} />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="une-titre">
+      <div class="container two-cols">
+        <Picture
+          class="featured__photo"
+          src={featuredPhoto}
+          alt={page.featured.imageAlt}
+          formats={['avif', 'webp']}
+          widths={[400, 640, 1000]}
+          sizes="(max-width: 900px) 100vw, 624px"
+          data-reveal
+        />
+        <div class="stack stack--20" data-reveal>
+          <p class="eyebrow">{page.featured.eyebrow}</p>
+          <h2 id="une-titre" class="featured__title">
+            <span class="featured__strong">{page.featured.titleStrong}</span>{' '}
+            <span class="featured__light">{page.featured.titleLight}</span>
+          </h2>
+          <p class="featured__text">{page.featured.text}</p>
+          <a class="featured__link text-link" href={sitePath(lang, 'ambalakalanoro')}>
+            <span class="text-link__label">{page.featured.link}</span>
+            <ArrowRight class="featured__arrow" size={18} />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div id={CONTACT_ID} class="contact-anchor">
+      <PhotoBanner
+        id="partenariat-titre"
+        titleStrong={page.cta.titleStrong}
+        titleLight={page.cta.titleLight}
+        text={page.cta.text}
+        image={ctaPhoto}
+        imagePosition="50% 45%"
+      >
+        <div class="cta__buttons">
+          <Button href={mailto} variant="on-dark-primary" icon="mail">{page.cta.write}</Button>
+          <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
+        </div>
+      </PhotoBanner>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  /* Filtre des partenaires par type (« all » : tous). La carte « Votre organisation ici ? » reste visible. */
+  document.querySelectorAll<HTMLElement>('[data-partners]').forEach((root) => {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-value]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-type]')];
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const { countOne = '', countMany = '' } = root.dataset;
+
+    const select = (value: string) => {
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.value === value)));
+      let shown = 0;
+      cards.forEach((card) => {
+        card.hidden = value !== 'all' && card.dataset.type !== value;
+        if (!card.hidden) shown += 1;
+      });
+      if (count) count.textContent = (shown > 1 ? countMany : countOne).replace('{count}', String(shown));
+    };
+
+    buttons.forEach((button) => button.addEventListener('click', () => select(button.dataset.value!)));
+    root.querySelector<HTMLElement>('[data-filters]')?.removeAttribute('hidden');
+  });
+</script>
+
+<style>
+  .section--tinted {
+    background: var(--section);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stack--20 {
+    gap: var(--space-5);
+  }
+
+  .stack--32 {
+    gap: var(--space-8);
+  }
+
+  .stack--40 {
+    gap: 40px;
+  }
+
+  .card {
+    border: 1px solid var(--bordure-carte);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Trois façons de travailler ensemble : 3 colonnes, 2 en tablette, 1 en mobile. */
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 1000px) {
+    .ways {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .ways {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .way-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--space-7);
+    border-radius: var(--radius-card);
+  }
+
+  .icon-disc {
+    flex-shrink: 0;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--section);
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+    color: var(--texte);
+  }
+
+  .way-card__title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .way-card__text {
+    font-size: 16px;
+    line-height: var(--lh-body);
+  }
+
+  /* Liste : titre à gauche, compteur aligné sur le titre à droite. */
+  .list-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px 32px;
+  }
+
+  .list-count {
+    padding-top: clamp(8px, 1.2vw, 16px);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filters__pill {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 2px solid var(--surface);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui),
+      color var(--transition-ui);
+  }
+
+  .filters__pill:hover {
+    border-color: var(--texte);
+  }
+
+  .filters__pill[aria-pressed='true'] {
+    background: var(--bouton-plein);
+    border-color: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  /* Grille des partenaires : 4 colonnes, puis 3, 2 et 1. */
+  .partners-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 1100px) {
+    .partners-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 800px) {
+    .partners-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .partners-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .partner-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+    border-radius: var(--radius-card);
+  }
+
+  /* Les cartes ne sont pas des liens (lien « Site web » à l'intérieur) : pas de survol de carte. */
+  .partner-card[hidden] {
+    display: none;
+  }
+
+  .partner-card__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88px;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: var(--disque);
+  }
+
+  .partner-card__logo :global(.partner-card__logo-img) {
+    max-width: 100%;
+    max-height: 52px;
+    width: auto;
+    height: auto;
+  }
+
+  /* Logo provisoire (SVG en ligne) : hauteur fixe, comme les vrais logos. */
+  .partner-card__logo-svg {
+    display: flex;
+    max-width: 100%;
+    color: var(--texte);
+  }
+
+  .partner-card__logo-svg :global(svg) {
+    max-width: 100%;
+    height: 52px;
+    width: auto;
+  }
+
+  /* Monogramme sobre, en attendant les logos fournis par l'ONG. */
+  .partner-card__monogram {
+    font-size: 26px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  .partner-card__type {
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--section);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .partner-card__name {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .partner-card__role {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .partner-card__foot {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 6px;
+    font-size: 14px;
+  }
+
+  .partner-card__sites {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .partner-card__sites :global(.partner-card__pin) {
+    flex-shrink: 0;
+    color: var(--sauge);
+  }
+
+  .partner-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+  }
+
+  .partner-card__link :global(.partner-card__external) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  /* Lien externe : l'icône glisse vers le haut et la droite, dans le sens de la flèche. */
+  .partner-card__link:hover :global(.partner-card__external),
+  .partner-card__link:focus-visible :global(.partner-card__external) {
+    transform: translate(2px, -2px);
+  }
+
+  /*
+   * Liens texte : même survol que les liens d'action des titres de section (SectionHeading) :
+   * filet sauge au repos, trait tracé de gauche à droite au survol, icône qui glisse.
+   */
+  .text-link {
+    --trait: var(--texte);
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  .text-link:hover {
+    color: var(--texte);
+  }
+
+  .text-link--on-dark {
+    --trait: var(--blanc);
+    color: var(--blanc);
+  }
+
+  .text-link--on-dark:hover {
+    color: var(--blanc);
+  }
+
+  .text-link__label {
+    padding-bottom: 3px;
+    background:
+      linear-gradient(var(--trait), var(--trait)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .text-link:hover .text-link__label,
+  .text-link:focus-visible .text-link__label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  /* Dernière carte, basalte : appel à rejoindre les partenaires. */
+  .join-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-5);
+    min-height: 260px;
+    padding: var(--space-6);
+    border-radius: var(--radius-card);
+    background: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .join-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .join-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  .join-card__title {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .join-card__lead {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .join-card__link,
+  .featured__link {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+
+  .join-card__link {
+    font-size: 16px;
+    color: var(--blanc);
+  }
+
+  .join-card__link:hover {
+    color: var(--blanc);
+  }
+
+  .join-card__link :global(.join-card__arrow),
+  .featured__link :global(.featured__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .join-card__link:hover :global(.join-card__arrow),
+  .join-card__link:focus-visible :global(.join-card__arrow),
+  .featured__link:hover :global(.featured__arrow),
+  .featured__link:focus-visible :global(.featured__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  /* Le focus par défaut (basalte) ne se voit pas sur la carte basalte. */
+  .join-card__link:focus-visible {
+    outline-color: var(--blanc);
+  }
+
+  /* Partenariat à la une */
+  .two-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 40px 64px;
+  }
+
+  @media (max-width: 900px) {
+    .two-cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .two-cols :global(.featured__photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 160px 160px var(--radius-card) var(--radius-card);
+  }
+
+  @media (max-width: 700px) {
+    .two-cols :global(.featured__photo) {
+      border-radius: 40px 40px var(--radius-card-sm) var(--radius-card-sm);
+    }
+  }
+
+  .featured__title {
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+  }
+
+  .featured__strong {
+    font-weight: 800;
+  }
+
+  .featured__light {
+    font-weight: 300;
+  }
+
+  .featured__text {
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .featured__link {
+    font-size: 17px;
+  }
+
+  /* Ancre de la carte d'appel : laisse de l'air sous le header au saut depuis les boutons. */
+  .contact-anchor {
+    scroll-margin-top: var(--space-6);
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .text-link__label,
+    .partner-card__link :global(.partner-card__external),
+    .filters__pill,
+    .join-card__link :global(.join-card__arrow),
+    .featured__link :global(.featured__arrow) {
+      transition: none;
+    }
+
+    .partner-card__link:hover :global(.partner-card__external),
+    .partner-card__link:focus-visible :global(.partner-card__external) {
+      transform: none;
+    }
+
+    .join-card__link:hover :global(.join-card__arrow),
+    .join-card__link:focus-visible :global(.join-card__arrow),
+    .featured__link:hover :global(.featured__arrow),
+    .featured__link:focus-visible :global(.featured__arrow) {
+      transform: none;
+    }
+  }
+</style>
