@@ -12,7 +12,7 @@ import X from '@lucide/astro/icons/x';
 import { getImage, Picture } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { GALLERY_PHOTOS, GALLERY_PLACES, type GalleryCredit, type GalleryPlace } from '../data/galerie';
-import { CONTACT_EMAIL } from '../data/navigation';
+import { pagePath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { fill } from '../lib/don';
@@ -70,7 +70,7 @@ const filters = [
 
 const countLabel = (count: number) => (count > 1 ? page.list.countMany : page.list.countOne).replace('{count}', String(count));
 
-const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(page.cta.mailSubject)}`;
+const contactHref = pagePath(lang, 'contact');
 
 // « Ressources » n'a pas encore de page : affichée sans lien dans le fil d'Ariane.
 const breadcrumb = [
@@ -214,8 +214,7 @@ const breadcrumb = [
       image={ctaPhoto}
       imagePosition="50% 50%"
     >
-      <!-- TODO page Contact : renvoyer vers elle au lieu du mailto. -->
-      <Button href={mailto} variant="on-dark-primary" icon="mail">{page.cta.contact}</Button>
+      <Button href={contactHref} variant="on-dark-primary">{page.cta.contact}</Button>
     </PhotoBanner>
   </main>
 

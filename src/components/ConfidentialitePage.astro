@@ -15,6 +15,7 @@ import {
   RETENTION,
 } from '../data/confidentialite';
 import { LEGAL_CONTACT_EMAIL, PUBLISHER } from '../data/mentions-legales';
+import { pagePath } from '../data/navigation';
 import { getLang, t } from '../i18n';
 import { fill } from '../lib/don';
 import InfoNote from './InfoNote.astro';
@@ -137,10 +138,9 @@ const mail = `mailto:${LEGAL_CONTACT_EMAIL}`;
 
   <section id="nous-contacter" class="legal-section" aria-labelledby="nous-contacter-t">
     <h2 id="nous-contacter-t" class="legal-section__title">{page.contact.title}</h2>
-    <!-- TODO page Contact : faire du « formulaire de contact » un lien vers la page. -->
     <p>
       {page.contact.before}<a href={mail}>{LEGAL_CONTACT_EMAIL}</a>
-      {' '}<TodoPill>{page.toConfirm}</TodoPill>{page.contact.middle}{page.contact.form}{page.contact.after}
+      {' '}<TodoPill>{page.toConfirm}</TodoPill>{page.contact.middle}<a href={pagePath(lang, 'contact')}>{page.contact.form}</a>{page.contact.after}
     </p>
   </section>
 </LegalPage>
