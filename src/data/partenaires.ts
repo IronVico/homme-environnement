@@ -23,11 +23,16 @@ export interface Partner {
    * maquette (voir SHOW_PROVISIONAL_LOGOS), sinon monogramme aux initiales.
    */
   logo?: ImageMetadata;
+  /**
+   * Version monochrome du logo (src/assets/logos/partenaires-mono/<id>.png, fond transparent),
+   * utilisée comme masque en mode sombre. Rattachée automatiquement par identifiant.
+   */
+  logoMono?: ImageMetadata;
   /** Monogramme affiché sans logo, quand les initiales calculées ne conviennent pas. */
   monogram?: string;
 }
 
-export const PARTNERS: Partner[] = [
+const RAW_PARTNERS: Partner[] = [
   {
     id: 'rainforest-trust',
     name: 'Rainforest Trust',
@@ -102,13 +107,54 @@ export const PARTNERS: Partner[] = [
     role: 'Recherche sur les plantes médicinales.',
     url: 'https://pharmacie.edu.umontpellier.fr/',
   },
-  // TODO ONG : rôle des entreprises et de Caméléon Center Conservation (« à préciser » sur la maquette).
+  // TODO ONG : rôles, sites et liens des partenaires ci-dessous (ajoutés avec les logos du 26/10/2026),
+// et confirmation des types marqués « type à confirmer ».
+  {
+    id: 'sos-lemurs',
+    name: 'SOS Lemurs (UICN)',
+    type: 'bailleurs',
+  },
+  {
+    id: 'franklinia',
+    name: 'Fondation Franklinia',
+    type: 'bailleurs',
+  },
+  {
+    id: 'oif',
+    name: 'Organisation internationale de la Francophonie',
+    type: 'bailleurs',
+  },
+  {
+    id: 'catholic-relief-services',
+    name: 'Catholic Relief Services',
+    type: 'bailleurs',
+  },
+  {
+    id: 'ministere-environnement',
+    name: "Ministère de l'Environnement et du Développement durable",
+    type: 'bailleurs', // type à confirmer (institution publique malgache)
+  },
+  {
+    id: 'ministere-tourisme',
+    name: "Ministère du Tourisme et de l'Artisanat",
+    type: 'bailleurs', // type à confirmer (institution publique malgache)
+  },
+  {
+    id: 'office-tourisme-alaotra-mangoro',
+    name: 'Office régional du tourisme Alaotra-Mangoro',
+    type: 'bailleurs', // type à confirmer (institution publique malgache)
+    sites: ['vohimana'],
+  },
+  {
+    id: 'parc-zoologique-paris',
+    name: 'Parc zoologique de Paris (MNHN)',
+    type: 'recherche',
+  },
   {
     id: 'pure-trade',
     name: 'Pure Trade',
     type: 'entreprises',
     sites: ['vohimana'],
-    // TODO URL
   },
   {
     id: 'tam-tam-phyto-aroma',
@@ -116,7 +162,6 @@ export const PARTNERS: Partner[] = [
     type: 'entreprises',
     monogram: 'TT',
     sites: ['vohimana'],
-    // TODO URL
   },
   {
     id: 'bourrelier-group',
@@ -125,23 +170,66 @@ export const PARTNERS: Partner[] = [
     sites: ['vohimana'],
     url: 'https://www.bourrelier-group.com/',
   },
+  { id: 'amare-global', name: 'Amare Global', type: 'entreprises' },
+  { id: 'bougies-denis-fils', name: 'Bougies Denis & Fils', type: 'entreprises' },
+  { id: 'efficite', name: 'EffiCité', type: 'entreprises' },
+  { id: 'floribis', name: 'Floribis', type: 'entreprises' },
+  { id: 'humy', name: 'Humy', type: 'entreprises' },
+  { id: 'imagin', name: "Imag'in", type: 'entreprises' }, // type à confirmer
+  { id: 'laboratoires-teane', name: 'Laboratoires Tēane', type: 'entreprises' },
+  { id: 'mahay-expedition', name: 'Mahay Expédition', type: 'entreprises' },
+  { id: 'marmalade-fish', name: 'Marmalade Fish', type: 'entreprises' },
+  { id: 'perfumista', name: 'Perfumista', type: 'entreprises' },
+  { id: 'univet-nature', name: 'Univet Nature', type: 'entreprises' },
+  { id: 'films-de-pierre', name: 'Les Films de Pierre', type: 'entreprises' },
+  { id: 'behave', name: 'Behave', type: 'entreprises' }, // type à confirmer
+  { id: 'ravenala', name: 'Ravenala', type: 'entreprises' }, // type à confirmer
+  { id: 'misa', name: 'MISA', type: 'entreprises' }, // type à confirmer
   {
     id: 'cameleon-center',
     name: 'Caméléon Center Conservation',
     type: 'associations',
     sites: ['vohimana'],
-    // TODO URL
   },
+  { id: 'sages-femmes-sans-frontieres', name: 'Sages-femmes sans frontières', type: 'associations' },
+  { id: 'amis-de-coralie', name: 'Les Amis de Coralie', type: 'associations' },
+  { id: 'madagascar-voakajy', name: 'Madagascar Voakajy', type: 'associations' },
+  {
+    id: 'maison-familiale-rurale',
+    name: 'Maison familiale rurale de Vohimana',
+    type: 'associations',
+    sites: ['vohimana'],
+  },
+  { id: 'rugby-french-flair', name: 'Rugby French Flair', type: 'associations' }, // type à confirmer
 ];
 
+/** Logos fournis par l'ONG (src/assets/logos/partenaires/<id>.png|jpg), rattachés par identifiant. */
+const partnerLogos = import.meta.glob<ImageMetadata>('../assets/logos/partenaires/*.{png,jpg}', {
+  import: 'default',
+  eager: true,
+});
+
+function logoFor(id: string): ImageMetadata | undefined {
+  return partnerLogos[`../assets/logos/partenaires/${id}.png`] ?? partnerLogos[`../assets/logos/partenaires/${id}.jpg`];
+}
+
+const partnerMonoLogos = import.meta.glob<ImageMetadata>('../assets/logos/partenaires-mono/*.png', {
+  import: 'default',
+  eager: true,
+});
+
+export const PARTNERS: Partner[] = RAW_PARTNERS.map((partner) => ({
+  ...partner,
+  logo: partner.logo ?? logoFor(partner.id),
+  logoMono: partnerMonoLogos[`../assets/logos/partenaires-mono/${partner.id}.png`],
+}));
+
 /**
- * Logos provisoires de la maquette (src/assets/logos/partenaires-provisoires, nom = id du
- * partenaire) : pictogramme et nom dessinés pour la maquette, ce ne sont PAS les logos des
- * organisations. Affichés en ligne à la demande de Victor, en attendant les vrais fichiers.
- * TODO avant la mise en production : remplacer par les logos fournis par l'ONG (champ `logo`)
- * ou passer cette constante à false (monogrammes).
+ * Logos provisoires de la maquette (src/assets/logos/partenaires-provisoires) : ce ne sont PAS
+ * les logos des organisations. Désactivés depuis la livraison des vrais logos par l'ONG (26/10/2026) :
+ * un partenaire sans logo fourni affiche son monogramme.
  */
-export const SHOW_PROVISIONAL_LOGOS = true;
+export const SHOW_PROVISIONAL_LOGOS = false;
 
 const provisionalLogos = import.meta.glob<string>('../assets/logos/partenaires-provisoires/*.svg', {
   query: '?raw',
