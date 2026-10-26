@@ -46,8 +46,12 @@ export const HELLOASSO = {
   donation: 'https://www.helloasso.com/associations/association-l-homme-et-l-environnement',
   /** Formulaire de don mensuel s'il est distinct ; vide : même formulaire que `donation`. */
   donationMonthly: '',
+  /** Page de l'association sur HelloAsso (liste ses formulaires et boutiques). */
+  association: 'https://www.helloasso.com/associations/association-l-homme-et-l-environnement',
   /** TODO ONG : formulaire d'adhésion (« Devenir membre »). */
   membership: '',
+  /** TODO ONG : boutique HelloAsso (produits Aroma Forest, page Particuliers). */
+  shop: '',
   /** TODO ONG : formulaire de la campagne Ambalakalanoro. */
   campaign: '',
   /**
