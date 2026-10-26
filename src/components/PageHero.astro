@@ -46,6 +46,11 @@ interface Props {
    * Citation facultative, dans une carte qui chevauche le bas de la photo.
    */
   portrait?: { name: string; role: string; quote?: string };
+  /**
+   * Empilé (tablette, mobile) : la photo passe au-dessus du texte, pour être vue sans
+   * défiler quand le texte du hero est long (fiche projet).
+   */
+  imageFirst?: boolean;
 }
 
 const {
@@ -63,6 +68,7 @@ const {
   badge,
   caption,
   portrait,
+  imageFirst = false,
 } = Astro.props;
 
 // La photo remplit un cadre de 460 × 575 px (4:5) : une photo plus large que haute y est
@@ -74,7 +80,7 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
 ---
 
 <div class="page-hero-wrap">
-  <section class:list={['page-hero', 'container', { 'page-hero--portrait': portrait }]}>
+  <section class:list={['page-hero', 'container', { 'page-hero--portrait': portrait, 'page-hero--image-first': imageFirst }]}>
     <div class="page-hero__text">
       {
         badge && (
@@ -318,6 +324,16 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
     .page-hero__figure {
       flex: none;
       position: relative;
+    }
+
+    /* Ordre visuel seulement : la photo n'est pas focalisable, l'ordre de lecture reste le texte. */
+    .page-hero--image-first .page-hero__figure {
+      order: -1;
+    }
+
+    /* Tablette : la photo pleine largeur ne prend pas plus de la moitié de l'écran, le titre reste visible. */
+    .page-hero--image-first :global(.page-hero__photo) {
+      max-height: 50svh;
     }
 
     /* Empilé : le motif passe derrière la photo, sous le texte et les boutons. */
