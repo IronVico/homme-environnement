@@ -2,7 +2,7 @@
 /**
  * Carte du pays avec un repère numéroté par site, et la liste des sites à côté.
  * Madagascar : carte verticale collée pendant qu'on parcourt la liste.
- * Burkina Faso (un site) : carte large, nom du site sous le repère, note de position.
+ * Burkina Faso : carte large, note de position ; avec un seul site, nom du site sous le repère.
  * Repère et carte de site sont liés : survoler ou parcourir au clavier un repère
  * ou une carte de site met ce site en avant des deux côtés. Repère et carte
  * mènent tous deux à la fiche du site.
@@ -39,10 +39,12 @@ interface Props {
 const { sites, map, country = 'madagascar' } = Astro.props;
 const selectedId = sites[0]?.id;
 const wide = country === 'burkina-faso';
+// Un seul site : la carte prend la largeur, la carte du site est à côté.
+const single = sites.length === 1;
 const CountryMap = wide ? BurkinaMap : MadagascarMap;
 ---
 
-<div class:list={['sites-explorer', { 'sites-explorer--wide': wide }]} data-sites-explorer>
+<div class:list={['sites-explorer', { 'sites-explorer--wide': wide, 'sites-explorer--single': wide && single }]} data-sites-explorer>
   <div class="sites-explorer__map">
     <div class="sites-explorer__panel" role="group" aria-label={map.label}>
       <CountryMap labels={{ ...map, neighbours: map.neighbours ?? [] }}>
@@ -64,6 +66,7 @@ const CountryMap = wide ? BurkinaMap : MadagascarMap;
         }
         {
           wide &&
+            single &&
             sites.map((site) => (
               <span
                 class="sites-explorer__name"
@@ -261,16 +264,24 @@ const CountryMap = wide ? BurkinaMap : MadagascarMap;
     white-space: nowrap;
   }
 
-  /* Burkina Faso : carte large à gauche, carte du site à droite (380px). */
+  /*
+   * Burkina Faso, carte plus large que haute. Plusieurs sites : carte de 560px au plus,
+   * collée pendant qu'on parcourt la liste, sites sur 2 colonnes à côté.
+   */
   .sites-explorer--wide {
+    grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+  }
+
+  /* Un seul site : carte large à gauche, carte du site à droite (380px), rien de collé. */
+  .sites-explorer--single {
     grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
   }
 
-  .sites-explorer--wide .sites-explorer__map {
+  .sites-explorer--single .sites-explorer__map {
     position: static;
   }
 
-  .sites-explorer--wide .sites-explorer__list {
+  .sites-explorer--single .sites-explorer__list {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -284,7 +295,9 @@ const CountryMap = wide ? BurkinaMap : MadagascarMap;
    * largeur, et ne reste pas collée (elle masquerait la liste).
    */
   @media (max-width: 900px) {
-    .sites-explorer {
+    .sites-explorer,
+    .sites-explorer--wide,
+    .sites-explorer--single {
       grid-template-columns: minmax(0, 1fr);
     }
 
