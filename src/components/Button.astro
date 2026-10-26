@@ -1,11 +1,16 @@
 ---
 import ArrowDown from '@lucide/astro/icons/arrow-down';
 import ArrowRight from '@lucide/astro/icons/arrow-right';
+import BookOpen from '@lucide/astro/icons/book-open';
+import Download from '@lucide/astro/icons/download';
 import Heart from '@lucide/astro/icons/heart';
 import Mail from '@lucide/astro/icons/mail';
 
-interface Props {
-  href: string;
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'class' | 'href' | 'type'> {
+  /** Lien ; sans href, le bouton est un <button type="button"> (action dans la page). */
+  href?: string;
   /**
    * don : pêche, réservé à « Faire un don ». primary : fond basalte, action principale d'une page.
    * secondary : contour basalte. on-dark : contour blanc sur photo.
@@ -16,22 +21,35 @@ interface Props {
   size?: 'md' | 'sm';
   /** Flèche des variantes secondaires : vers le bas pour une ancre dans la page. */
   arrow?: 'right' | 'down';
-  /** mail : enveloppe avant le libellé, à la place de la flèche (lien mailto). */
-  icon?: 'mail';
+  /**
+   * Icône avant le libellé, à la place de la flèche : mail (lien mailto), book (lire en ligne),
+   * download (télécharger un fichier).
+   */
+  icon?: 'mail' | 'book' | 'download';
   /** Lien vers la page affichée (aria-current="page"). */
   current?: boolean;
   class?: string;
 }
 
-const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current, class: className } = Astro.props;
+const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current, class: className, ...rest } = Astro.props;
+const Tag = href === undefined ? 'button' : 'a';
+const type: 'button' | undefined = href === undefined ? 'button' : undefined;
 ---
 
-<a href={href} aria-current={current ? 'page' : undefined} class:list={['btn', 'btn-motion', `btn--${variant}`, `btn--${size}`, className]}>
+<Tag
+  href={href}
+  type={type}
+  aria-current={current ? 'page' : undefined}
+  class:list={['btn', 'btn-motion', `btn--${variant}`, `btn--${size}`, className]}
+  {...rest}
+>
   {variant === 'don' && <Heart size={18} />}
   {icon === 'mail' && <Mail size={20} />}
+  {icon === 'book' && <BookOpen size={20} />}
+  {icon === 'download' && <Download size={20} />}
   <slot />
   {variant !== 'don' && !icon && (arrow === 'down' ? <ArrowDown size={20} /> : <ArrowRight size={20} />)}
-</a>
+</Tag>
 
 <style>
   .btn {
@@ -48,6 +66,16 @@ const { href, variant = 'secondary', size = 'md', arrow = 'right', icon, current
 
   .btn svg {
     flex-shrink: 0;
+  }
+
+  button.btn {
+    border: 0;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  button.btn[hidden] {
+    display: none;
   }
 
   /* Écran très étroit (320px, zoom 400 %) : le libellé passe sur deux lignes plutôt que de déborder. */

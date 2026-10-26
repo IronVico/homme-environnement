@@ -11,6 +11,7 @@ import type { Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
+  /** Texte alternatif ; vide : logo décoratif (couverture de rapport), ignoré des lecteurs d'écran. */
   alt: string;
   class?: string;
 }
@@ -24,7 +25,16 @@ const inner = (lang === 'en' ? logoEnRaw : logoFrRaw)
   .replaceAll('fill="#444941"', 'class="logo__nom"');
 ---
 
-<svg class:list={['logo', className]} viewBox="0 0 432.01 173.81" width="432" height="174" role="img" aria-label={alt} set:html={inner} />
+<svg
+  class:list={['logo', className]}
+  viewBox="0 0 432.01 173.81"
+  width="432"
+  height="174"
+  role={alt ? 'img' : undefined}
+  aria-label={alt || undefined}
+  aria-hidden={alt ? undefined : 'true'}
+  set:html={inner}
+/>
 
 <style>
   .logo :global(.logo__nom) {

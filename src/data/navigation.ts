@@ -33,6 +33,7 @@ export const PAGES = {
   mentionsLegales: 'mentions-legales',
   confidentialite: 'confidentialite',
   galerie: 'ressources/galerie',
+  rapports: 'ressources/rapports',
 } as const;
 
 /** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
@@ -45,7 +46,7 @@ export const STAGES_EMAIL = 'contact.vsc@homme-environnement.org';
 export const PARTNERS_EMAIL = 'contact@homme-environnement.org';
 
 /**
- * Adresse générale de l'ONG (bouton « Nous contacter » de la Galerie, mailto).
+ * Adresse générale de l'ONG (boutons « Nous contacter » de la Galerie et des Rapports, mailto).
  * TODO page Contact : renvoyer vers elle. TODO ONG : confirmer l'adresse.
  */
 export const CONTACT_EMAIL = 'contact@homme-environnement.org';
@@ -127,8 +128,8 @@ const FOOTER_HREFS = [
   ],
   // TODO pages Particuliers et Entreprises.
   [HOME_ENGAGE, PAGES.stages, HOME_ENGAGE],
-  // TODO pages Rapports et études, et Contact.
-  ['#', PAGES.galerie, '#'],
+  // TODO page Contact.
+  [PAGES.rapports, PAGES.galerie, '#'],
 ];
 const LEGAL_HREFS = [PAGES.mentionsLegales, PAGES.confidentialite];
 
