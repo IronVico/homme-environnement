@@ -112,6 +112,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Galerie photos » encore en français (copie de fr.ts).
   galerie: structuredClone(fr.galerie),
+
+  // TODO traduction : page « Rapports et études » encore en français (copie de fr.ts).
+  rapports: structuredClone(fr.rapports),
 };
 
 export default en;
