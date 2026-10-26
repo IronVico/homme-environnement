@@ -79,7 +79,7 @@ const { reader } = t(getLang(Astro.currentLocale)).rapports;
       </button>
       <a class="reader__download btn-motion" href="#" download data-reader-download>
         <Download size={18} />
-        {reader.download}
+        {reader.download}<span class="visually-hidden"> {reader.downloadHidden}</span>
       </a>
       <button
         class="reader__tool reader__close"
@@ -112,7 +112,7 @@ const { reader } = t(getLang(Astro.currentLocale)).rapports;
       >
         <ChevronLeft size={24} />
       </button>
-      <div class="reader__scroller" tabindex="0" data-reader-scroller>
+      <div class="reader__scroller" tabindex="0" role="region" aria-label={reader.pageRegion} data-reader-scroller>
         <canvas class="reader__page" role="img" data-reader-canvas></canvas>
         <p class="reader__status" role="status" data-reader-status></p>
       </div>
@@ -186,7 +186,17 @@ const { reader } = t(getLang(Astro.currentLocale)).rapports;
       canvas.hidden = Boolean(text);
     };
 
+    // Bouton qui se désactive alors qu'il a le focus (dernière page, zoom maximal) : le focus
+    // passe au bouton opposé au lieu de se perdre (WCAG 2.4.3).
+    const opposite = new Map<HTMLButtonElement, HTMLButtonElement>([
+      [prev, next],
+      [next, prev],
+      [zoomOut, zoomIn],
+      [zoomIn, zoomOut],
+    ]);
+
     const updateControls = () => {
+      const focused = document.activeElement;
       const count = doc?.numPages ?? 0;
       position.textContent = count ? fill(strings.position, { index, count }) : '';
       positionLong.textContent = count ? fill(strings.positionLong, { index, count }) : '';
@@ -195,6 +205,8 @@ const { reader } = t(getLang(Astro.currentLocale)).rapports;
       next.disabled = !doc || index >= count;
       zoomOut.disabled = !doc || zoom === 0;
       zoomIn.disabled = !doc || zoom === ZOOMS.length - 1;
+      const other = opposite.get(focused as HTMLButtonElement);
+      if (other && (focused as HTMLButtonElement).disabled && !other.disabled) other.focus();
       zoomOutput.value = `${Math.round(ZOOMS[zoom]! * 100)} %`;
       thumbs.querySelectorAll('button').forEach((button, i) => {
         if (i + 1 === index) button.setAttribute('aria-current', 'true');

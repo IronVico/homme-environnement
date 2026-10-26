@@ -1442,6 +1442,10 @@ const fr = {
       fullscreen: 'Plein écran',
       exitFullscreen: 'Quitter le plein écran',
       download: 'Télécharger',
+      /** Complément lu par les lecteurs d'écran après « Télécharger ». */
+      downloadHidden: 'le PDF',
+      /** Zone de la page affichée (défilement au clavier). */
+      pageRegion: 'Page affichée',
       close: 'Fermer la liseuse',
       previous: 'Page précédente',
       next: 'Page suivante',
