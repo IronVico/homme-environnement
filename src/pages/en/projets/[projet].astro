@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ProjectPage from '../../../components/ProjectPage.astro';
+
+/** Une fiche par projet (src/content/projets). */
+export const getStaticPaths = (async () => {
+  const projects = await getCollection('projets');
+  return projects.map((project) => ({ params: { projet: project.id }, props: { project } }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props as { project: CollectionEntry<'projets'> };
+---
+
+<ProjectPage project={project} />

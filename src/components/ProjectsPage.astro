@@ -7,7 +7,7 @@
  */
 import { getCollection } from 'astro:content';
 import { COUNTRIES, PROJECT_THEMES } from '../data/projets';
-import { donatePath, fieldPath } from '../data/navigation';
+import { donatePath, fieldPath, projectPath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from './Breadcrumb.astro';
@@ -119,7 +119,7 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
                   sitesLabel={page.list.sitesLabel}
                   image={data.photo}
                   imagePosition={data.photoPosition}
-                  href="#"
+                  href={projectPath(lang, project.id)}
                 />
               );
             })

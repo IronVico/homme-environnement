@@ -1,7 +1,7 @@
 import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { COUNTRIES, PROJECT_ICONS, PROJECT_THEMES } from './data/projets';
+import { COUNTRIES, PROJECT_DETAIL_ICONS, PROJECT_ICONS, PROJECT_THEMES } from './data/projets';
 
 /** Statut UICN d'une espèce, ou « endemique » pour une espèce non évaluée mais endémique. */
 const speciesStatus = z.enum(['CR', 'EN', 'VU', 'NT', 'LC', 'endemique']);
@@ -167,8 +167,11 @@ const sites = defineCollection({
 
 /**
  * Projets : un fichier Markdown par projet (src/content/projets/), relié aux sites
- * où il est mené. Le frontmatter alimente les cartes de la page « Nos projets »
- * et de la page pays ; le corps servira à la future fiche projet.
+ * où il est mené. Le frontmatter alimente les cartes de la page « Nos projets »,
+ * de la page pays et la fiche projet (/projets/<projet>) ; le corps (Markdown) est
+ * le texte de la section « Le projet » de la fiche.
+ * Les champs de la fiche sont facultatifs : un champ absent s'affiche « [à fournir] »
+ * et la fiche n'est pas indexée.
  */
 const projets = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projets' }),
@@ -191,6 +194,73 @@ const projets = defineCollection({
       photoPosition: z.string().default('50% 50%'),
       /** Ordre d'affichage dans les listes. */
       order: z.number(),
+
+      // Fiche projet.
+      /** Nom court du hero et du fil d'Ariane (« Plantes médicinales ») ; sinon `title`. */
+      shortTitle: z.string().optional(),
+      /** Fin du titre de la fiche, en Light après le nom : « le savoir de la forêt de Vohimana. » */
+      tagline: z.string().optional(),
+      /** Chapeau du hero (sinon `summary`). */
+      intro: z.string().optional(),
+      /** Photo du hero, si elle diffère de celle des cartes (`photo`). */
+      heroPhoto: image().optional(),
+      heroPhotoPosition: z.string().optional(),
+      /** Texte alternatif de la photo du hero (les cartes la traitent en décor). */
+      photoAlt: z.string().optional(),
+      /** Légende sous la photo du hero (lieu seulement : pas de crédit photo sur le site). */
+      photoCaption: z.string().optional(),
+      /**
+       * Bande de chiffres, dans l'ordre d'affichage. `value` : nombre (formaté selon la langue)
+       * ou texte tel quel ; `prefix` (« ≈ »), `suffix` (« + ») et `unit` (« ha ») l'entourent.
+       */
+      figures: z
+        .array(
+          z.object({
+            icon: z.enum(PROJECT_DETAIL_ICONS),
+            value: z.union([z.number(), z.string()]),
+            prefix: z.string().optional(),
+            suffix: z.string().optional(),
+            unit: z.string().optional(),
+            text: z.string(),
+          }),
+        )
+        .optional(),
+      /** Section « Le projet » : titre en deux temps, photo et encart ; le texte est le corps du fichier. */
+      story: z
+        .object({
+          titleStrong: z.string(),
+          titleLight: z.string(),
+          photo: image().optional(),
+          photoAlt: z.string().optional(),
+          photoCaption: z.string().optional(),
+          photoPosition: z.string().default('50% 50%'),
+          /** Encart sous le texte : début en gras (« Depuis 2011, »), puis la suite. */
+          note: z.object({ title: z.string(), text: z.string() }).optional(),
+        })
+        .optional(),
+      /** Étapes de « Comment ça marche », dans l'ordre (numérotées 01, 02…). */
+      steps: z
+        .array(z.object({ icon: z.enum(PROJECT_DETAIL_ICONS), title: z.string(), text: z.string() }))
+        .optional(),
+      /** Phrase sous le titre « Où se déroule le projet » (sinon, le nombre de sites). */
+      whereLead: z.string().optional(),
+      /**
+       * Partenaires du projet : identifiant d'un partenaire de src/data/partenaires.ts (nom et
+       * lien en viennent), ou partenaire absent de cette liste ({ name, url }).
+       */
+      partners: z
+        .array(z.union([z.string(), z.object({ name: z.string(), url: z.url().optional() })]))
+        .optional(),
+      /** Bandeau de don final (sinon, texte générique du gabarit). */
+      cta: z
+        .object({
+          titleStrong: z.string(),
+          titleLight: z.string(),
+          text: z.string(),
+          photo: image().optional(),
+          photoPosition: z.string().default('50% 45%'),
+        })
+        .optional(),
     }),
 });
 

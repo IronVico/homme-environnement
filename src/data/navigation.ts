@@ -72,12 +72,9 @@ export function sitePath(lang: Lang, site: string): string {
   return localeUrl(lang, `${PAGES.madagascar}/${site}`);
 }
 
-/**
- * Lien vers un projet : sa carte dans la page « Nos projets ».
- * TODO fiche projet : renvoyer vers localeUrl(lang, `projets/${project}`).
- */
+/** URL de la fiche d'un projet : « plantes-medicinales » → « /projets/plantes-medicinales ». */
 export function projectPath(lang: Lang, project: string): string {
-  return `${pagePath(lang, 'projets')}#projet-${project}`;
+  return localeUrl(lang, `${PAGES.projets}/${project}`);
 }
 
 /** Page « Nos projets » filtrée sur un thème (paramètre lu par le filtre de la page). */

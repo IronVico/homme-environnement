@@ -1,0 +1,756 @@
+---
+/**
+ * Fiche d'un projet, commune aux deux langues et aux 9 projets (/projets/<projet> et
+ * /en/projets/<projet>). Contenu du projet dans son fichier src/content/projets/<projet>.md
+ * (frontmatter, et corps pour le texte « Le projet »), textes du gabarit dans src/i18n
+ * (clé `projet`). Un champ absent s'affiche « [à fournir] » et la page n'est pas indexée.
+ * « Où se déroule le projet » reprend la carte de la page pays (SitesExplorer), une carte par pays.
+ */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Calendar from '@lucide/astro/icons/calendar';
+import Coins from '@lucide/astro/icons/coins';
+import Droplet from '@lucide/astro/icons/droplet';
+import Droplets from '@lucide/astro/icons/droplets';
+import ExternalLink from '@lucide/astro/icons/external-link';
+import FlaskConical from '@lucide/astro/icons/flask-conical';
+import Flower from '@lucide/astro/icons/flower';
+import GraduationCap from '@lucide/astro/icons/graduation-cap';
+import HandHeart from '@lucide/astro/icons/hand-heart';
+import Info from '@lucide/astro/icons/info';
+import Leaf from '@lucide/astro/icons/leaf';
+import MapPin from '@lucide/astro/icons/map-pin';
+import Search from '@lucide/astro/icons/search';
+import Shield from '@lucide/astro/icons/shield';
+import Sprout from '@lucide/astro/icons/sprout';
+import Store from '@lucide/astro/icons/store';
+import Sun from '@lucide/astro/icons/sun';
+import Tent from '@lucide/astro/icons/tent';
+import Trees from '@lucide/astro/icons/trees';
+import Users from '@lucide/astro/icons/users';
+import { Picture } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { donatePath, fieldPath, pagePath, projectPath, sitePath } from '../data/navigation';
+import { PARTNERS } from '../data/partenaires';
+import type { PROJECT_DETAIL_ICONS } from '../data/projets';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getExplorerSites } from '../lib/explorer-sites';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import CountryFlag from './CountryFlag.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import InfoNote from './InfoNote.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import ProjectCard from './ProjectCard.astro';
+import ProjectGrid from './ProjectGrid.astro';
+import SectionHeading from './SectionHeading.astro';
+import SitesExplorer from './SitesExplorer.astro';
+import StatCard from './StatCard.astro';
+
+import ctaPhoto from '../assets/photos/engager-terrain.jpg';
+
+interface Props {
+  project: CollectionEntry<'projets'>;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.projet;
+const missing = page.missing;
+
+const fill = (text: string, values: Record<string, string>) =>
+  text.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
+
+const ICONS = {
+  droplets: Droplets,
+  leaf: Leaf,
+  flask: FlaskConical,
+  users: Users,
+  sprout: Sprout,
+  trees: Trees,
+  search: Search,
+  store: Store,
+  shield: Shield,
+  'map-pin': MapPin,
+  calendar: Calendar,
+  droplet: Droplet,
+  sun: Sun,
+  'graduation-cap': GraduationCap,
+  'hand-heart': HandHeart,
+  tent: Tent,
+  flower: Flower,
+  coins: Coins,
+} satisfies Record<(typeof PROJECT_DETAIL_ICONS)[number], unknown>;
+
+const name = data.shortTitle ?? data.title;
+const ThemeIcon = ICONS[data.icon];
+const { Content } = await render(project);
+const hasBody = Boolean(project.body?.trim());
+
+// Sites du projet, par pays (dans l'ordre des pays du projet), numérotés à la suite sur toute la page.
+const allSites = await getCollection('sites');
+const siteNames = new Map(allSites.map((site) => [site.id, site.data.name]));
+const projectSiteIds = data.sites.map((ref) => ref.id);
+let num = 0;
+const countryMaps = await Promise.all(
+  data.countries.map(async (country) => {
+    const others = allSites.filter((site) => site.data.country === country && !projectSiteIds.includes(site.id));
+    const sites = await getExplorerSites(
+      lang,
+      others.map((site) => site.id),
+      country,
+    );
+    return {
+      country,
+      label: dict.projets.countries[country],
+      map: country === 'madagascar' ? dict.madagascar.sites.map : dict.burkina.sites.map,
+      // Pas de fiche pour le Burkina Faso : la carte du site mène aux projets de la page pays.
+      all: country === 'madagascar' ? pagePath(lang, 'madagascar') : pagePath(lang, 'burkina'),
+      sites: sites.map((site) => ({
+        ...site,
+        href: country === 'madagascar' ? site.href : `${pagePath(lang, 'burkina')}#projets`,
+      })),
+    };
+  }),
+);
+for (const group of countryMaps) for (const site of group.sites) site.num = ++num;
+const siteCount = num;
+const twoCountries = countryMaps.length > 1;
+
+// Pastilles du hero : pays et sites (« Madagascar · Vohimana »), un par pays.
+const placeChips = countryMaps.map((group) => ({
+  country: group.country,
+  label: [group.label, group.sites.map((site) => site.name).join(', ')].filter(Boolean).join(' · '),
+}));
+
+// Bouton secondaire du hero : la fiche du site quand le projet n'a qu'un site (à Madagascar), sinon la carte.
+const singleSite = siteCount === 1 && countryMaps[0]?.country === 'madagascar' ? countryMaps[0].sites[0] : undefined;
+const heroCta = singleSite
+  ? { label: fill(page.site, { name: singleSite.name }), href: sitePath(lang, singleSite.id) }
+  : { label: `${page.where.titleStrong} ${page.where.titleLight}`, href: '#ou' };
+
+// Bande de chiffres : celle du projet, sinon le nombre de sites et deux chiffres à fournir.
+const figures = data.figures ?? [
+  {
+    icon: 'map-pin' as const,
+    value: siteCount,
+    text: siteCount > 1 ? page.defaultFigures.sitesMany : page.defaultFigures.sitesOne,
+  },
+  { icon: 'users' as const, value: missing, text: page.defaultFigures.beneficiaries },
+  { icon: 'calendar' as const, value: missing, text: page.defaultFigures.start },
+];
+
+// Partenaires : un identifiant de src/data/partenaires.ts, ou un nom (et un lien) propre au projet.
+const partners = (data.partners ?? []).map((partner) => {
+  if (typeof partner !== 'string') return partner;
+  const known = PARTNERS.find((candidate) => candidate.id === partner);
+  if (!known) throw new Error(`Projet ${project.id} : partenaire « ${partner} » absent de src/data/partenaires.ts`);
+  return { name: known.name, url: known.url };
+});
+
+// D'autres projets : les trois suivants dans l'ordre de la page « Nos projets ».
+const projects = (await getCollection('projets')).sort((a, b) => a.data.order - b.data.order);
+const index = projects.findIndex((other) => other.id === project.id);
+const others = [1, 2, 3].map((step) => projects[(index + step) % projects.length]!).filter((other) => other.id !== project.id);
+
+// Fiche complète : tous les contenus propres au projet sont fournis.
+const complete = Boolean(
+  data.tagline &&
+    data.intro &&
+    data.photoAlt &&
+    data.figures &&
+    data.story?.photo &&
+    hasBody &&
+    data.steps?.length &&
+    data.partners?.length,
+);
+
+const cta = data.cta ?? page.cta;
+const heroPhoto = data.heroPhoto ?? data.photo;
+const heroPosition = data.heroPhoto ? (data.heroPhotoPosition ?? '50% 50%') : data.photoPosition;
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.projets.title, href: pagePath(lang, 'projets') },
+];
+---
+
+<BaseLayout
+  title={name}
+  description={data.summary}
+  ogImage={heroPhoto}
+  ogImageAlt={data.photoAlt}
+  noindex={!complete}
+>
+  <Header current="projets" />
+  <Breadcrumb items={breadcrumb} current={name} />
+
+  {/* TODO traduction : sur /en/, le contenu de la fiche est encore en français. */}
+  <main id="contenu" lang={lang === 'en' ? 'fr' : undefined}>
+    <PageHero
+      titleStrong={`${name},`}
+      titleLight={data.tagline ?? missing}
+      lead={data.intro ?? data.summary}
+      image={heroPhoto}
+      imageAlt={data.photoAlt ?? ''}
+      imagePosition={heroPosition}
+      caption={data.photoCaption}
+      donate={{ label: page.donate, href: donatePath(lang) }}
+      cta={heroCta}
+    >
+      <ul class="chips" slot="chips" data-reveal>
+        <li class="chip chip--theme">
+          <ThemeIcon size={16} />
+          {dict.projets.themes[data.theme]}
+        </li>
+        {
+          placeChips.map((chip) => (
+            <li class="chip">
+              <CountryFlag country={chip.country} />
+              {chip.label}
+            </li>
+          ))
+        }
+      </ul>
+    </PageHero>
+
+    <section class="figures" aria-label={page.statsLabel}>
+      <div class="figures__grid container">
+        {
+          figures.map(({ icon, ...stat }) => {
+            const FigureIcon = ICONS[icon];
+            return (
+              <StatCard {...stat}>
+                <FigureIcon slot="icon" size={28} />
+              </StatCard>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="projet-titre">
+      <div class="container two-cols">
+        <div class="story" data-reveal>
+          <p class="eyebrow">{page.story.eyebrow}</p>
+          <h2 id="projet-titre" class="title-h2">
+            {
+              data.story ? (
+                <>
+                  <span class="title-h2__strong">{data.story.titleStrong}</span>{' '}
+                  <span class="title-h2__light">{data.story.titleLight}</span>
+                </>
+              ) : (
+                <span class="title-h2__strong">{page.story.missingTitle}</span>
+              )
+            }
+          </h2>
+          <div class="story__text">{hasBody ? <Content /> : <p>{missing}</p>}</div>
+          {data.story?.note && <InfoNote icon={Info} title={data.story.note.title} text={data.story.note.text} />}
+        </div>
+        <figure class="story__figure" data-reveal>
+          {
+            data.story?.photo ? (
+              <Picture
+                class="story__photo"
+                src={data.story.photo}
+                alt={data.story.photoAlt ?? ''}
+                style={`object-position: ${data.story.photoPosition}`}
+                formats={['avif', 'webp']}
+                widths={[400, 640, 900, 1260]}
+                sizes="(max-width: 900px) 100vw, 600px"
+              />
+            ) : (
+              <div class="story__photo story__photo--missing">{page.photoMissing}</div>
+            )
+          }
+          {data.story?.photoCaption && <figcaption class="caption">{data.story.photoCaption}</figcaption>}
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="etapes-titre">
+      <div class="container stack">
+        <SectionHeading id="etapes-titre" strong={page.steps.titleStrong} light={page.steps.titleLight} />
+        {
+          data.steps?.length ? (
+            <ol class="steps">
+              {data.steps.map((step) => {
+                const StepIcon = ICONS[step.icon];
+                return (
+                  <li class="step" data-reveal>
+                    <span class="step__head">
+                      <span class="step__icon">
+                        <StepIcon size={24} />
+                      </span>
+                    </span>
+                    <h3 class="step__title">{step.title}</h3>
+                    <p class="step__text">{step.text}</p>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <p class="missing">{missing}</p>
+          )
+        }
+      </div>
+    </section>
+
+    <section id="ou" class="section" aria-labelledby="ou-titre">
+      <div class="container stack">
+        <SectionHeading
+          id="ou-titre"
+          strong={page.where.titleStrong}
+          light={page.where.titleLight}
+          lead={data.whereLead ??
+            (siteCount > 1 ? fill(page.where.leadMany, { count: String(siteCount) }) : page.where.leadOne)}
+        />
+        {
+          countryMaps.map((group) => (
+            <div class="where" aria-labelledby={twoCountries ? `ou-${group.country}` : undefined} role={twoCountries ? 'group' : undefined}>
+              {twoCountries && (
+                <h3 class="where__country" id={`ou-${group.country}`}>
+                  <CountryFlag country={group.country} size={22} />
+                  {group.label}
+                </h3>
+              )}
+              <SitesExplorer map={group.map} sites={group.sites} country={group.country} />
+              <a class="where__all" href={group.all}>
+                <span class="where__all-label">{page.where.all[group.country]}</span>
+                <ArrowRight class="where__all-arrow" size={18} />
+              </a>
+            </div>
+          ))
+        }
+
+        <div class="partners">
+          <h3 class="partners__title">{page.partners.title}</h3>
+          {
+            partners.length ? (
+              <ul class="partners__list">
+                {partners.map((partner) => (
+                  <li>
+                    {partner.url ? (
+                      <a class="partner partner--link" href={partner.url} rel="noopener" target="_blank">
+                        {partner.name}
+                        <ExternalLink class="partner__icon" size={14} />
+                        <span class="visually-hidden"> {page.partners.newTab}</span>
+                      </a>
+                    ) : (
+                      <span class="partner">{partner.name}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>{missing}</p>
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="autres-titre">
+      <div class="container stack stack--32">
+        <SectionHeading
+          id="autres-titre"
+          strong={page.others.titleStrong}
+          light={page.others.titleLight}
+          link={{ label: page.others.all, href: pagePath(lang, 'projets') }}
+        />
+        <ProjectGrid>
+          {
+            others.map((other) => (
+              <ProjectCard
+                icon={other.data.icon}
+                title={other.data.title}
+                text={other.data.summary}
+                sites={[...other.data.sites.map((ref) => siteNames.get(ref.id) ?? ref.id), ...other.data.otherSites]}
+                sitesLabel={dict.projectCard.sitesLabel}
+                href={projectPath(lang, other.id)}
+                linkLabel={dict.projectCard.link}
+              />
+            ))
+          }
+        </ProjectGrid>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="soutenir-titre"
+      titleStrong={cta.titleStrong}
+      titleLight={cta.titleLight}
+      text={cta.text}
+      image={data.cta?.photo ?? ctaPhoto}
+      imagePosition={data.cta?.photoPosition ?? '50% 45%'}
+      spaced
+    >
+      <div class="cta__buttons">
+        <Button href={donatePath(lang)} variant="don">{page.donate}</Button>
+        <Button href={fieldPath(lang)} variant="on-dark">{page.field}</Button>
+      </div>
+    </PhotoBanner>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { initStats } from '../scripts/stats';
+  initStats();
+</script>
+
+<style>
+  .section--tinted {
+    background: var(--section);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .stack--32 {
+    gap: var(--space-8);
+  }
+
+  .title-h2 {
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+  }
+
+  .title-h2__strong {
+    font-weight: 800;
+  }
+
+  .title-h2__light {
+    font-weight: 300;
+  }
+
+  .two-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 40px 64px;
+  }
+
+  @media (max-width: 900px) {
+    .two-cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Pastilles du hero : thème (vert clair) puis pays et sites (contour). */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 7px 14px;
+    border: 1px solid var(--section);
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .chip--theme {
+    background: var(--section);
+    font-weight: 600;
+  }
+
+  .chip :global(svg) {
+    flex-shrink: 0;
+  }
+
+  /* Bande sauge des chiffres : cartes chiffre, variante icône (StatCard). */
+  .figures {
+    background: var(--accent);
+  }
+
+  .figures__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: var(--space-5);
+    padding-block: clamp(40px, 5vw, 56px);
+  }
+
+  /* Le projet : texte (corps du Markdown) et photo en arche. */
+  .story {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .story__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .story__text :global(p) {
+    margin: 0;
+  }
+
+  .story__figure {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .story__figure :global(.story__photo) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 160px 160px var(--radius-card) var(--radius-card);
+  }
+
+  .story__photo--missing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--section);
+    font-weight: 600;
+  }
+
+  @media (max-width: 700px) {
+    .story__figure :global(.story__photo) {
+      border-radius: 40px 40px var(--radius-card-sm) var(--radius-card-sm);
+    }
+  }
+
+  .caption {
+    font-size: var(--fs-caption);
+    color: var(--texte-doux);
+  }
+
+  /* Comment ça marche : étapes numérotées, 3 colonnes. */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  @media (max-width: 1000px) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--space-7);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+    counter-increment: step;
+  }
+
+  /*
+   * Numéro de l'étape (01, 02…) : redit l'ordre de la liste <ol>, lu par les lecteurs d'écran.
+   * En ardoise et non en sauge comme la maquette : la sauge n'est jamais du texte.
+   */
+  .step__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .step__head::after {
+    content: counter(step, decimal-leading-zero);
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: var(--ls-stat);
+    line-height: 1;
+    color: var(--texte-doux);
+  }
+
+  .step__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--section);
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+  }
+
+  .step__title {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .step__text {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  /* Où se déroule le projet : une carte par pays (SitesExplorer), lien vers la page pays. */
+  .where {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .where__country {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  /* Même lien que « Tous les projets » des titres de section : filet sauge, trait basalte au survol. */
+  .where__all {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-block: 4px;
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  .where__all:hover {
+    color: var(--texte);
+  }
+
+  .where__all-label {
+    padding-bottom: 4px;
+    background:
+      linear-gradient(var(--texte), var(--texte)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .where__all:hover .where__all-label,
+  .where__all:focus-visible .where__all-label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  .where__all :global(.where__all-arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .where__all:hover :global(.where__all-arrow),
+  .where__all:focus-visible :global(.where__all-arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .where__all-label {
+      transition: none;
+    }
+
+    .where__all:hover :global(.where__all-arrow),
+    .where__all:focus-visible :global(.where__all-arrow) {
+      transform: none;
+    }
+  }
+
+  /* Partenaires du projet : pastilles, liens vers leur site quand on l'a. */
+  .partners {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--bordure-carte);
+  }
+
+  .partners__title {
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .partners__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .partner {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 10px 18px;
+    border: 1px solid var(--section);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+  }
+
+  /* Partenaire avec site : même survol que les boutons secondaires (contour basalte, léger soulèvement). */
+  .partner--link {
+    color: var(--texte);
+    text-decoration: none;
+    transition:
+      border-color var(--transition-ui),
+      transform var(--transition-ui);
+  }
+
+  .partner--link:hover {
+    color: var(--texte-fort);
+    border-color: var(--texte);
+    transform: translateY(var(--lift-button-hover));
+  }
+
+  .partner :global(.partner__icon) {
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner--link {
+      transition: none;
+    }
+
+    .partner--link:hover {
+      transform: none;
+    }
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

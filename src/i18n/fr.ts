@@ -405,6 +405,58 @@ const fr = {
       field: 'Venir sur le terrain',
     },
   },
+  // Fiche projet (gabarit commun, maquette FicheProjet). Le contenu propre à chaque projet est dans src/content/projets.
+  projet: {
+    /** Valeur ou texte pas encore fourni par l'ONG (affiché tel quel sur la page). */
+    missing: '[à fournir]',
+    photoMissing: '[Photo à fournir]',
+    donate: 'Soutenir ce projet',
+    /** Bouton secondaire du hero, projet mené sur un seul site avec fiche. {name} : nom du site. */
+    site: 'Le site de {name}',
+    statsLabel: 'Le projet en chiffres',
+    /** Chiffres par défaut (projet sans champ `figures`) ; le premier est le nombre de sites du projet. */
+    defaultFigures: {
+      sitesOne: 'site où le projet est mené.',
+      sitesMany: 'sites où le projet est mené.',
+      beneficiaries: 'bénéficiaires directs.',
+      start: 'année de lancement du projet.',
+    },
+    story: {
+      eyebrow: 'Le projet',
+      /** Titre affiché tant que le projet n'a pas de champ `story`. */
+      missingTitle: '[Titre à fournir]',
+    },
+    steps: { titleStrong: 'Comment', titleLight: 'ça marche' },
+    where: {
+      titleStrong: 'Où se déroule',
+      titleLight: 'le projet',
+      /** Phrase par défaut (projet sans `whereLead`). {count} : nombre de sites. */
+      leadOne: 'Le projet est mené sur un de nos sites.',
+      leadMany: 'Le projet est mené sur {count} de nos sites.',
+      /** Lien sous les sites de chaque pays. */
+      all: {
+        madagascar: 'Voir tous nos sites à Madagascar',
+        'burkina-faso': 'Voir nos actions au Burkina Faso',
+      },
+    },
+    partners: {
+      title: 'Partenaires du projet',
+      /** Lu par les lecteurs d'écran après le nom d'un partenaire avec lien. */
+      newTab: '(nouvel onglet)',
+    },
+    others: {
+      titleStrong: "D'autres projets",
+      titleLight: 'à découvrir',
+      all: 'Tous les projets',
+    },
+    /** Bandeau de don par défaut (projet sans champ `cta`). */
+    cta: {
+      titleStrong: 'Soutenir ce projet,',
+      titleLight: "c'est agir avec les communautés.",
+      text: 'Votre don finance directement les actions du projet sur le terrain.',
+    },
+    field: 'Venir sur le terrain',
+  },
   // Page « Stages et volontariat » (maquette StagesVolontariat, texte VSC de l'ONG).
   stages: {
     title: 'Stages et volontariat',

@@ -89,6 +89,9 @@ const en: Dictionary = {
   // TODO traduction : page « Nos projets » encore en français (copie de fr.ts).
   projets: structuredClone(fr.projets),
 
+  // TODO traduction : fiches projet encore en français (copie de fr.ts).
+  projet: structuredClone(fr.projet),
+
   // TODO traduction : page « Stages et volontariat » encore en français (copie de fr.ts).
   stages: structuredClone(fr.stages),
 
