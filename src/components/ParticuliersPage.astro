@@ -75,7 +75,7 @@ const contentLang = lang === 'en' ? 'fr' : undefined;
       imageAlt={page.hero.imageAlt}
       imagePosition="50% 30%"
       caption={page.hero.caption}
-      donate={{ label: dict.ui.donate, href: donatePath(lang) }}
+      donate={{ label: dict.ui.donate, href: donatePath(lang), lang: contentLang && lang }}
       cta={{ label: page.hero.allWays, href: '#agir' }}
     />
 
@@ -160,7 +160,7 @@ const contentLang = lang === 'en' ? 'fr' : undefined;
       imagePosition="50% 50%"
     >
       <div class="cta__buttons">
-        <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
+        <Button href={donatePath(lang)} variant="don"><span lang={contentLang && lang}>{dict.ui.donate}</span></Button>
         <Button href={pagePath(lang, 'stages')} variant="on-dark">{page.cta.field}</Button>
       </div>
     </PhotoBanner>

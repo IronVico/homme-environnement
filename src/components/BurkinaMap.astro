@@ -100,7 +100,8 @@ const contours = [
       <text y="-28" text-anchor="middle" font-size="12" font-weight="700" style="fill: var(--texte)">{labels.north}</text>
     </g>
     <circle cx={CAPITAL.x} cy={CAPITAL.y} r="4" style="fill: var(--carte-capitale)"></circle>
-    {/* Nom à gauche du point : le repère de Kollo et Guiaro est juste en dessous. */}
+    {/* Nom à gauche du point : le repère de Kollo et Guiaro est juste en dessous.
+        noir-95 en dur : le nom est sur le pays en sauge (--accent), identique dans les deux modes. */}
     <text x={CAPITAL.x - 10} y={CAPITAL.y + 4.5} text-anchor="end" font-size="13" font-weight="500" style="fill: var(--noir-95)">
       {labels.capital}
     </text>

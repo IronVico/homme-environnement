@@ -19,6 +19,7 @@ import Sprout from '@lucide/astro/icons/sprout';
 import Tent from '@lucide/astro/icons/tent';
 import Trees from '@lucide/astro/icons/trees';
 import type { PROJECT_ICONS } from '../data/projets';
+import { getLang } from '../i18n';
 
 const ICONS = {
   shield: Shield,
@@ -46,6 +47,10 @@ interface Props {
 }
 
 const { icon, title, text, sites, sitesLabel, href, linkLabel } = Astro.props;
+// Libellés d'interface déjà traduits, dans des pages anglaises dont le contenu est encore
+// en français (<main lang="fr">) : on rétablit leur langue pour les lecteurs d'écran.
+const uiLang = getLang(Astro.currentLocale);
+const labelLang = uiLang === 'en' ? 'en' : undefined;
 const Icon = ICONS[icon];
 const Tag = href ? 'a' : 'div';
 ---
@@ -61,7 +66,7 @@ const Tag = href ? 'a' : 'div';
           <span class="project-card__sites">
             <MapPin class="project-card__pin" size={16} />
             <span>
-              <span class="visually-hidden">{sitesLabel} : </span>
+              <span class="visually-hidden" lang={labelLang}>{sitesLabel}{uiLang === 'en' ? ': ' : ' : '}</span>
               {sites.join(', ')}
             </span>
           </span>
@@ -71,7 +76,7 @@ const Tag = href ? 'a' : 'div';
         href && (
           <span class="project-card__more">
             <ArrowRight class="project-card__arrow" size={18} />
-            <span class="visually-hidden">{linkLabel}</span>
+            <span class="visually-hidden" lang={labelLang}>{linkLabel}</span>
           </span>
         )
       }
