@@ -93,7 +93,7 @@ const breadcrumb = [
       cta={{ label: page.hero.faq, href: '#faq' }}
     />
 
-    <section class="section section--tinted" aria-labelledby="pourquoi-titre">
+    <section class="section" aria-labelledby="pourquoi-titre">
       <div class="container two-cols">
         <div class="stack stack--24">
           <SectionHeading id="pourquoi-titre" strong={page.why.titleStrong} light={page.why.titleLight} />
@@ -135,7 +135,7 @@ const breadcrumb = [
       </div>
     </section>
 
-    <section class="section" aria-labelledby="missions-titre">
+    <section class="section section--tinted" aria-labelledby="missions-titre">
       <div class="container two-cols">
         <div class="stack stack--20">
           <SectionHeading id="missions-titre" strong={page.missions.titleStrong} light={page.missions.titleLight} />
@@ -174,7 +174,7 @@ const breadcrumb = [
       </div>
     </section>
 
-    <section class="section" aria-labelledby="conditions-titre">
+    <section class="section section--tinted" aria-labelledby="conditions-titre">
       <div class="container stack stack--40">
         <SectionHeading
           id="conditions-titre"
@@ -201,9 +201,9 @@ const breadcrumb = [
       </div>
     </section>
 
-    <section class="section section--sauge" aria-labelledby="frais-titre">
+    <section class="section" aria-labelledby="frais-titre">
       <div class="container two-cols">
-        <div class="stack stack--16 fees__text">
+        <div class="stack stack--16">
           <SectionHeading id="frais-titre" strong={page.fees.titleStrong} light={page.fees.titleLight} />
           {
             page.fees.texts.map((text) => (
@@ -250,7 +250,7 @@ const breadcrumb = [
       </div>
     </section>
 
-    <section id="candidater" class="section" aria-labelledby="candidater-titre">
+    <section id="candidater" class="section section--tinted" aria-labelledby="candidater-titre">
       <div class="container">
         <div class="apply two-cols">
           <div class="stack stack--20">
@@ -279,7 +279,7 @@ const breadcrumb = [
       </div>
     </section>
 
-    <section id="faq" class="section section--after-apply" aria-labelledby="faq-titre">
+    <section id="faq" class="section" aria-labelledby="faq-titre">
       <div class="container stack stack--32">
         <SectionHeading id="faq-titre" strong={page.faq.titleStrong} light={page.faq.titleLight} />
         <Faq items={faqItems} />
@@ -293,21 +293,6 @@ const breadcrumb = [
 <style>
   .section--tinted {
     background: var(--section);
-  }
-
-  /* Bande sauge : le texte passe en noir-95 (le basalte n'est pas assez contrasté). */
-  .section--sauge {
-    background: var(--accent);
-  }
-
-  .fees__text,
-  .fees__text :global(.section-heading__title) {
-    color: var(--noir-95);
-  }
-
-  /* La FAQ suit le bloc « Candidater » : pas de double espacement entre les deux. */
-  .section--after-apply {
-    padding-top: 0;
   }
 
   .stack {
@@ -565,10 +550,13 @@ const breadcrumb = [
   }
 
   /* Candidater */
+  /* Sur la section vert clair, le bloc devient une carte blanche. */
   .apply {
     padding: clamp(28px, 5vw, 64px);
+    border: 1px solid var(--bordure-carte);
     border-radius: var(--radius-block);
-    background: var(--section);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
   }
 
   .apply__buttons {
@@ -600,7 +588,7 @@ const breadcrumb = [
     width: 40px;
     height: 40px;
     border-radius: var(--radius-pill);
-    background: var(--surface);
+    background: var(--disque);
     font-size: var(--fs-body);
     font-weight: 800;
   }
