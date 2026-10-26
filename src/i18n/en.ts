@@ -95,6 +95,9 @@ const en: Dictionary = {
   // TODO traduction : page « Stages et volontariat » encore en français (copie de fr.ts).
   stages: structuredClone(fr.stages),
 
+  // TODO traduction : page « Entreprises » encore en français (copie de fr.ts).
+  entreprises: structuredClone(fr.entreprises),
+
   // TODO traduction : page « Équipe » encore en français (copie de fr.ts).
   equipe: structuredClone(fr.equipe),
 
@@ -118,6 +121,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Rapports et études » encore en français (copie de fr.ts).
   rapports: structuredClone(fr.rapports),
+
+  // TODO traduction : page « Contact » encore en français (copie de fr.ts).
+  contact: structuredClone(fr.contact),
 };
 
 export default en;

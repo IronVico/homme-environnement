@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import SitePage from '../../../../components/SitePage.astro';
+
+/** Une fiche par site du Burkina Faso (src/content/sites). */
+export const getStaticPaths = (async () => {
+  const sites = await getCollection('sites', ({ data }) => data.country === 'burkina-faso');
+  return sites.map((site) => ({ params: { site: site.id }, props: { site } }));
+}) satisfies GetStaticPaths;
+
+const { site } = Astro.props as { site: CollectionEntry<'sites'> };
+---
+
+<SitePage site={site} />

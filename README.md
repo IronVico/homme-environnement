@@ -127,10 +127,28 @@ Règles à suivre pour toute nouvelle page (WCAG 2.2 AA, modes clair et sombre, 
 
 - **Dons** : HelloAsso. Le lien est centralisé dans `DON_URL` ([`src/data/navigation.ts`](src/data/navigation.ts)).
 - **Newsletter** : outil d'emailing pas encore choisi. Le formulaire ([`NewsletterForm.astro`](src/components/NewsletterForm.astro)) a le markup accessible mais l'envoi est bloqué côté client ; une fois l'outil choisi, renseigner l'`action` et retirer le `preventDefault`.
+- **Formulaire de contact** (page `/contact`) : voir la section suivante.
 - **Réseaux sociaux** : URL LinkedIn et Facebook en placeholder dans `SOCIAL_URLS` ([`src/data/navigation.ts`](src/data/navigation.ts)).
 - **Traduction anglaise** de la home (voir « Langues »).
 - **Contenus** : en dur dans `src/pages/index.astro` pour l'instant ; passage en Markdown / CMS à décider.
 - **Pages internes** : tous les liens pointent vers `#`.
+
+## Formulaire de contact
+
+Le site reste statique ; seule la route `POST /api/contact` tourne côté serveur : une fonction Vercel ([`api/contact.ts`](api/contact.ts)) qui envoie le message par e-mail en SMTP, depuis une boîte de la messagerie de l'ONG (pas de service tiers, aucun cookie). Champs, sujets et validation sont partagés entre la page et la fonction ([`src/lib/contact.ts`](src/lib/contact.ts)) ; anti-spam : un champ piège invisible.
+
+Variables d'environnement à renseigner dans le projet Vercel (Settings → Environment Variables), modèle dans [`.env.example`](.env.example) :
+
+| Variable       | Rôle |
+| -------------- | ---- |
+| `CONTACT_TO`   | Destinataire des messages |
+| `SMTP_HOST`    | Serveur SMTP de la messagerie de l'ONG |
+| `SMTP_PORT`    | `465` (SSL, par défaut) ou `587` (STARTTLS) |
+| `SMTP_USER`    | Identifiant de la boîte qui envoie |
+| `SMTP_PASS`    | Mot de passe (ou mot de passe d'application) de cette boîte |
+| `CONTACT_FROM` | Expéditeur affiché, facultatif (`SMTP_USER` par défaut) |
+
+Tant qu'elles manquent (et avec `npm run dev`, qui ne sert pas `/api`), l'envoi échoue proprement : la page propose d'envoyer le message depuis la messagerie du visiteur (lien `mailto` prérempli). Pour tester la fonction en local : `vercel dev`.
 
 ## Contenus provisoires (maquette V1)
 

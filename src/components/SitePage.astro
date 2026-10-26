@@ -1,9 +1,10 @@
 ---
 /**
- * Fiche d'un site de Madagascar, commune aux deux langues et à tous les sites
- * (/sites/madagascar/<site> et /en/sites/madagascar/<site>). Contenu du site dans
+ * Fiche d'un site, commune aux deux langues, aux deux pays et à tous les sites
+ * (/sites/<pays>/<site> et /en/sites/<pays>/<site>). Contenu du site dans
  * son fichier src/content/sites/<site>.md, chiffres dans src/data/chiffres.ts,
- * textes du gabarit dans src/i18n (clé `site`).
+ * textes du gabarit dans src/i18n (clé `site`, et `site.burkina` pour le Burkina Faso).
+ * Le pays choisit la carte de localisation, le fil d'Ariane et la navigation entre sites.
  * Un champ absent du site s'affiche « [à fournir] » et la page n'est pas indexée.
  */
 import ArrowLeft from '@lucide/astro/icons/arrow-left';
@@ -12,6 +13,7 @@ import Backpack from '@lucide/astro/icons/backpack';
 import Droplets from '@lucide/astro/icons/droplets';
 import GraduationCap from '@lucide/astro/icons/graduation-cap';
 import HandHeart from '@lucide/astro/icons/hand-heart';
+import Info from '@lucide/astro/icons/info';
 import Scissors from '@lucide/astro/icons/scissors';
 import ShieldCheck from '@lucide/astro/icons/shield-check';
 import Sprout from '@lucide/astro/icons/sprout';
@@ -33,6 +35,7 @@ import { donatePath, fieldPath, pagePath, projectPath, sitePath } from '../data/
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from './Breadcrumb.astro';
+import BurkinaMap from './BurkinaMap.astro';
 import Button from './Button.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
@@ -55,7 +58,16 @@ const { site } = Astro.props;
 const { data } = site;
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
-const page = dict.site;
+// Burkina Faso : ses textes propres remplacent ceux des fiches de Madagascar.
+const burkina = data.country === 'burkina-faso';
+const local = burkina ? dict.site.burkina : undefined;
+const page = {
+  ...dict.site,
+  ...local,
+  species: { ...dict.site.species, ...local?.species },
+  nav: { ...dict.site.nav, ...local?.nav },
+};
+const countryPage = burkina ? 'burkina' : 'madagascar';
 
 const fill = (text: string, values: Record<string, string>) =>
   text.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
@@ -66,6 +78,7 @@ const sites = (await getCollection('sites', ({ data: other }) => other.country =
   (a, b) => a.data.order - b.data.order,
 );
 const index = sites.findIndex((other) => other.id === site.id);
+const otherSites = sites.filter((other) => other.id !== site.id);
 
 // Actions du site : une action reliée à un projet en prend l'icône, le titre et les sites ;
 // la phrase reste celle du site. Sans projet, l'action garde ses propres contenus.
@@ -82,6 +95,11 @@ const actionCards = (data.actions ?? []).map((action) => {
   };
 });
 const next = sites[(index + 1) % sites.length]!;
+// Pays d'un seul site (Burkina Faso) : le lien suivant mène à l'autre pays.
+const nextLink =
+  next.id !== site.id
+    ? { label: fill(page.nav.next, { name: next.data.name }), href: sitePath(lang, next.id, data.country) }
+    : page.nav.other && { label: page.nav.other, href: pagePath(lang, 'madagascar') };
 
 // Fiche complète : tous les contenus propres au site sont fournis.
 const complete = Boolean(
@@ -116,6 +134,8 @@ const FIGURE_ICONS = {
   frogsCounted: null,
   medicinalPlants: Leaf,
   lakes: Droplet,
+  families: Droplet,
+  pupils: GraduationCap,
 };
 type FigureKey = keyof typeof FIGURE_ICONS & keyof SiteFigures;
 
@@ -156,6 +176,24 @@ const speciesStatus = (status: (typeof data.species)[number]['status']) =>
 const story = data.story ?? { ...page.storyMissing, paragraphs: [page.missing] };
 const cta = data.cta ?? { ...page.cta, titleStrong: withName(page.cta.titleStrong) };
 const madagascarMap = dict.madagascar.sites.map;
+const burkinaMap = dict.burkina.sites.map;
+
+// Bouton secondaire du hero : séjours sur un site ouvert à la visite, sinon actions du site (Burkina Faso).
+const heroCta = data.visitable
+  ? { label: page.field, href: fieldPath(lang, site.id) }
+  : page.heroActions
+    ? { label: page.heroActions, href: '#actions' }
+    : undefined;
+// Second bouton de la carte d'appel : même logique, vers tous les projets.
+const ctaSecondary = data.visitable
+  ? { label: page.field, href: fieldPath(lang, site.id) }
+  : page.projects
+    ? { label: page.projects, href: pagePath(lang, 'projets') }
+    : undefined;
+
+// Carte de localisation du pays du site.
+const CountryMap = burkina ? BurkinaMap : MadagascarMap;
+const mapLabels = burkina ? burkinaMap : { ...madagascarMap, neighbours: [] };
 
 // Étiquette du site sur la carte : à gauche du repère, à droite pour les sites de l'Ouest.
 const labelSide = data.mapPosition.x > 50 ? 'left' : 'right';
@@ -163,7 +201,7 @@ const labelSide = data.mapPosition.x > 50 ? 'left' : 'right';
 const breadcrumb = [
   { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
   { label: dict.nav.main[1]!, href: '#' }, // TODO page « Nos sites »
-  { label: dict.madagascar.title, href: pagePath(lang, 'madagascar') },
+  { label: dict[countryPage].title, href: pagePath(lang, countryPage) },
 ];
 ---
 
@@ -188,7 +226,7 @@ const breadcrumb = [
       imagePosition={data.photoPosition}
       caption={fill(page.photoCaption, { name: data.name })}
       donate={{ label: withName(page.donate), href: donatePath(lang) }}
-      cta={data.visitable ? { label: page.field, href: fieldPath(lang, site.id) } : undefined}
+      cta={heroCta}
     />
 
     <section class="figures" aria-label={withName(page.statsLabel)}>
@@ -234,28 +272,26 @@ const breadcrumb = [
 
         <div class="locator" data-reveal>
           <div class="locator__map" role="group" aria-label={withName(page.mapLabel)}>
-            <MadagascarMap labels={madagascarMap} compact>
+            <CountryMap labels={mapLabels} compact={!burkina}>
               {
                 // Autres sites : liens vers leur fiche, nom affiché au survol et au focus.
-                sites
-                  .filter((other) => other.id !== site.id)
-                  .map((other) => (
-                    <a
-                      class="locator__site"
-                      href={sitePath(lang, other.id)}
-                      style={`left: ${other.data.mapPosition.x}%; top: ${other.data.mapPosition.y}%`}
+                otherSites.map((other) => (
+                  <a
+                    class="locator__site"
+                    href={sitePath(lang, other.id, data.country)}
+                    style={`left: ${other.data.mapPosition.x}%; top: ${other.data.mapPosition.y}%`}
+                  >
+                    <span class="locator__dot" />
+                    <span
+                      class:list={[
+                        'locator__label locator__label--tip',
+                        `locator__label--${other.data.mapPosition.x > 50 ? 'left' : 'right'}`,
+                      ]}
                     >
-                      <span class="locator__dot" />
-                      <span
-                        class:list={[
-                          'locator__label locator__label--tip',
-                          `locator__label--${other.data.mapPosition.x > 50 ? 'left' : 'right'}`,
-                        ]}
-                      >
-                        {other.data.name}
-                      </span>
-                    </a>
-                  ))
+                      {other.data.name}
+                    </span>
+                  </a>
+                ))
               }
               <span
                 class="locator__current"
@@ -267,8 +303,16 @@ const breadcrumb = [
               >
                 {data.name}
               </span>
-            </MadagascarMap>
+            </CountryMap>
           </div>
+          {
+            burkina && (
+              <p class="locator__note">
+                <Info size={16} />
+                {burkinaMap.note}
+              </p>
+            )
+          }
           <dl class="locator__facts">
             <div class="locator__fact">
               <dt><span class="locator__fact-icon"><MapPin size={20} /></span>{page.location}</dt>
@@ -311,7 +355,7 @@ const breadcrumb = [
       </div>
     </section>
 
-    <section class="section" aria-labelledby="actions-titre">
+    <section id="actions" class="section" aria-labelledby="actions-titre">
       <div class="container stack">
         <SectionHeading
           id="actions-titre"
@@ -402,19 +446,19 @@ const breadcrumb = [
     >
       <div class="cta__buttons">
         <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
-        {data.visitable && <Button href={fieldPath(lang, site.id)} variant="on-dark">{page.field}</Button>}
+        {ctaSecondary && <Button href={ctaSecondary.href} variant="on-dark">{ctaSecondary.label}</Button>}
       </div>
     </PhotoBanner>
 
     <nav class="site-nav container" aria-label={page.nav.label}>
-      <a class="site-nav__link site-nav__link--back" href={pagePath(lang, 'madagascar')}>
+      <a class="site-nav__link site-nav__link--back" href={pagePath(lang, countryPage)}>
         <ArrowLeft class="site-nav__arrow" size={18} />
         <span class="site-nav__label">{page.nav.all}</span>
       </a>
       {
-        next.id !== site.id && (
-          <a class="site-nav__link" href={sitePath(lang, next.id)}>
-            <span class="site-nav__label">{fill(page.nav.next, { name: next.data.name })}</span>
+        nextLink && (
+          <a class="site-nav__link" href={nextLink.href}>
+            <span class="site-nav__label">{nextLink.label}</span>
             <ArrowRight class="site-nav__arrow" size={18} />
           </a>
         )
@@ -641,6 +685,23 @@ const breadcrumb = [
 
   .locator__label--right {
     transform: translate(20px, -50%);
+  }
+
+  /* Carte du Burkina Faso : pleine largeur du bloc (format paysage). */
+  .locator__map :global(.bf-map) {
+    width: 100%;
+  }
+
+  .locator__note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: calc(-1 * var(--space-3));
+    font-size: 13px;
+  }
+
+  .locator__note :global(svg) {
+    flex-shrink: 0;
   }
 
   .locator__facts {

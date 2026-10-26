@@ -23,6 +23,8 @@ const figureKey = z.enum([
   'frogsCounted',
   'medicinalPlants',
   'lakes',
+  'families',
+  'pupils',
 ]);
 
 /**

@@ -1,0 +1,360 @@
+---
+/**
+ * Page « Entreprises » (S'engager, maquettes Entreprises / EntreprisesMobile), commune aux
+ * deux langues (/s-engager/entreprises et /en/s-engager/entreprises).
+ * Textes dans src/i18n (clé `entreprises`), partenaires dans src/data/partenaires.ts.
+ */
+import Briefcase from '@lucide/astro/icons/briefcase';
+import Check from '@lucide/astro/icons/check';
+import HandCoins from '@lucide/astro/icons/hand-coins';
+import Leaf from '@lucide/astro/icons/leaf';
+import { Picture } from 'astro:assets';
+import { engagePath, PARTNERS_EMAIL, pagePath } from '../data/navigation';
+import { getPartner } from '../data/partenaires';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Faq from './Faq.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import PageHero from './PageHero.astro';
+import PartnerCard from './PartnerCard.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import SectionHeading from './SectionHeading.astro';
+import StepsBlock from './StepsBlock.astro';
+
+import ctaPhoto from '../assets/photos/don/campagne-ambalakalanoro.jpg';
+import whyPhoto from '../assets/photos/don/impact-ylang-ylang.jpg';
+import heroPhoto from '../assets/photos/site-mont-passot.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.entreprises;
+
+// TODO ONG : adresse de contact des entreprises (en attendant, celle des partenariats).
+const mailto = `mailto:${PARTNERS_EMAIL}?subject=${encodeURIComponent(page.cta.mailSubject)}`;
+
+const offers = page.offers.cards.map((card, i) => ({ ...card, Icon: [HandCoins, Briefcase, Leaf][i]! }));
+
+// Entreprises partenaires mises en avant (logos fournis par l'ONG).
+const partners = ['pure-trade', 'bourrelier-group', 'floribis'].map(getPartner);
+
+const faqItems = page.faq.items.map(({ question, answer }) => ({ question, answer: [answer] }));
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[3]!, href: engagePath(lang) }, // TODO page « S'engager »
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={heroPhoto} ogImageAlt={page.hero.imageAlt}>
+  <Header current="engager" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <!-- Contenu encore en français sur la page anglaise. -->
+  <main id="contenu" lang={lang === 'en' ? 'fr' : undefined}>
+    <PageHero
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      image={heroPhoto}
+      imageAlt={page.hero.imageAlt}
+      imagePosition="50% 40%"
+      caption={page.hero.caption}
+      primary={{ label: page.hero.write, href: mailto, icon: 'mail' }}
+      cta={{ label: page.hero.offers, href: '#offres' }}
+    />
+
+    <section id="offres" class="section" aria-labelledby="offres-titre">
+      <div class="container stack stack--40">
+        <SectionHeading
+          id="offres-titre"
+          strong={page.offers.titleStrong}
+          light={page.offers.titleLight}
+          lead={page.offers.lead}
+        />
+        <div class="offers">
+          {
+            offers.map(({ Icon, title, text }) => (
+              <div class="card offer-card" data-reveal>
+                <span class="icon-disc">
+                  <Icon size={24} />
+                </span>
+                <h3 class="offer-card__title">{title}</h3>
+                <p class="offer-card__text">{text}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="pourquoi-titre">
+      <div class="container why">
+        <div class="stack stack--32">
+          <SectionHeading id="pourquoi-titre" strong={page.why.titleStrong} light={page.why.titleLight} />
+          <ul class="why__list">
+            {
+              page.why.items.map((item) => (
+                <li class="why__item" data-reveal>
+                  <span class="why__check">
+                    <Check size={18} />
+                  </span>
+                  <span class="why__body">
+                    <span class="why__title">{item.title}</span>
+                    <span class="why__text">{item.text}</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <figure class="why__figure" data-reveal>
+          <Picture
+            class="why__photo"
+            src={whyPhoto}
+            alt={page.why.imageAlt}
+            formats={['avif', 'webp']}
+            widths={[400, 640, 960]}
+            sizes="(max-width: 900px) 100vw, 400px"
+          />
+          <figcaption class="why__caption">{page.why.caption}</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="etapes-titre">
+      <div class="container">
+        <StepsBlock
+          id="etapes-titre"
+          tone="section"
+          compact
+          titleStrong={page.steps.titleStrong}
+          titleLight={page.steps.titleLight}
+          text={page.steps.text}
+          button={{ label: page.steps.button, href: mailto }}
+          steps={page.steps.items}
+        />
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="partenaires-titre">
+      <div class="container stack stack--32">
+        <SectionHeading
+          id="partenaires-titre"
+          strong={page.partners.titleStrong}
+          light={page.partners.titleLight}
+          link={{ label: page.partners.link, href: pagePath(lang, 'partenaires') }}
+        />
+        <ul class="partners">
+          {
+            partners.map((partner) => (
+              <PartnerCard partner={partner} typeLabel={dict.partenaires.types[partner.type]} data-reveal />
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section id="faq" class="section" aria-labelledby="faq-titre">
+      <div class="container stack stack--32">
+        <SectionHeading id="faq-titre" strong={page.faq.titleStrong} light={page.faq.titleLight} />
+        <Faq items={faqItems} />
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="contact-titre"
+      titleStrong={page.cta.titleStrong}
+      titleLight={page.cta.titleLight}
+      text={page.cta.text}
+      image={ctaPhoto}
+      imagePosition="50% 50%"
+    >
+      <div class="cta__buttons">
+        <Button href={mailto} variant="on-dark-primary" icon="mail">{page.cta.write}</Button>
+        <Button href={pagePath(lang, 'partenaires')} variant="on-dark">{page.cta.partners}</Button>
+      </div>
+    </PhotoBanner>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .section--tinted {
+    background: var(--section);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stack--32 {
+    gap: var(--space-8);
+  }
+
+  .stack--40 {
+    gap: 40px;
+  }
+
+  .card {
+    border: 1px solid var(--bordure-carte);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Trois façons de vous engager, puis partenaires : 3 colonnes, 2 en tablette, 1 en mobile. */
+  .offers,
+  .partners {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 1000px) {
+    .offers,
+    .partners {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .offers,
+    .partners {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .offer-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--space-7);
+    border-radius: var(--radius-card-lg);
+  }
+
+  .icon-disc {
+    flex-shrink: 0;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+    color: var(--texte);
+  }
+
+  .offer-card__title {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .offer-card__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* Pourquoi nous : arguments sur deux tiers, photo carrée en arche sur un tiers. */
+  .why {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 40px 64px;
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .why {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .why__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .why__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .why__check {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+  }
+
+  .why__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .why__title {
+    font-size: 19px;
+    font-weight: 800;
+  }
+
+  .why__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .why__figure {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .why__figure :global(.why__photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 96px 96px var(--radius-card-sm) var(--radius-card-sm);
+  }
+
+  /* Empilé : photo paysage, arche réduite. */
+  @media (max-width: 900px) {
+    .why__figure :global(.why__photo) {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .why__figure :global(.why__photo) {
+      border-radius: 40px 40px var(--radius-card-sm) var(--radius-card-sm);
+    }
+  }
+
+  /* Sur vert clair : légende en basalte (l'ardoise est réservée au fond blanc). */
+  .why__caption {
+    font-size: var(--fs-caption);
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

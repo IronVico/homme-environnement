@@ -44,7 +44,7 @@ const campaignProgress =
 const otherCards = [
   { href: '#', image: otherBoutique, position: '50% 40%' }, // TODO URL de la boutique solidaire
   { href: pagePath(lang, 'stages'), image: otherService, position: '50% 40%' },
-  { href: engagePath(lang), image: otherEntreprise, position: '50% 35%' }, // TODO page Entreprises
+  { href: pagePath(lang, 'entreprises'), image: otherEntreprise, position: '50% 35%' },
 ].map((card, i) => ({ ...card, ...page.other.cards[i]! }));
 
 const faqItems = page.faq.items.map(({ question, answer }) => ({ question, answer: [answer] }));

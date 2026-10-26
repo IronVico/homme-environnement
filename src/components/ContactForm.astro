@@ -1,0 +1,468 @@
+---
+/**
+ * Formulaire de la page Contact (carte « Votre message »). Envoi : fonction Vercel api/contact.ts.
+ * - Avec JS : validation au fil de la saisie (message sous le champ en quittant le champ, retiré dès
+ *   que la saisie est valide), focus sur le premier champ en erreur, envoi en fetch, résultat dans
+ *   la zone role="status". Si l'envoi échoue, lien mailto prérempli avec le message.
+ * - Sans JS : validation du navigateur (required), envoi classique ; la fonction renvoie à la page,
+ *   à l'ancre du message de confirmation ou d'erreur (affiché par :target).
+ * Anti-spam : champ piège (CONTACT_TRAP) hors écran, ignoré des visiteurs et du clavier.
+ */
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import Send from '@lucide/astro/icons/send';
+import { CONTACT_EMAIL, pagePath } from '../data/navigation';
+import { getLang, t } from '../i18n';
+import { fill } from '../lib/don';
+import { CONTACT_ANCHORS, CONTACT_ENDPOINT, CONTACT_MAX, CONTACT_SUBJECTS, CONTACT_TRAP } from '../lib/contact';
+
+interface Props {
+  /** id du titre de la carte (nom accessible du formulaire). */
+  labelledby: string;
+}
+
+const { labelledby } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const form = t(lang).contact.form;
+const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) });
+---
+
+<form
+  class="contact-form"
+  action={CONTACT_ENDPOINT}
+  method="post"
+  aria-labelledby={labelledby}
+  data-contact
+  data-sending={form.sending}
+  data-sent={form.sent}
+  data-failed={form.failed}
+  data-failed-link={form.failedLink}
+  data-email={CONTACT_EMAIL}
+>
+  <input type="hidden" name="lang" value={lang} />
+
+  <div class="contact-form__row">
+    <div class="contact-form__field">
+      <label class="contact-form__label" for="contact-nom">{form.name} <span aria-hidden="true">*</span></label>
+      <input
+        class="contact-form__input"
+        id="contact-nom"
+        name="nom"
+        type="text"
+        autocomplete="name"
+        maxlength={CONTACT_MAX.nom}
+        required
+        aria-describedby="contact-nom-erreur"
+        data-field
+        data-error-required={form.errors.nom}
+        data-error-too-long={tooLong(CONTACT_MAX.nom)}
+      />
+      <p class="contact-form__error" id="contact-nom-erreur" aria-live="polite"></p>
+    </div>
+    <div class="contact-form__field">
+      <label class="contact-form__label" for="contact-email">{form.email} <span aria-hidden="true">*</span></label>
+      <input
+        class="contact-form__input"
+        id="contact-email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        inputmode="email"
+        maxlength={CONTACT_MAX.email}
+        placeholder={form.emailPlaceholder}
+        required
+        aria-describedby="contact-email-aide contact-email-erreur"
+        data-field
+        data-error-required={form.errors.email}
+        data-error-email={form.errors.emailInvalid}
+        data-error-too-long={tooLong(CONTACT_MAX.email)}
+      />
+      <p class="contact-form__help" id="contact-email-aide">{form.emailHelp}</p>
+      <p class="contact-form__error" id="contact-email-erreur" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="contact-sujet">{form.subject} <span aria-hidden="true">*</span></label>
+    <span class="contact-form__select">
+      <select
+        class="contact-form__input"
+        id="contact-sujet"
+        name="sujet"
+        required
+        aria-describedby="contact-sujet-erreur"
+        data-field
+        data-error-required={form.errors.sujet}
+      >
+        <option value="" disabled selected>{form.subjectPlaceholder}</option>
+        {CONTACT_SUBJECTS.map((subject) => <option value={subject}>{form.subjects[subject]}</option>)}
+      </select>
+      <ChevronDown class="contact-form__chevron" size={20} />
+    </span>
+    <p class="contact-form__error" id="contact-sujet-erreur" aria-live="polite"></p>
+  </div>
+
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="contact-message">{form.message} <span aria-hidden="true">*</span></label>
+    <textarea
+      class="contact-form__input contact-form__textarea"
+      id="contact-message"
+      name="message"
+      rows="7"
+      maxlength={CONTACT_MAX.message}
+      required
+      aria-describedby="contact-message-aide contact-message-erreur"
+      data-field
+      data-error-required={form.errors.message}
+      data-error-too-long={tooLong(CONTACT_MAX.message)}></textarea>
+    <p class="contact-form__help" id="contact-message-aide">{form.messageHelp}</p>
+    <p class="contact-form__error" id="contact-message-erreur" aria-live="polite"></p>
+  </div>
+
+  <!-- Champ piège : hors écran, sauté au clavier ; s'il est rempli, le message est ignoré. -->
+  <div class="contact-form__trap" aria-hidden="true">
+    <label for="contact-piege">{form.trap}</label>
+    <input id="contact-piege" name={CONTACT_TRAP} type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="contact-form__field">
+    <div class="contact-form__consent">
+      <input
+        class="contact-form__checkbox"
+        id="contact-consentement"
+        name="consentement"
+        type="checkbox"
+        required
+        aria-describedby="contact-consentement-erreur"
+        data-field
+        data-error-required={form.errors.consentement}
+      />
+      <label for="contact-consentement">
+        {form.consent} <span aria-hidden="true">*</span>
+      </label>
+    </div>
+    <p class="contact-form__privacy"><a href={pagePath(lang, 'confidentialite')}>{form.privacyLink}</a></p>
+    <p class="contact-form__error" id="contact-consentement-erreur" aria-live="polite"></p>
+  </div>
+
+  <div class="contact-form__actions">
+    <button class="contact-form__submit btn-motion" type="submit">
+      {form.submit}
+      <Send size={20} />
+    </button>
+    <p class="contact-form__status" role="status" data-status></p>
+    <p class="contact-form__notice" id={CONTACT_ANCHORS.sent} tabindex="-1">{form.sent}</p>
+    <p class="contact-form__notice" id={CONTACT_ANCHORS.error} tabindex="-1">
+      {form.failedNoScript}<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+    </p>
+  </div>
+</form>
+
+<script>
+  import { readContactValues, validateContactField, type ContactError, type ContactField } from '../lib/contact';
+
+  type Control = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+  const ERROR_ATTRIBUTE: Record<ContactError, string> = {
+    required: 'errorRequired',
+    email: 'errorEmail',
+    tooLong: 'errorTooLong',
+  };
+
+  document.querySelectorAll<HTMLFormElement>('form[data-contact]').forEach((form) => {
+    // La validation passe par le script (messages sous les champs), plus par les bulles du navigateur.
+    form.noValidate = true;
+    const controls = [...form.querySelectorAll<Control>('[data-field]')];
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    let sending = false;
+
+    const showError = (control: Control, error: ContactError | null) => {
+      const message = document.getElementById(`${control.id}-erreur`);
+      const text = error ? (control.dataset[ERROR_ATTRIBUTE[error]] ?? control.dataset.errorRequired ?? '') : '';
+      if (message && message.textContent !== text) message.textContent = text;
+      if (error) control.setAttribute('aria-invalid', 'true');
+      else control.removeAttribute('aria-invalid');
+    };
+
+    const check = (control: Control) => {
+      const error = validateContactField(control.name as ContactField, readContactValues(new FormData(form)));
+      showError(control, error);
+      return error;
+    };
+
+    controls.forEach((control) => {
+      // Affiché en quittant le champ ; retiré dès que la saisie redevient valide.
+      control.addEventListener('blur', () => {
+        if (control.type === 'checkbox' && !control.hasAttribute('aria-invalid')) return;
+        check(control);
+      });
+      const recheck = () => {
+        if (control.hasAttribute('aria-invalid')) check(control);
+      };
+      control.addEventListener('input', recheck);
+      control.addEventListener('change', recheck);
+    });
+
+    // Échec d'envoi : lien mailto prérempli avec le message saisi.
+    const showFailure = () => {
+      const values = readContactValues(new FormData(form));
+      const link = document.createElement('a');
+      const subject = form.querySelector<HTMLSelectElement>('select[name="sujet"]')?.selectedOptions[0]?.textContent ?? '';
+      link.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+        `${values.message.trim()}\n\n${values.nom.trim()}`,
+      )}`;
+      link.textContent = form.dataset.failedLink ?? '';
+      status.replaceChildren(form.dataset.failed ?? '', link, '.');
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (sending) return;
+
+      const invalid = controls.filter((control) => check(control) !== null);
+      if (invalid.length > 0) {
+        status.textContent = '';
+        invalid[0]!.focus();
+        return;
+      }
+
+      sending = true;
+      submit.setAttribute('aria-disabled', 'true');
+      status.textContent = form.dataset.sending ?? '';
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        const result = (await response.json().catch(() => ({}))) as {
+          ok?: boolean;
+          errors?: Partial<Record<ContactField, ContactError>>;
+        };
+        if (response.ok && result.ok) {
+          form.reset();
+          status.textContent = form.dataset.sent ?? '';
+        } else if (result.errors && Object.keys(result.errors).length > 0) {
+          // Refusé par la fonction (rare : mêmes règles que le script).
+          status.textContent = '';
+          const refused = controls.filter((control) => result.errors?.[control.name as ContactField]);
+          refused.forEach((control) => showError(control, result.errors![control.name as ContactField]!));
+          refused[0]?.focus();
+        } else {
+          showFailure();
+        }
+      } catch {
+        showFailure();
+      } finally {
+        sending = false;
+        submit.removeAttribute('aria-disabled');
+      }
+    });
+  });
+</script>
+
+<style>
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .contact-form__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 20px;
+  }
+
+  @media (max-width: 600px) {
+    .contact-form__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .contact-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .contact-form__label {
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+  }
+
+  /* Contour à 3:1 minimum sur la carte (WCAG 1.4.11) : texte doux, comme le montant libre du don. */
+  .contact-form__input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 52px;
+    margin: 0;
+    padding: 14px 18px;
+    border: 1.5px solid var(--texte-doux);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--texte);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.4;
+    transition: border-color var(--transition-ui);
+  }
+
+  .contact-form__input::placeholder {
+    color: var(--texte-doux);
+    opacity: 1;
+  }
+
+  .contact-form__input:hover,
+  .contact-form__input:focus,
+  .contact-form__input[aria-invalid='true'] {
+    border-color: var(--texte);
+  }
+
+  .contact-form__input[aria-invalid='true'] {
+    border-width: 2px;
+  }
+
+  .contact-form__textarea {
+    min-height: 180px;
+    border-radius: 18px;
+    line-height: 1.55;
+    resize: vertical;
+  }
+
+  .contact-form__select {
+    position: relative;
+    display: block;
+  }
+
+  .contact-form__select select {
+    padding-right: 52px;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .contact-form__select :global(.contact-form__chevron) {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    color: var(--texte);
+    pointer-events: none;
+    translate: 0 -50%;
+  }
+
+  .contact-form__help {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--texte-doux);
+  }
+
+  .contact-form__error {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* Vide : reste dans la page (zone aria-live déjà présente pour être annoncée), sans espace. */
+  .contact-form__error:empty {
+    margin-top: calc(-1 * var(--space-2));
+  }
+
+  .contact-form__consent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--fs-body-sm);
+    line-height: 1.55;
+  }
+
+  .contact-form__checkbox {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    margin: 1px 0 0;
+    accent-color: var(--bouton-plein);
+    cursor: pointer;
+  }
+
+  .contact-form__consent label {
+    cursor: pointer;
+  }
+
+  /* Lien sous la case, aligné sur le texte du libellé (case 22px + écart 12px). */
+  .contact-form__privacy {
+    padding-left: 34px;
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+  }
+
+  .contact-form__trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .contact-form__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .contact-form__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+    font: inherit;
+    font-size: var(--fs-button);
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .contact-form__submit:hover {
+    background: var(--texte-fort);
+  }
+
+  .contact-form__submit[aria-disabled='true'] {
+    cursor: progress;
+  }
+
+  .contact-form__submit :global(svg) {
+    flex-shrink: 0;
+  }
+
+  .contact-form__status,
+  .contact-form__notice {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .contact-form__status:empty {
+    margin-top: -16px;
+  }
+
+  /* Messages de l'envoi sans JS : affichés quand la page revient à leur ancre. */
+  .contact-form__notice {
+    display: none;
+  }
+
+  .contact-form__notice:target {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact-form__input {
+      transition: none;
+    }
+  }
+</style>
