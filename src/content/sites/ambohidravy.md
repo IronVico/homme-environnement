@@ -46,15 +46,15 @@ species:
     text: "Un palissandre endémique, rare, très touché par l'exploitation illégale de son bois précieux."
 actionsLead: Protéger la forêt sacrée avec ceux qui en sont les gardiens.
 actions:
-  - icon: surveillance
+  - icon: shield
     title: Renforcer la surveillance
     text: "Former et équiper les patrouilleurs communautaires (GPS, radios, matériel de terrain) pour patrouiller plus souvent et réagir vite aux intrusions."
     project: surveillance-forestiere
-  - icon: agriculture
+  - icon: sprout
     title: Soutenir les communautés
     text: "Appuyer la gouvernance locale et des filières compatibles avec la forêt, comme la vanille plantée sous couvert forestier."
     project: chaines-de-valeur
-  - icon: laboratoire
+  - icon: flask
     title: Une station de conservation et de recherche
     text: "Une présence permanente pour freiner les coupes illégales, servir de base aux patrouilles et accueillir chercheurs et étudiants."
 # groups: à fournir (la présentation ne cite pas de groupement local).

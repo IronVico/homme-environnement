@@ -222,7 +222,6 @@ const fr = {
       titleStrong: 'Nos projets',
       titleLight: 'à Madagascar',
       lead: 'Chaque projet allie protection de la nature et revenus pour les communautés, sur un ou plusieurs de nos sites.',
-      sitesLabel: 'Sites',
     },
     cta: {
       titleStrong: 'Soutenir Madagascar,',
@@ -230,6 +229,62 @@ const fr = {
       text: 'Votre don finance directement les actions sur les sites.',
       field: 'Venir sur le terrain',
     },
+  },
+  // Page pays Burkina Faso (maquette PaysBurkina). Chiffres dans src/data/chiffres.ts (BURKINA).
+  burkina: {
+    title: 'Burkina Faso',
+    description:
+      "Au Burkina Faso, L'Homme & l'Environnement agit à Kollo et Guiaro avec les communautés locales : eau potable solaire, cultures durables et éducation environnementale.",
+    hero: {
+      titleStrong: 'Burkina Faso,',
+      titleLight: "l'eau et la terre au cœur du projet.",
+      lead: "Au Burkina Faso, L'Homme & l'Environnement agit sur un site, Kollo et Guiaro, avec les communautés locales : l'accès à l'eau potable grâce à l'énergie solaire, des cultures durables pour remplacer la culture sur brûlis et l'éducation environnementale dans les écoles.",
+      // TODO ONG : texte à fournir.
+      text: "[Texte à compléter : année de début de l'action, contexte du pays.]",
+      cta: 'Découvrir le site',
+      imageAlt: "Un troupeau d'éléphants traverse une piste de terre rouge, Burkina Faso",
+    },
+    statsLabel: 'Burkina Faso en chiffres',
+    stats: [
+      { unit: 'ha', text: 'protégés à Kollo et Guiaro.', illustrationLabel: 'Surface protégée' },
+      {
+        unit: undefined,
+        text: "familles ayant accès à l'eau potable grâce à l'adduction solaire.",
+        illustrationLabel: "Accès à l'eau",
+      },
+      { unit: undefined, text: 'élèves sensibilisés dans les écoles.', illustrationLabel: 'Élèves sensibilisés' },
+    ],
+    sites: {
+      titleStrong: 'Notre site',
+      titleLight: 'au Burkina Faso',
+      lead: "Un site, Kollo et Guiaro, où nous agissons avec les familles pour l'eau, la terre et l'école.",
+      /** Pas encore de fiche : la carte du site mène aux projets de la page. */
+      link: 'Voir les projets du site',
+      map: {
+        label: 'Carte du site au Burkina Faso',
+        capital: 'Ouagadougou',
+        north: 'N',
+        /** Pays voisins, dans l'ordre des positions de BurkinaMap. */
+        neighbours: ['Mali', 'Niger', 'Ghana', "Côte d'Ivoire", 'Togo', 'Bénin'],
+        note: 'Position indicative, à confirmer.',
+      },
+    },
+    projects: {
+      titleStrong: 'Nos projets',
+      titleLight: 'au Burkina Faso',
+      lead: "Trois projets menés avec les familles de Kollo et Guiaro, pour l'eau, la terre et l'école.",
+    },
+    cta: {
+      titleStrong: 'Soutenir le Burkina Faso,',
+      titleLight: "c'est sécuriser l'eau des familles de Kollo et Guiaro.",
+      text: 'Votre don finance directement les actions sur le site.',
+      projects: 'Tous nos projets',
+    },
+  },
+  // Carte projet compacte (pages pays, fiches site).
+  projectCard: {
+    link: 'Voir le projet',
+    sitesLabel: 'Sites',
   },
   // Fiche site (gabarit commun, maquette FicheVohimana). Le contenu propre à chaque site est dans src/content/sites.
   site: {
@@ -283,7 +338,6 @@ const fr = {
     actions: {
       titleStrong: 'Nos actions',
       titleLight: 'sur le site',
-      link: 'Voir le projet',
     },
     people: {
       titleStrong: 'Ceux qui font',

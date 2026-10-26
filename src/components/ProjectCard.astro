@@ -1,52 +1,160 @@
 ---
-/** Carte blanche compacte d'un projet : titre avec flèche, puis les sites où il est mené. */
+/**
+ * Carte projet compacte, sans photo (pages pays, fiches site) : icône du projet
+ * dans une pastille menthe, titre, une phrase, puis sous un filet les sites où il
+ * est mené et la flèche. La carte avec photo (ProjectPhotoCard) est réservée à la
+ * page « Nos projets ». À placer dans un ProjectGrid (élément de liste).
+ * Sans `href` (action d'un site sans projet relié), la carte n'est pas cliquable :
+ * ni flèche ni survol.
+ */
 import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Droplet from '@lucide/astro/icons/droplet';
+import Droplets from '@lucide/astro/icons/droplets';
+import FlaskConical from '@lucide/astro/icons/flask-conical';
+import Flower from '@lucide/astro/icons/flower';
+import GraduationCap from '@lucide/astro/icons/graduation-cap';
+import MapPin from '@lucide/astro/icons/map-pin';
+import Shield from '@lucide/astro/icons/shield';
+import Sprout from '@lucide/astro/icons/sprout';
+import Tent from '@lucide/astro/icons/tent';
+import Trees from '@lucide/astro/icons/trees';
+import type { PROJECT_ICONS } from '../data/projets';
+
+const ICONS = {
+  shield: Shield,
+  flask: FlaskConical,
+  tent: Tent,
+  sprout: Sprout,
+  trees: Trees,
+  'graduation-cap': GraduationCap,
+  flower: Flower,
+  droplets: Droplets,
+  droplet: Droplet,
+} satisfies Record<(typeof PROJECT_ICONS)[number], unknown>;
 
 interface Props {
+  icon: keyof typeof ICONS;
   title: string;
+  text: string;
+  /** Noms des sites où le projet est mené. */
   sites: string[];
   /** Préfixe lu par les lecteurs d'écran devant la liste des sites (« Sites : »). */
   sitesLabel: string;
-  href: string;
+  href?: string;
+  /** Texte lu par les lecteurs d'écran à la place de la flèche (« Voir le projet »). */
+  linkLabel: string;
 }
 
-const { title, sites, sitesLabel, href } = Astro.props;
+const { icon, title, text, sites, sitesLabel, href, linkLabel } = Astro.props;
+const Icon = ICONS[icon];
+const Tag = href ? 'a' : 'div';
 ---
 
-<a class="project-card card-lift" href={href} data-reveal>
-  <span class="project-card__title">
-    {title}
-    <ArrowRight class="project-card__arrow" size={18} />
-  </span>
-  <span class="project-card__sites"><span class="visually-hidden">{sitesLabel} : </span>{sites.join(', ')}</span>
-</a>
+<li class="project-card-item" data-reveal>
+  <Tag class:list={['project-card', { 'card-lift': href }]} href={href}>
+    <span class="project-card__icon"><Icon size={22} /></span>
+    <h3 class="project-card__title">{title}</h3>
+    <p class="project-card__text">{text}</p>
+    <span class="project-card__footer">
+      {
+        sites.length > 0 && (
+          <span class="project-card__sites">
+            <MapPin class="project-card__pin" size={16} />
+            <span>
+              <span class="visually-hidden">{sitesLabel} : </span>
+              {sites.join(', ')}
+            </span>
+          </span>
+        )
+      }
+      {
+        href && (
+          <span class="project-card__more">
+            <ArrowRight class="project-card__arrow" size={18} />
+            <span class="visually-hidden">{linkLabel}</span>
+          </span>
+        )
+      }
+    </span>
+  </Tag>
+</li>
 
 <style>
+  .project-card-item {
+    display: flex;
+  }
+
   .project-card {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 20px 22px;
+    gap: var(--space-3);
+    padding: var(--space-6);
     background: var(--surface);
     color: var(--texte);
     border: 1px solid var(--bordure-carte);
-    border-radius: var(--radius-card-sm);
+    border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     text-decoration: none;
   }
 
-  .project-card:hover {
+  a.project-card:hover {
+    color: var(--texte);
+  }
+
+  .project-card__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
     color: var(--texte);
   }
 
   .project-card__title {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .project-card__text {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* Sites à gauche, flèche à droite, sous un filet. */
+  .project-card__footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.2;
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--bordure-carte);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .project-card__sites {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  /* Repère sauge : décoratif, le texte reste en basalte. */
+  .project-card :global(.project-card__pin) {
+    flex-shrink: 0;
+    color: var(--accent);
+  }
+
+  .project-card__more {
+    display: inline-flex;
+    margin-left: auto;
   }
 
   .project-card :global(.project-card__arrow) {
@@ -54,21 +162,14 @@ const { title, sites, sitesLabel, href } = Astro.props;
     transition: transform var(--transition-ui);
   }
 
-  .project-card:hover :global(.project-card__arrow),
-  .project-card:focus-visible :global(.project-card__arrow) {
+  a.project-card:hover :global(.project-card__arrow),
+  a.project-card:focus-visible :global(.project-card__arrow) {
     transform: translateX(var(--nudge-arrow-hover));
   }
 
-  /* Ardoise : la carte est blanche (contraste 4,7:1). */
-  .project-card__sites {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--texte-doux);
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .project-card:hover :global(.project-card__arrow),
-    .project-card:focus-visible :global(.project-card__arrow) {
+    a.project-card:hover :global(.project-card__arrow),
+    a.project-card:focus-visible :global(.project-card__arrow) {
       transform: none;
     }
   }

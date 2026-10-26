@@ -32,7 +32,6 @@ import { SITE_FIGURES, type SiteFigures } from '../data/chiffres';
 import { donatePath, fieldPath, pagePath, projectPath, sitePath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ActionCard from './ActionCard.astro';
 import Breadcrumb from './Breadcrumb.astro';
 import Button from './Button.astro';
 import Footer from './Footer.astro';
@@ -40,6 +39,8 @@ import Header from './Header.astro';
 import MadagascarMap from './MadagascarMap.astro';
 import PageHero from './PageHero.astro';
 import PhotoBanner from './PhotoBanner.astro';
+import ProjectCard from './ProjectCard.astro';
+import ProjectGrid from './ProjectGrid.astro';
 import SectionHeading from './SectionHeading.astro';
 import SpeciesCard from './SpeciesCard.astro';
 import StatCard from './StatCard.astro';
@@ -65,6 +66,21 @@ const sites = (await getCollection('sites', ({ data: other }) => other.country =
   (a, b) => a.data.order - b.data.order,
 );
 const index = sites.findIndex((other) => other.id === site.id);
+
+// Actions du site : une action reliée à un projet en prend l'icône, le titre et les sites ;
+// la phrase reste celle du site. Sans projet, l'action garde ses propres contenus.
+const siteNames = new Map((await getCollection('sites')).map((other) => [other.id, other.data.name]));
+const projects = new Map((await getCollection('projets')).map((project) => [project.id, project.data]));
+const actionCards = (data.actions ?? []).map((action) => {
+  const project = action.project && projects.get(action.project.id);
+  return {
+    icon: project?.icon ?? action.icon,
+    title: project?.title ?? action.title,
+    text: action.text,
+    sites: project ? project.sites.map((ref) => siteNames.get(ref.id) ?? ref.id) : [data.name],
+    href: action.project && projectPath(lang, action.project.id),
+  };
+});
 const next = sites[(index + 1) % sites.length]!;
 
 // Fiche complète : tous les contenus propres au site sont fournis.
@@ -304,18 +320,12 @@ const breadcrumb = [
           lead={data.actionsLead ?? page.missing}
         />
         {
-          data.actions?.length ? (
-            <ul class="cards-grid">
-              {data.actions.map((action) => (
-                <ActionCard
-                  icon={action.icon}
-                  title={action.title}
-                  text={action.text}
-                  href={action.project ? projectPath(lang, action.project.id) : '#'}
-                  linkLabel={page.actions.link}
-                />
+          actionCards.length ? (
+            <ProjectGrid>
+              {actionCards.map((card) => (
+                <ProjectCard {...card} sitesLabel={dict.projectCard.sitesLabel} linkLabel={dict.projectCard.link} />
               ))}
-            </ul>
+            </ProjectGrid>
           ) : (
             <p class="missing">{page.missing}</p>
           )

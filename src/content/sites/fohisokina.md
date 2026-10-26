@@ -37,15 +37,15 @@ species:
     photoPosition: 50% 65%
 actionsLead: "Protéger la grenouille, en protégeant d'abord son habitat."
 actions:
-  - icon: surveillance
+  - icon: shield
     title: Prévenir les feux de brousse
     text: "Soutenir la surveillance par les habitants et entretenir les pare-feux, pour limiter les incendies qui détruisent l'habitat."
     project: surveillance-forestiere
-  - icon: reboisement
+  - icon: trees
     title: Restaurer et préserver l'habitat
     text: "Reboiser, protéger les zones humides et les fragments de forêt, avec l'appui de biologistes spécialistes de l'espèce."
     project: reboisement
-  - icon: agriculture
+  - icon: sprout
     title: Des filières économiques durables
     text: "Pisciculture, apiculture, agroforesterie : des revenus qui allègent la pression sur les milieux naturels."
     project: chaines-de-valeur

@@ -66,19 +66,19 @@ src/
 | Composant           | Rôle |
 | ------------------- | ---- |
 | `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
-| `MadagascarPage`    | Page pays Madagascar commune aux deux langues ; sites et projets lus dans les collections, chiffres dans `data/chiffres.ts` |
+| `CountryPage`       | Page pays (Madagascar, Burkina Faso) commune aux deux langues ; sites et projets lus dans les collections, chiffres dans `data/chiffres.ts` |
 | `Breadcrumb`        | Fil d'Ariane des pages internes |
 | `PageHero`          | Hero des pages internes : H1 en deux temps, chapeau, bouton secondaire, photo en arche |
 | `SitesExplorer`     | Carte du pays avec repères numérotés + liste des sites, liés (clic sur un repère, survol ou focus d'une carte) |
-| `MadagascarMap`     | Carte SVG de Madagascar (courbes de niveau, capitale, mers), libellés traduisibles |
+| `MadagascarMap` / `BurkinaMap` | Cartes SVG des pays (courbes de niveau, capitale, mers ou pays voisins), libellés traduisibles |
 | `SiteCard`          | Carte compacte d'un site, toute cliquable : numéro et nom, accroche sur 2 lignes, surface protégée |
-| `ProjectCard`       | Carte compacte d'un projet et des sites où il est mené |
+| `ProjectCard` / `ProjectGrid` | Carte projet compacte sans photo (icône, titre, phrase, sites), en grille de 3 colonnes : pages pays et actions des fiches site. La carte avec photo (`ProjectPhotoCard`) est réservée à « Nos projets » |
 | `PhotoBanner`       | Carte sur photo assombrie (titre + phrase) avec contenu libre : newsletter, boutons d'appel |
 | `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don ; sous-menus déroulants (accordéon dans le burger) ; fixé en haut au scroll ; burger en dessous de 1280px |
 | `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
 | `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
 | `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
-| `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles, sites, part, familles) ; valeur texte (« [X] ») affichée sans compteur |
+| `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles, sites, part, familles, eau) ; valeur texte (« [X] ») affichée sans compteur |
 | `SectionHeading`    | Titre de section en deux temps (fort + doux), sur-titre, chapeau (toujours dessous) et lien facultatifs |
 | `PillarCard`        | Pilier de l'approche, photo en arche |
 | `CountryCard`       | Grande carte photo (pays mis en avant) avec pastilles de sites (`Chip`) |

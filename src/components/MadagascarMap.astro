@@ -12,7 +12,7 @@ import { ISLAND_PATH, ISLAND_VIEWBOX } from '../lib/madagascar';
 import { uid } from '../lib/uid';
 
 interface Props {
-  labels: { capital: string; channel: string; ocean: string; north: string };
+  labels: { capital: string; channel?: string; ocean?: string; north: string };
   /** Carte de localisation (fiche site) : sans les mers, capitale nommée sous son point. */
   compact?: boolean;
 }

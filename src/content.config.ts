@@ -1,7 +1,7 @@
 import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { COUNTRIES, PROJECT_THEMES } from './data/projets';
+import { COUNTRIES, PROJECT_ICONS, PROJECT_THEMES } from './data/projets';
 
 /** Statut UICN d'une espèce, ou « endemique » pour une espèce non évaluée mais endémique. */
 const speciesStatus = z.enum(['CR', 'EN', 'VU', 'NT', 'LC', 'endemique']);
@@ -111,11 +111,14 @@ const sites = defineCollection({
       ),
       /** Phrase sous le titre de la section actions. */
       actionsLead: z.string().optional(),
-      /** Actions menées sur le site ; `project` relie la carte à la page du projet. */
+      /**
+       * Actions menées sur le site ; `project` relie la carte au projet, dont elle prend
+       * l'icône, le titre et les sites (le texte reste celui du site).
+       */
       actions: z
         .array(
           z.object({
-            icon: z.enum(['surveillance', 'laboratoire', 'tourisme', 'agriculture', 'reboisement', 'education']),
+            icon: z.enum(PROJECT_ICONS),
             title: z.string(),
             text: z.string(),
             project: reference('projets').optional(),
@@ -181,6 +184,8 @@ const projets = defineCollection({
       otherSites: z.array(z.string()).default([]),
       /** Texte court des cartes. */
       summary: z.string(),
+      /** Pictogramme de la carte compacte (pastille menthe). */
+      icon: z.enum(PROJECT_ICONS),
       photo: image(),
       /** Cadrage de la photo dans la carte (object-position). */
       photoPosition: z.string().default('50% 50%'),

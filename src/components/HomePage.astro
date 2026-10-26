@@ -108,7 +108,7 @@ const madagascarSites = (await getCollection('sites', ({ data }) => data.country
               variant="country"
               title={home.actions.burkina.title}
               text={home.actions.burkina.text}
-              href="#"
+              href={pagePath(lang, 'burkina')}
               image={paysBurkina}
               imageAlt={home.actions.burkina.imageAlt}
               imagePosition="50% 60%"

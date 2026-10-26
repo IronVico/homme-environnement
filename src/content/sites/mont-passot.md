@@ -50,15 +50,15 @@ species:
     credit: { author: Markus A. Roesch }
 actionsLead: "Préserver les lacs, les forêts et les communautés qui en vivent."
 actions:
-  - icon: reboisement
+  - icon: trees
     title: Protéger les bassins versants
     text: "Restaurer les forêts qui entourent les lacs, lutter contre l'érosion et garder une eau de qualité."
     project: lacs-sacres
-  - icon: agriculture
+  - icon: sprout
     title: Soutenir les filières durables
     text: "Accompagner les associations locales et la filière d'huile essentielle d'ylang-ylang, compatible avec la forêt."
     project: ylang-ylang
-  - icon: laboratoire
+  - icon: flask
     title: Recherche et suivi écologique
     text: "Mieux connaître les espèces endémiques des lacs et suivre l'évolution de leurs habitats."
 # groups: à fournir (la présentation parle d'associations locales sans les nommer).

@@ -1,12 +1,16 @@
 ---
 /**
  * Carte du pays avec un repère numéroté par site, et la liste des sites à côté.
+ * Madagascar : carte verticale collée pendant qu'on parcourt la liste.
+ * Burkina Faso (un site) : carte large, nom du site sous le repère, note de position.
  * Repère et carte de site sont liés : survoler ou parcourir au clavier un repère
  * ou une carte de site met ce site en avant des deux côtés. Repère et carte
  * mènent tous deux à la fiche du site.
  * Sans JS : le premier site est mis en avant, la liste reste complète.
  */
+import Info from '@lucide/astro/icons/info';
 import type { ComponentProps } from 'astro/types';
+import BurkinaMap from './BurkinaMap.astro';
 import MadagascarMap from './MadagascarMap.astro';
 import SiteCard from './SiteCard.astro';
 
@@ -19,17 +23,29 @@ type Site = Omit<ComponentProps<typeof SiteCard>, 'selected'> & {
 
 interface Props {
   sites: Site[];
-  map: { label: string; capital: string; channel: string; ocean: string; north: string };
+  /** Libellés de la carte : mers pour Madagascar, pays voisins et note de position pour le Burkina Faso. */
+  map: {
+    label: string;
+    capital: string;
+    north: string;
+    channel?: string;
+    ocean?: string;
+    neighbours?: string[];
+    note?: string;
+  };
+  country?: 'madagascar' | 'burkina-faso';
 }
 
-const { sites, map } = Astro.props;
+const { sites, map, country = 'madagascar' } = Astro.props;
 const selectedId = sites[0]?.id;
+const wide = country === 'burkina-faso';
+const CountryMap = wide ? BurkinaMap : MadagascarMap;
 ---
 
-<div class="sites-explorer" data-sites-explorer>
+<div class:list={['sites-explorer', { 'sites-explorer--wide': wide }]} data-sites-explorer>
   <div class="sites-explorer__map">
     <div class="sites-explorer__panel" role="group" aria-label={map.label}>
-      <MadagascarMap labels={map}>
+      <CountryMap labels={{ ...map, neighbours: map.neighbours ?? [] }}>
         {
           sites.map((site) => (
             <a
@@ -46,8 +62,28 @@ const selectedId = sites[0]?.id;
             </a>
           ))
         }
-      </MadagascarMap>
+        {
+          wide &&
+            sites.map((site) => (
+              <span
+                class="sites-explorer__name"
+                style={`left: ${site.mapPosition.x}%; top: ${site.mapPosition.y}%`}
+                aria-hidden="true"
+              >
+                {site.name}
+              </span>
+            ))
+        }
+      </CountryMap>
     </div>
+    {
+      map.note && (
+        <p class="sites-explorer__note">
+          <Info size={16} />
+          {map.note}
+        </p>
+      )
+    }
   </div>
 
   <ol class="sites-explorer__list">
@@ -118,6 +154,18 @@ const selectedId = sites[0]?.id;
       calc((100svh - var(--map-top) - 24px - 2 * var(--panel-pad)) * 399 / 772),
       440px
     );
+  }
+
+  .sites-explorer__note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+
+  .sites-explorer__note :global(svg) {
+    flex-shrink: 0;
   }
 
   .sites-explorer__list {
@@ -195,6 +243,35 @@ const selectedId = sites[0]?.id;
 
   .sites-explorer__pin:focus-visible {
     outline: none;
+  }
+
+  /* Nom du site sous son repère (carte du Burkina Faso). */
+  .sites-explorer__name {
+    position: absolute;
+    z-index: 2;
+    margin-top: 8px;
+    padding: 6px 12px;
+    transform: translateX(-50%);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* Burkina Faso : carte large à gauche, carte du site à droite (380px). */
+  .sites-explorer--wide {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+  }
+
+  .sites-explorer--wide .sites-explorer__map {
+    position: static;
+  }
+
+  .sites-explorer--wide .sites-explorer__list {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .sites-explorer__pin:focus-visible .sites-explorer__drop {

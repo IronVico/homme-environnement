@@ -24,6 +24,7 @@ export interface NavColumn {
 export const PAGES = {
   ong: 'ong',
   madagascar: 'sites/madagascar',
+  burkina: 'sites/burkina-faso',
   projets: 'projets',
   stages: 's-engager/stages-volontariat',
   equipe: 'ong/equipe',
@@ -108,7 +109,7 @@ export function ongPath(lang: Lang, section: keyof typeof ONG_ANCHORS): string {
 const MAIN_HREFS = [PAGES.ong, '#', PAGES.projets, HOME_ENGAGE, '#', '#'];
 const FOOTER_HREFS = [
   [`${PAGES.ong}#${ONG_ANCHORS.approach}`, `${PAGES.ong}#${ONG_ANCHORS.history}`, PAGES.equipe, PAGES.partenaires],
-  [PAGES.madagascar, '#'],
+  [PAGES.madagascar, PAGES.burkina],
   // « Plantes aromatiques » : thème Filières durables (ylang-ylang), en attendant d'aligner le libellé.
   [
     projectsByTheme('conservation'),
