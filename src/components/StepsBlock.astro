@@ -1,0 +1,151 @@
+---
+/**
+ * Encart arrondi en deux colonnes : titre, chapeau et bouton à gauche, étapes numérotées
+ * à droite (« Candidater » de la page Stages, « Comment ça se passe ? » de la page Entreprises).
+ * tone="surface" : carte blanche, pour une section vert clair.
+ * tone="section" : encart vert clair, pour une section blanche.
+ */
+import Button from './Button.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  /** Identifiant du titre (aria-labelledby de la section parente). */
+  id: string;
+  titleStrong: string;
+  titleLight?: string;
+  text: string;
+  /** Bouton principal (basalte) ; icône enveloppe pour un lien mailto. */
+  button: { label: string; href: string };
+  steps: { title: string; text: string }[];
+  tone?: 'surface' | 'section';
+  /** Titre réduit (42px max au lieu de 52px), comme la maquette Entreprises. */
+  compact?: boolean;
+}
+
+const { id, titleStrong, titleLight, text, button, steps, tone = 'surface', compact = false } = Astro.props;
+const icon = button.href.startsWith('mailto:') ? 'mail' : undefined;
+---
+
+<div class:list={['steps-block', `steps-block--${tone}`, { 'steps-block--compact': compact }]}>
+  <div class="steps-block__intro">
+    <SectionHeading id={id} strong={titleStrong} light={titleLight} />
+    <p class="steps-block__text" data-reveal>{text}</p>
+    <div class="steps-block__buttons" data-reveal>
+      <Button href={button.href} variant="primary" icon={icon}>{button.label}</Button>
+    </div>
+  </div>
+  <ol class="steps">
+    {
+      steps.map((step, i) => (
+        <li class="step" data-reveal>
+          <span class="step__num" aria-hidden="true">
+            {i + 1}
+          </span>
+          <span class="step__body">
+            <span class="step__title">{step.title}</span>
+            <span class="step__text">{step.text}</span>
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  /* Deux colonnes égales, empilées sous 900px. */
+  .steps-block {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px 64px;
+    align-items: center;
+    padding: clamp(28px, 5vw, 64px);
+    border-radius: var(--radius-block);
+  }
+
+  @media (max-width: 900px) {
+    .steps-block {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Sur une section vert clair, le bloc devient une carte blanche. */
+  .steps-block--surface {
+    border: 1px solid var(--bordure-carte);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Sur une section blanche : encart vert clair, numéros sur disque blanc. */
+  .steps-block--section {
+    background: var(--section);
+  }
+
+  .steps-block__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .steps-block--compact :global(.section-heading__title) {
+    font-size: clamp(30px, 3vw, 42px);
+  }
+
+  .steps-block__text {
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .steps-block__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .step__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+    font-size: var(--fs-body);
+    font-weight: 800;
+  }
+
+  .steps-block--section .step__num {
+    background: var(--surface);
+  }
+
+  .step__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .step__title {
+    font-size: 19px;
+    font-weight: 800;
+  }
+
+  .step__text {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+</style>

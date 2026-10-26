@@ -1,0 +1,145 @@
+---
+/**
+ * Carte d'un partenaire (pages Partenaires et Entreprises) : logo, type, nom. La carte n'est
+ * pas un lien : pas de survol. Le slot accueille le contenu propre à la page (rôle, sites, lien).
+ * Logo en couleur en mode clair, version monochrome (masque à la couleur du texte) en mode
+ * sombre ; logo provisoire de la maquette ou monogramme sans logo fourni.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import { partnerMonogram, provisionalLogo, type Partner } from '../data/partenaires';
+
+interface Props extends HTMLAttributes<'li'> {
+  partner: Partner;
+  typeLabel: string;
+}
+
+const { partner, typeLabel, class: className, ...rest } = Astro.props;
+const logoSvg = partner.logo ? undefined : provisionalLogo(partner);
+---
+
+<li class:list={['partner-card', className]} {...rest}>
+  <span class="partner-card__logo">
+    {
+      partner.logo ? (
+        <>
+          <Image class="partner-card__logo-img" src={partner.logo} alt="" height={52} densities={[1, 2]} />
+          {partner.logoMono && (
+            <span
+              class="partner-card__logo-mono"
+              aria-hidden="true"
+              style={`--logo: url(${partner.logoMono.src}); aspect-ratio: ${partner.logoMono.width} / ${partner.logoMono.height}`}
+            />
+          )}
+        </>
+      ) : logoSvg ? (
+        <span class="partner-card__logo-svg" set:html={logoSvg} />
+      ) : (
+        <span class="partner-card__monogram" aria-hidden="true">
+          {partnerMonogram(partner)}
+        </span>
+      )
+    }
+  </span>
+  <span class="partner-card__type">{typeLabel}</span>
+  <h3 class="partner-card__name">{partner.name}</h3>
+  <slot />
+</li>
+
+<style>
+  .partner-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .partner-card[hidden] {
+    display: none;
+  }
+
+  .partner-card__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88px;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: var(--surface);
+  }
+
+  .partner-card__logo :global(.partner-card__logo-img) {
+    max-width: 100%;
+    max-height: 52px;
+    width: auto;
+    height: auto;
+  }
+
+  /* Mode sombre : logo monochrome (masque) à la couleur du texte, à la place du logo en couleur. */
+  .partner-card__logo-mono {
+    display: none;
+    height: 44px;
+    max-width: 100%;
+    background-color: var(--texte-doux);
+    -webkit-mask: var(--logo) center / contain no-repeat;
+    mask: var(--logo) center / contain no-repeat;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .partner-card__logo:has(.partner-card__logo-mono) :global(.partner-card__logo-img) {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .partner-card__logo-mono {
+      display: block;
+    }
+  }
+
+  :global(:root[data-theme='dark']) .partner-card__logo:has(.partner-card__logo-mono) :global(.partner-card__logo-img) {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .partner-card__logo-mono {
+    display: block;
+  }
+
+  /* Logo provisoire (SVG en ligne) : hauteur fixe, comme les vrais logos. */
+  .partner-card__logo-svg {
+    display: flex;
+    max-width: 100%;
+    color: var(--texte);
+  }
+
+  .partner-card__logo-svg :global(svg) {
+    max-width: 100%;
+    height: 52px;
+    width: auto;
+  }
+
+  /* Monogramme sobre, en attendant les logos fournis par l'ONG. */
+  .partner-card__monogram {
+    font-size: 26px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  .partner-card__type {
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--section);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .partner-card__name {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+</style>
