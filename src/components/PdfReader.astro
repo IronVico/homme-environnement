@@ -1,0 +1,734 @@
+---
+/**
+ * Liseuse PDF (maquette RapportsLiseuse) : boîte de dialogue modale, ouverte par un bouton
+ * [data-reader-open] (data-file : chemin du PDF, data-title : titre du document).
+ * En-tête : titre, « Page x / n », zoom − / +, plein écran, Télécharger, Fermer ; miniatures
+ * à gauche ; page au centre sur fond vert clair, flèches précédente / suivante.
+ * Clavier : flèches gauche / droite (ou Page préc. / suiv.), Début / Fin ; Échap ferme et rend
+ * le focus au bouton d'ouverture.
+ * PDF.js (pdfjs-dist) n'est chargé qu'à la première ouverture (import dynamique), avec son
+ * worker servi par le site. Un seul exemplaire par page : il sert à tous les boutons.
+ * En mobile (< 700px), la page Rapports ouvre le PDF dans un nouvel onglet à la place.
+ */
+import ChevronLeft from '@lucide/astro/icons/chevron-left';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import Download from '@lucide/astro/icons/download';
+import Maximize from '@lucide/astro/icons/maximize';
+import Minimize from '@lucide/astro/icons/minimize';
+import X from '@lucide/astro/icons/x';
+import ZoomIn from '@lucide/astro/icons/zoom-in';
+import ZoomOut from '@lucide/astro/icons/zoom-out';
+import { getLang, t } from '../i18n';
+
+const { reader } = t(getLang(Astro.currentLocale)).rapports;
+---
+
+<dialog
+  class="reader"
+  aria-labelledby="reader-title"
+  data-reader
+  data-position={reader.position}
+  data-position-long={reader.positionLong}
+  data-page-button={reader.pageButton}
+  data-fullscreen={reader.fullscreen}
+  data-exit-fullscreen={reader.exitFullscreen}
+  data-loading={reader.loading}
+  data-error={reader.error}
+>
+  <header class="reader__bar">
+    <div class="reader__heading">
+      <h2 class="reader__title" id="reader-title" data-reader-title></h2>
+      <p class="reader__position" aria-live="polite" aria-atomic="true">
+        <span aria-hidden="true" data-reader-position></span>
+        <span class="visually-hidden" data-reader-position-long></span>
+      </p>
+    </div>
+    <div class="reader__tools">
+      <button
+        class="reader__tool"
+        type="button"
+        aria-label={reader.zoomOut}
+        data-tooltip={reader.zoomOut}
+        data-tooltip-pos="below"
+        data-reader-zoom-out
+      >
+        <ZoomOut size={20} />
+      </button>
+      <output class="reader__zoom" aria-label={reader.zoomLevel} data-reader-zoom>100 %</output>
+      <button
+        class="reader__tool"
+        type="button"
+        aria-label={reader.zoomIn}
+        data-tooltip={reader.zoomIn}
+        data-tooltip-pos="below"
+        data-reader-zoom-in
+      >
+        <ZoomIn size={20} />
+      </button>
+      <button
+        class="reader__tool"
+        type="button"
+        aria-label={reader.fullscreen}
+        data-tooltip={reader.fullscreen}
+        data-tooltip-pos="below"
+        data-reader-fullscreen
+        hidden
+      >
+        <Maximize class="reader__icon-enter" size={20} />
+        <Minimize class="reader__icon-exit" size={20} />
+      </button>
+      <a class="reader__download btn-motion" href="#" download data-reader-download>
+        <Download size={18} />
+        {reader.download}
+      </a>
+      <button
+        class="reader__tool reader__close"
+        type="button"
+        aria-label={reader.close}
+        data-tooltip={reader.close}
+        data-tooltip-pos="below"
+        data-tooltip-align="end"
+        data-reader-close
+        autofocus
+      >
+        <X size={20} />
+      </button>
+    </div>
+  </header>
+
+  <div class="reader__body">
+    <nav class="reader__thumbs" aria-label={reader.pagesLabel}>
+      <ol class="reader__thumb-list" data-reader-thumbs></ol>
+    </nav>
+
+    <div class="reader__stage">
+      <button
+        class="reader__arrow reader__arrow--prev"
+        type="button"
+        aria-label={reader.previous}
+        data-tooltip={reader.previous}
+        data-tooltip-align="start"
+        data-reader-prev
+      >
+        <ChevronLeft size={24} />
+      </button>
+      <div class="reader__scroller" tabindex="0" data-reader-scroller>
+        <canvas class="reader__page" role="img" data-reader-canvas></canvas>
+        <p class="reader__status" role="status" data-reader-status></p>
+      </div>
+      <button
+        class="reader__arrow reader__arrow--next"
+        type="button"
+        aria-label={reader.next}
+        data-tooltip={reader.next}
+        data-tooltip-align="end"
+        data-reader-next
+      >
+        <ChevronRight size={24} />
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
+
+  type PdfJs = typeof import('pdfjs-dist');
+
+  // PDF.js et son worker : chargés à la première ouverture seulement.
+  let pdfjs: Promise<PdfJs> | undefined;
+  const loadPdfJs = () =>
+    (pdfjs ??= Promise.all([import('pdfjs-dist'), import('pdfjs-dist/build/pdf.worker.min.mjs?url')]).then(
+      ([lib, worker]) => {
+        lib.GlobalWorkerOptions.workerSrc = worker.default;
+        return lib;
+      },
+    ));
+
+  /** Zoom relatif à la page entière visible (100 %). */
+  const ZOOMS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3];
+  const THUMB_WIDTH = 96;
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-reader]');
+
+  if (dialog && typeof dialog.showModal === 'function') {
+    const $ = <T extends Element>(selector: string) => dialog.querySelector<T>(selector)!;
+    const strings = dialog.dataset;
+    const fill = (template = '', values: Record<string, number>) =>
+      template.replace(/\{(\w+)\}/g, (match, key: string) => String(values[key] ?? match));
+
+    const title = $<HTMLElement>('[data-reader-title]');
+    const position = $<HTMLElement>('[data-reader-position]');
+    const positionLong = $<HTMLElement>('[data-reader-position-long]');
+    const zoomOutput = $<HTMLOutputElement>('[data-reader-zoom]');
+    const zoomOut = $<HTMLButtonElement>('[data-reader-zoom-out]');
+    const zoomIn = $<HTMLButtonElement>('[data-reader-zoom-in]');
+    const fullscreen = $<HTMLButtonElement>('[data-reader-fullscreen]');
+    const download = $<HTMLAnchorElement>('[data-reader-download]');
+    const thumbs = $<HTMLOListElement>('[data-reader-thumbs]');
+    const prev = $<HTMLButtonElement>('[data-reader-prev]');
+    const next = $<HTMLButtonElement>('[data-reader-next]');
+    const scroller = $<HTMLElement>('[data-reader-scroller]');
+    const canvas = $<HTMLCanvasElement>('[data-reader-canvas]');
+    const status = $<HTMLElement>('[data-reader-status]');
+
+    let loading: PDFDocumentLoadingTask | undefined;
+    let doc: PDFDocumentProxy | undefined;
+    let renderTask: RenderTask | undefined;
+    let opener: HTMLElement | null = null;
+    let index = 1;
+    let zoom = 2; // rang dans ZOOMS : 100 %
+    let session = 0; // change à chaque ouverture : les rendus d'une session fermée s'arrêtent
+
+    const setStatus = (text: string) => {
+      status.textContent = text;
+      status.hidden = !text;
+      canvas.hidden = Boolean(text);
+    };
+
+    const updateControls = () => {
+      const count = doc?.numPages ?? 0;
+      position.textContent = count ? fill(strings.position, { index, count }) : '';
+      positionLong.textContent = count ? fill(strings.positionLong, { index, count }) : '';
+      canvas.setAttribute('aria-label', positionLong.textContent);
+      prev.disabled = !doc || index <= 1;
+      next.disabled = !doc || index >= count;
+      zoomOut.disabled = !doc || zoom === 0;
+      zoomIn.disabled = !doc || zoom === ZOOMS.length - 1;
+      zoomOutput.value = `${Math.round(ZOOMS[zoom]! * 100)} %`;
+      thumbs.querySelectorAll('button').forEach((button, i) => {
+        if (i + 1 === index) button.setAttribute('aria-current', 'true');
+        else button.removeAttribute('aria-current');
+      });
+    };
+
+    const renderPage = async () => {
+      if (!doc) return;
+      const current = session;
+      const page = await doc.getPage(index);
+      if (current !== session) return;
+      // Page entière visible à 100 % (marges du cadre déduites).
+      const style = getComputedStyle(scroller);
+      const width = scroller.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const height = scroller.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      const base = page.getViewport({ scale: 1 });
+      const fit = Math.max(0.1, Math.min(width / base.width, height / base.height));
+      const viewport = page.getViewport({ scale: fit * ZOOMS[zoom]! });
+      const ratio = window.devicePixelRatio || 1;
+
+      renderTask?.cancel();
+      // Rendu dans un canevas hors écran, recopié une fois prêt : pas de page blanche entre deux pages.
+      const buffer = document.createElement('canvas');
+      buffer.width = Math.floor(viewport.width * ratio);
+      buffer.height = Math.floor(viewport.height * ratio);
+      const task = page.render({
+        canvas: buffer,
+        viewport,
+        transform: ratio === 1 ? undefined : [ratio, 0, 0, ratio, 0, 0],
+      });
+      renderTask = task;
+      try {
+        await task.promise;
+      } catch {
+        return; // rendu annulé (page suivante demandée entre-temps)
+      }
+      if (current !== session) return;
+      canvas.width = buffer.width;
+      canvas.height = buffer.height;
+      canvas.style.width = `${Math.floor(viewport.width)}px`;
+      canvas.style.height = `${Math.floor(viewport.height)}px`;
+      canvas.getContext('2d')!.drawImage(buffer, 0, 0);
+      setStatus('');
+    };
+
+    const goTo = (target: number) => {
+      if (!doc) return;
+      const clamped = Math.min(Math.max(target, 1), doc.numPages);
+      if (clamped === index) return;
+      index = clamped;
+      scroller.scrollTo(0, 0);
+      updateControls();
+      thumbs.querySelector('[aria-current]')?.scrollIntoView({ block: 'nearest' });
+      void renderPage();
+    };
+
+    const setZoom = (rank: number) => {
+      zoom = Math.min(Math.max(rank, 0), ZOOMS.length - 1);
+      updateControls();
+      void renderPage();
+    };
+
+    // Miniatures : une par page, rendues l'une après l'autre après la première page.
+    const renderThumbs = async () => {
+      if (!doc) return;
+      const current = session;
+      const items = Array.from({ length: doc.numPages }, (_, i) => {
+        const li = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'reader__thumb';
+        button.setAttribute('aria-label', fill(strings.pageButton, { index: i + 1 }));
+        button.addEventListener('click', () => goTo(i + 1));
+        const thumb = document.createElement('canvas');
+        thumb.className = 'reader__thumb-canvas';
+        button.append(thumb);
+        const label = document.createElement('span');
+        label.className = 'reader__thumb-label';
+        label.setAttribute('aria-hidden', 'true');
+        label.textContent = String(i + 1);
+        li.append(button, label);
+        return { li, thumb };
+      });
+      thumbs.replaceChildren(...items.map((item) => item.li));
+      updateControls();
+      const ratio = window.devicePixelRatio || 1;
+      for (const [i, { thumb }] of items.entries()) {
+        if (current !== session) return;
+        const page = await doc.getPage(i + 1);
+        const base = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale: THUMB_WIDTH / base.width });
+        thumb.width = Math.floor(viewport.width * ratio);
+        thumb.height = Math.floor(viewport.height * ratio);
+        thumb.style.aspectRatio = `${base.width} / ${base.height}`;
+        try {
+          await page.render({ canvas: thumb, viewport, transform: ratio === 1 ? undefined : [ratio, 0, 0, ratio, 0, 0] })
+            .promise;
+        } catch {
+          return;
+        }
+      }
+    };
+
+    const open = async (file: string, label: string, trigger: HTMLElement) => {
+      opener = trigger;
+      session += 1;
+      const current = session;
+      index = 1;
+      zoom = 2;
+      doc = undefined;
+      title.textContent = label;
+      download.href = file;
+      thumbs.replaceChildren();
+      canvas.width = 0;
+      setStatus(strings.loading ?? '');
+      updateControls();
+      dialog.showModal();
+      try {
+        const lib = await loadPdfJs();
+        if (current !== session) return;
+        loading = lib.getDocument({ url: file });
+        const loaded = await loading.promise;
+        if (current !== session) {
+          void loaded.loadingTask.destroy();
+          return;
+        }
+        doc = loaded;
+        updateControls();
+        await renderPage();
+        void renderThumbs();
+      } catch {
+        if (current === session) setStatus(strings.error ?? '');
+      }
+    };
+
+    document.querySelectorAll<HTMLElement>('[data-reader-open]').forEach((trigger) => {
+      trigger.addEventListener('click', (event) => {
+        const { file, title: label = '' } = trigger.dataset;
+        if (!file) return;
+        event.preventDefault();
+        void open(file, label, trigger);
+      });
+    });
+
+    prev.addEventListener('click', () => goTo(index - 1));
+    next.addEventListener('click', () => goTo(index + 1));
+    zoomOut.addEventListener('click', () => setZoom(zoom - 1));
+    zoomIn.addEventListener('click', () => setZoom(zoom + 1));
+    $<HTMLButtonElement>('[data-reader-close]').addEventListener('click', () => dialog.close());
+
+    // Plein écran : seulement si le navigateur le permet (pas sur iPhone).
+    if (document.fullscreenEnabled) {
+      fullscreen.hidden = false;
+      fullscreen.addEventListener('click', () => {
+        if (document.fullscreenElement) void document.exitFullscreen();
+        else void dialog.requestFullscreen();
+      });
+      document.addEventListener('fullscreenchange', () => {
+        const on = document.fullscreenElement === dialog;
+        const text = (on ? strings.exitFullscreen : strings.fullscreen) ?? '';
+        fullscreen.setAttribute('aria-label', text);
+        fullscreen.dataset.tooltip = text;
+        dialog.toggleAttribute('data-fullscreen-on', on);
+        if (dialog.open) void renderPage();
+      });
+    }
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      // Page agrandie : les flèches font défiler la page quand elle déborde en largeur.
+      const panning = event.target === scroller && scroller.scrollWidth > scroller.clientWidth;
+      if ((event.key === 'ArrowLeft' && !panning) || event.key === 'PageUp') goTo(index - 1);
+      else if ((event.key === 'ArrowRight' && !panning) || event.key === 'PageDown') goTo(index + 1);
+      else if (event.key === 'Home' && event.target !== scroller) goTo(1);
+      else if (event.key === 'End' && event.target !== scroller) goTo(doc?.numPages ?? 1);
+      else return;
+      event.preventDefault();
+    });
+
+    // Fenêtre redimensionnée : la page reste entière à 100 %.
+    let resizeTimer: number | undefined;
+    window.addEventListener('resize', () => {
+      if (!dialog.open) return;
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => void renderPage(), 150);
+    });
+
+    // Clic sur le fond assombri, hors de la liseuse : ferme.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => {
+      session += 1;
+      renderTask?.cancel();
+      if (document.fullscreenElement) void document.exitFullscreen();
+      void loading?.destroy();
+      loading = undefined;
+      doc = undefined;
+      thumbs.replaceChildren();
+      opener?.focus();
+    });
+  }
+</script>
+
+<style>
+  /*
+   * Liseuse : carte claire posée sur un voile sombre, à 40px et 64px des bords.
+   * Fond, textes et boutons suivent le thème (tokens de rôle) ; la page du PDF reste blanche.
+   */
+  .reader {
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    inset: 40px 64px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-card-lg);
+    overflow: hidden;
+    background: var(--surface);
+    color: var(--texte);
+    box-shadow: 0 24px 64px rgb(35 31 32 / 0.35);
+  }
+
+  .reader[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .reader::backdrop {
+    background: var(--voile);
+  }
+
+  .reader[data-fullscreen-on] {
+    inset: 0;
+    border-radius: 0;
+  }
+
+  @media (max-width: 1000px) {
+    .reader {
+      inset: 16px;
+    }
+  }
+
+  .reader__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 16px;
+    padding: 16px 20px 16px 28px;
+    border-bottom: 1px solid var(--bordure-carte);
+  }
+
+  .reader__heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .reader__title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .reader__position {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--section);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .reader__position:empty,
+  .reader__position:has([data-reader-position]:empty) {
+    display: none;
+  }
+
+  .reader__tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reader__tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid var(--trait);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui);
+  }
+
+  .reader__tool:hover:not(:disabled) {
+    border-color: var(--texte);
+  }
+
+  .reader__tool:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .reader__tool[hidden] {
+    display: none;
+  }
+
+  .reader__icon-exit,
+  .reader[data-fullscreen-on] .reader__icon-enter {
+    display: none;
+  }
+
+  .reader[data-fullscreen-on] .reader__icon-exit {
+    display: block;
+  }
+
+  .reader__zoom {
+    min-width: 52px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .reader__download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+    padding: 10px 18px;
+    border: 2px solid currentColor;
+    border-radius: var(--radius-pill);
+    color: var(--texte);
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .reader__download:hover {
+    color: var(--texte-fort);
+    background: var(--section);
+  }
+
+  .reader__close {
+    margin-left: 4px;
+    border: 0;
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .reader__close:hover:not(:disabled) {
+    background: var(--texte-fort);
+  }
+
+  .reader__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 136px minmax(0, 1fr);
+  }
+
+  .reader__thumbs {
+    overflow-y: auto;
+    padding: 20px;
+    border-right: 1px solid var(--bordure-carte);
+  }
+
+  .reader__thumb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reader__thumbs :global(.reader__thumb) {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  /* Page blanche (papier) avant et pendant le rendu ; contour 2px texte sur la page affichée. */
+  .reader__thumbs :global(.reader__thumb-canvas) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 7 / 5;
+    border-radius: 6px;
+    background: var(--blanc);
+    outline: 1px solid var(--trait);
+    outline-offset: 2px;
+  }
+
+  .reader__thumbs :global(.reader__thumb:hover .reader__thumb-canvas) {
+    outline-color: var(--texte);
+  }
+
+  .reader__thumbs :global(.reader__thumb[aria-current] .reader__thumb-canvas) {
+    outline: 2px solid var(--texte);
+  }
+
+  .reader__thumbs :global(.reader__thumb:focus-visible) {
+    outline-offset: 6px;
+  }
+
+  .reader__thumbs :global(.reader__thumb-label) {
+    display: block;
+    margin-top: 6px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .reader__stage {
+    position: relative;
+    min-height: 0;
+    background: var(--section);
+  }
+
+  .reader__scroller {
+    display: flex;
+    height: 100%;
+    overflow: auto;
+    padding: 28px 96px;
+    box-sizing: border-box;
+  }
+
+  /* margin auto : centrée, et entièrement atteignable au défilement une fois agrandie. */
+  .reader__page {
+    flex-shrink: 0;
+    margin: auto;
+    border-radius: 6px;
+    background: var(--blanc);
+    box-shadow:
+      0 2px 4px color-mix(in srgb, var(--ombre-teinte) 10%, transparent),
+      0 18px 40px color-mix(in srgb, var(--ombre-teinte) 22%, transparent);
+  }
+
+  .reader__page[hidden],
+  .reader__status[hidden] {
+    display: none;
+  }
+
+  .reader__status {
+    margin: auto;
+    max-width: 420px;
+    text-align: center;
+    font-size: var(--fs-body);
+  }
+
+  .reader__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+    transition: box-shadow var(--transition-ui);
+  }
+
+  .reader__arrow:hover:not(:disabled) {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .reader__arrow:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .reader__arrow--prev {
+    left: 24px;
+  }
+
+  .reader__arrow--next {
+    right: 24px;
+  }
+
+  /* Écran moyen : miniatures masquées, la page prend toute la largeur. */
+  @media (max-width: 900px) {
+    .reader__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .reader__thumbs {
+      display: none;
+    }
+
+    .reader__scroller {
+      padding: 20px 72px;
+    }
+
+    .reader__arrow--prev {
+      left: 12px;
+    }
+
+    .reader__arrow--next {
+      right: 12px;
+    }
+  }
+
+  :global(html:has(.reader[open])) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reader__tool,
+    .reader__arrow {
+      transition: none;
+    }
+  }
+</style>

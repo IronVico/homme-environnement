@@ -1180,6 +1180,99 @@ const fr = {
       mailSubject: 'Photos de nos sites',
     },
   },
+
+  rapports: {
+    title: 'Rapports et études',
+    description:
+      "Rapports annuels, comptes, études scientifiques et présentations de sites de L'Homme & l'Environnement, à lire en ligne ou à télécharger en PDF.",
+    hero: {
+      titleStrong: 'Nos rapports,',
+      titleLight: 'en toute transparence.',
+      lead: "Rapports d'activité, comptes, études scientifiques et présentations de nos sites : les documents qui rendent compte de notre action à Madagascar et au Burkina Faso, en libre téléchargement.",
+    },
+    /** Libellés des types de document (src/data/rapports.ts) : pastille d'un document… */
+    types: {
+      annuel: 'Rapport annuel',
+      financier: 'Rapport financier',
+      etude: 'Étude scientifique',
+      site: 'Présentation de site',
+    },
+    /** …et pastille de filtre. */
+    typesPlural: {
+      annuel: 'Rapports annuels',
+      financier: 'Rapports financiers',
+      etude: 'Études scientifiques',
+      site: 'Présentations de sites',
+    },
+    featured: {
+      badge: 'À la une',
+      /** {title} : titre du document. */
+      coverLabel: 'Couverture du {title} (provisoire)',
+      coverAlt: 'Couverture du {title}',
+      coverTodo: '[couverture à fournir]',
+      coverRegions: 'Madagascar · Burkina Faso',
+      /** {date} : date de publication. */
+      published: 'Publié en {date}',
+      /** {count} : nombre de pages. */
+      pages: '{count} pages',
+      read: 'Lire en ligne',
+      download: 'Télécharger le PDF',
+    },
+    todo: {
+      size: '[poids à fournir]',
+      pages: '[nombre de pages à fournir]',
+      date: '[date à fournir]',
+      year: '[année à fournir]',
+      document: '[à fournir]',
+      file: '[PDF à fournir]',
+    },
+    list: {
+      titleStrong: 'Tous nos documents',
+      titleLight: 'à télécharger',
+      lead: 'Filtrez par type de document. Tous les fichiers sont au format PDF.',
+      /** {count} : nombre de documents affichés. */
+      countOne: '{count} document',
+      countMany: '{count} documents',
+      filtersLabel: 'Filtrer par type de document',
+      all: 'Tous',
+      download: 'Télécharger',
+      /** {title} : titre du document. */
+      downloadLabel: 'Télécharger : {title} (PDF)',
+      /** {size} : poids du fichier. */
+      format: 'PDF, {size}',
+      empty: 'Aucun document pour ce filtre.',
+    },
+    reader: {
+      /** {index} : page affichée, {count} : nombre de pages. */
+      position: 'Page {index} / {count}',
+      /** Lu par les lecteurs d'écran à chaque page. */
+      positionLong: 'Page {index} sur {count}',
+      pagesLabel: 'Pages du document',
+      /** {index} : numéro de la page. */
+      pageButton: 'Page {index}',
+      zoomOut: 'Dézoomer',
+      zoomIn: 'Zoomer',
+      zoomLevel: 'Zoom',
+      fullscreen: 'Plein écran',
+      exitFullscreen: 'Quitter le plein écran',
+      download: 'Télécharger',
+      close: 'Fermer la liseuse',
+      previous: 'Page précédente',
+      next: 'Page suivante',
+      loading: 'Chargement du document…',
+      error: "Le document n'a pas pu être affiché. Vous pouvez le télécharger.",
+      /** Mobile : le PDF s'ouvre dans le lecteur du téléphone. */
+      newTab: '(nouvel onglet)',
+    },
+    cta: {
+      titleStrong: 'Vous cherchez',
+      titleLight: 'un document ?',
+      text: 'Un rapport plus ancien, une étude citée sur nos pages ou des données pour un travail de recherche : écrivez-nous, nous vous orienterons vers le bon document.',
+      contact: 'Nous contacter',
+      /** Objet du mail prérempli, en attendant la page Contact. */
+      mailSubject: "Recherche d'un document",
+    },
+  },
 };
 
 export default fr;

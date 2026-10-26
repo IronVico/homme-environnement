@@ -1,0 +1,657 @@
+---
+/**
+ * Page « Rapports et études » (maquettes Rapports / RapportsMobile / RapportsLiseuse), commune
+ * aux deux langues (/ressources/rapports et /en/ressources/rapports). Textes dans src/i18n
+ * (clé `rapports`), documents dans src/data/rapports.ts.
+ * Un petit script filtre les documents par type. « Lire en ligne » ouvre la liseuse PDF
+ * (PdfReader) ; en mobile (< 700px) et sans JS, c'est un lien qui ouvre le PDF dans un nouvel
+ * onglet, avec le lecteur du téléphone.
+ */
+import Download from '@lucide/astro/icons/download';
+import FileText from '@lucide/astro/icons/file-text';
+import { FEATURED_REPORT_ID, REPORT_TYPES, REPORTS, type Report } from '../data/rapports';
+import { CONTACT_EMAIL } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { fill } from '../lib/don';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import ContourPattern from './ContourPattern.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import PdfReader from './PdfReader.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import ReportCover from './ReportCover.astro';
+import SectionHeading from './SectionHeading.astro';
+import TodoPill from './TodoPill.astro';
+
+import ctaPhoto from '../assets/photos/pays-madagascar.jpg';
+import ogPhoto from '../assets/photos/hero-artisane-vohimana.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.rapports;
+
+const featured = REPORTS.find((report) => report.id === FEATURED_REPORT_ID);
+if (!featured) throw new Error(`Document à la une « ${FEATURED_REPORT_ID} » absent de src/data/rapports.ts.`);
+
+// Pastilles de filtre : « Tous », puis chaque type qui a au moins un document, avec son nombre.
+const filters = [
+  { value: 'all', label: page.list.all, count: REPORTS.length },
+  ...REPORT_TYPES.map((type) => ({
+    value: type,
+    label: page.typesPlural[type],
+    count: REPORTS.filter((report) => report.type === type).length,
+  })).filter((filter) => filter.count > 0),
+];
+
+const countLabel = (count: number) => fill(count > 1 ? page.list.countMany : page.list.countOne, { count: String(count) });
+
+// Couverture provisoire : « Rapport annuel » en gras, l'année en léger (comme le titre de la carte).
+const titleParts = (report: Report) => {
+  const year = report.year && report.title.endsWith(report.year) ? report.year : '';
+  return { strong: year ? report.title.slice(0, -year.length).trim() : report.title, light: year };
+};
+const featuredTitle = titleParts(featured);
+
+const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(page.cta.mailSubject)}`;
+
+// « Ressources » n'a pas de page : affichée sans lien dans le fil d'Ariane (comme la Galerie).
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[4]!, href: '#' },
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={ogPhoto} noindex>
+  <Header current="ressources" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <!-- TODO traduction : sur la page anglaise, le contenu est encore en français. -->
+  <main id="contenu" lang={lang === 'en' ? 'fr' : undefined}>
+    <div class="reports-hero-wrap">
+      <ContourPattern variant="hero" class="reports-hero__contours" />
+      <section class="reports-hero container" aria-labelledby="rapports-h1">
+        <h1 id="rapports-h1" class="reports-hero__title" data-reveal>
+          <span class="reports-hero__strong">{page.hero.titleStrong}</span><br />
+          <span class="reports-hero__light">{page.hero.titleLight}</span>
+        </h1>
+        <p class="reports-hero__lead" data-reveal>{page.hero.lead}</p>
+      </section>
+      <section class="featured container" aria-labelledby="une-titre">
+        <article class="featured__card" data-reveal>
+          <div class="featured__visual">
+            <ReportCover
+              class="featured__cover"
+              title={featured.title}
+              titleStrong={featuredTitle.strong}
+              titleLight={featuredTitle.light}
+              image={featured.cover}
+            />
+          </div>
+          <div class="featured__body">
+            <ul class="featured__tags">
+              <li class="featured__tag featured__tag--strong">{page.featured.badge}</li>
+              <li class="featured__tag">{page.types[featured.type]}</li>
+            </ul>
+            <h2 id="une-titre" class="featured__title">
+              <span class="featured__strong">{featuredTitle.strong}</span>
+              {featuredTitle.light && ' '}
+              {featuredTitle.light && <span class="featured__light">{featuredTitle.light}</span>}
+            </h2>
+            {featured.summary && <p class="featured__summary">{featured.summary}</p>}
+            <ul class="featured__meta">
+              <li class="featured__meta-format"><FileText size={18} />PDF</li>
+              <li>{featured.size ?? <TodoPill>{page.todo.size}</TodoPill>}</li>
+              <li>{featured.pages ? fill(page.featured.pages, { count: String(featured.pages) }) : <TodoPill>{page.todo.pages}</TodoPill>}</li>
+              <li>
+                {
+                  featured.published ? (
+                    fill(page.featured.published, { date: featured.published })
+                  ) : (
+                    <>
+                      {page.featured.published.split('{date}')[0]}
+                      <TodoPill>{page.todo.date}</TodoPill>
+                    </>
+                  )
+                }
+              </li>
+            </ul>
+            {
+              featured.file ? (
+                <div class="featured__actions" data-read-actions>
+                  <Button
+                    class="featured__read featured__read--dialog"
+                    variant="primary"
+                    icon="book"
+                    aria-haspopup="dialog"
+                    data-reader-open
+                    data-file={featured.file}
+                    data-title={featured.title}
+                    hidden
+                  >
+                    {page.featured.read}
+                  </Button>
+                  <Button
+                    class="featured__read featured__read--link"
+                    href={featured.file}
+                    variant="primary"
+                    icon="book"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {page.featured.read}
+                    <span class="visually-hidden">{` ${page.reader.newTab}`}</span>
+                  </Button>
+                  <Button href={featured.file} variant="secondary" icon="download" download>
+                    {page.featured.download}
+                  </Button>
+                </div>
+              ) : (
+                <p>
+                  <TodoPill>{page.todo.file}</TodoPill>
+                </p>
+              )
+            }
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <section id="documents" class="documents" aria-labelledby="documents-titre">
+      <div
+        class="container documents__inner"
+        data-reports
+        data-count-one={page.list.countOne}
+        data-count-many={page.list.countMany}
+      >
+        <div class="documents__head">
+          <SectionHeading id="documents-titre" strong={page.list.titleStrong} light={page.list.titleLight} lead={page.list.lead} />
+          <p class="documents__count" aria-live="polite" data-count data-reveal>{countLabel(REPORTS.length)}</p>
+        </div>
+
+        <div class="filters" role="group" aria-label={page.list.filtersLabel} data-filters data-reveal hidden>
+          {
+            filters.map((filter) => (
+              <button
+                class="filters__pill"
+                type="button"
+                aria-pressed={filter.value === 'all' ? 'true' : 'false'}
+                data-value={filter.value}
+              >
+                {filter.label} ({filter.count})
+              </button>
+            ))
+          }
+        </div>
+
+        <ul class="docs" role="list">
+          {
+            REPORTS.map((report) => (
+              <li class="doc" id={`document-${report.id}`} data-type={report.type} data-reveal>
+                <span class="doc__icon" aria-hidden="true">
+                  <FileText size={24} />
+                </span>
+                <span class="doc__text">
+                  <span class="doc__title">
+                    {report.title}
+                    {report.pending && (
+                      <>
+                        {' '}
+                        <span class="doc__pending">{page.todo.document}</span>
+                      </>
+                    )}
+                  </span>
+                  <span class="doc__meta">
+                    <span class="doc__type">{page.types[report.type]}</span>
+                    <span>{report.year ?? <TodoPill>{page.todo.year}</TodoPill>}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{fill(page.list.format, { size: report.size ?? page.todo.size })}</span>
+                  </span>
+                </span>
+                {report.file ? (
+                  <a class="doc__download" href={report.file} download aria-label={fill(page.list.downloadLabel, { title: report.title })}>
+                    <Download size={18} />
+                    {page.list.download}
+                  </a>
+                ) : (
+                  <span class="doc__missing">
+                    <TodoPill>{page.todo.file}</TodoPill>
+                  </span>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="documents__empty" data-empty hidden>{page.list.empty}</p>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="chercher-titre"
+      titleStrong={page.cta.titleStrong}
+      titleLight={page.cta.titleLight}
+      text={page.cta.text}
+      image={ctaPhoto}
+      imagePosition="50% 50%"
+      spaced
+    >
+      <!-- TODO page Contact : renvoyer vers elle au lieu du mailto. -->
+      <Button href={mailto} variant="on-dark-primary" icon="mail">{page.cta.contact}</Button>
+    </PhotoBanner>
+
+    {featured.file && <PdfReader />}
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  // Filtre par type de document (« all » : tous) ; le compteur est annoncé (aria-live).
+  document.querySelectorAll<HTMLElement>('[data-reports]').forEach((root) => {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-value]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-type]')];
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    const { countOne = '', countMany = '' } = root.dataset;
+
+    const select = (value: string) => {
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.value === value)));
+      let shown = 0;
+      items.forEach((item) => {
+        item.hidden = value !== 'all' && item.dataset.type !== value;
+        if (!item.hidden) shown += 1;
+      });
+      if (count) count.textContent = (shown > 1 ? countMany : countOne).replace('{count}', String(shown));
+      if (empty) empty.hidden = shown > 0;
+    };
+
+    buttons.forEach((button) => button.addEventListener('click', () => select(button.dataset.value!)));
+    root.querySelector<HTMLElement>('[data-filters]')?.removeAttribute('hidden');
+  });
+
+  // « Lire en ligne » : bouton de la liseuse si le navigateur sait ouvrir une boîte de dialogue ;
+  // le lien vers le PDF (nouvel onglet) reste seul en mobile (CSS) et sans JS.
+  if (typeof HTMLDialogElement === 'function' && document.querySelector('[data-reader]')) {
+    document.querySelectorAll<HTMLElement>('[data-read-actions]').forEach((actions) => {
+      actions.querySelector('[data-reader-open]')?.removeAttribute('hidden');
+      actions.setAttribute('data-reader-ready', '');
+    });
+  }
+</script>
+
+<style>
+  /* Hero et carte À la une : le motif passe derrière les deux, sans être coupé entre eux. */
+  .reports-hero-wrap {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  .reports-hero-wrap :global(.reports-hero__contours) {
+    z-index: -1;
+  }
+
+  .reports-hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-top: clamp(24px, 4vw, 48px);
+    padding-bottom: clamp(40px, 5vw, 64px);
+  }
+
+  .reports-hero__title {
+    max-width: 820px;
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+  }
+
+  .reports-hero__strong {
+    font-weight: 800;
+  }
+
+  .reports-hero__light {
+    font-weight: 300;
+  }
+
+  .reports-hero__lead {
+    max-width: 640px;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  /* À la une : couverture sur vert clair à gauche (5/12), texte à droite (7/12). */
+  .featured {
+    position: relative;
+    padding-bottom: var(--space-section);
+  }
+
+  .featured__card {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    overflow: hidden;
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  @media (max-width: 900px) {
+    .featured__card {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .featured__visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(28px, 4vw, 48px);
+    background: var(--section);
+  }
+
+  /* Couverture posée de biais, comme un document sur une table. */
+  .featured__visual :global(.featured__cover) {
+    max-width: 440px;
+    box-shadow:
+      0 2px 4px color-mix(in srgb, var(--ombre-teinte) 10%, transparent),
+      0 18px 40px color-mix(in srgb, var(--ombre-teinte) 22%, transparent);
+    transform: rotate(-2deg);
+  }
+
+  .featured__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-5);
+    padding: clamp(28px, 4vw, 56px);
+  }
+
+  .featured__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .featured__tag {
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--section);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .featured__tag--strong {
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .featured__title {
+    font-size: clamp(30px, 3.2vw, 44px);
+    line-height: 1.05;
+    letter-spacing: var(--ls-h2);
+  }
+
+  .featured__strong {
+    font-weight: 800;
+  }
+
+  .featured__light {
+    font-weight: 300;
+  }
+
+  .featured__summary {
+    max-width: 560px;
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  .featured__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-body-sm);
+  }
+
+  .featured__meta-format {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .featured__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    padding-top: 4px;
+  }
+
+  /* Liseuse prête : bouton en desktop, lien (nouvel onglet) en mobile. */
+  @media (min-width: 700px) {
+    [data-reader-ready] :global(.featured__read--link) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 699px) {
+    [data-reader-ready] :global(.featured__read--dialog) {
+      display: none;
+    }
+
+    /* Mobile : boutons pleine largeur, l'un sous l'autre. */
+    .featured__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .featured__actions :global(.btn) {
+      justify-content: center;
+    }
+  }
+
+  .documents {
+    background: var(--section);
+  }
+
+  .documents__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    padding-block: var(--space-section);
+  }
+
+  /* Titre à gauche, compteur aligné sur le titre à droite. */
+  .documents__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px 32px;
+  }
+
+  .documents__count {
+    padding-top: clamp(8px, 1.2vw, 16px);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  /* Pastilles blanches sur la section vert clair ; active : basalte plein. */
+  .filters__pill {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 2px solid var(--surface);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui),
+      color var(--transition-ui);
+  }
+
+  .filters__pill:hover {
+    border-color: var(--texte);
+  }
+
+  .filters__pill[aria-pressed='true'] {
+    background: var(--bouton-plein);
+    border-color: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .docs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .doc {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px 20px;
+    padding: 18px 24px;
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .doc[hidden] {
+    display: none;
+  }
+
+  .doc__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+  }
+
+  .doc__text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .doc__title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+  }
+
+  .doc__pending {
+    font-size: var(--fs-body-sm);
+    font-weight: 400;
+  }
+
+  .doc__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    font-size: 14px;
+  }
+
+  .doc__type {
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--section);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Bouton Télécharger : pastille blanche bordée, basalte plein au survol. */
+  .doc__download {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 10px 18px;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition:
+      background-color var(--transition-ui),
+      color var(--transition-ui),
+      border-color var(--transition-ui);
+  }
+
+  .doc__download:hover {
+    border-color: var(--bouton-plein);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .doc__missing {
+    font-size: var(--fs-body-sm);
+  }
+
+  /* Mobile : bouton (ou mention « PDF à fournir ») sous le texte, pleine largeur. */
+  @media (max-width: 700px) {
+    .doc {
+      grid-template-columns: auto minmax(0, 1fr);
+      padding: 18px 20px;
+    }
+
+    .doc__download,
+    .doc__missing {
+      grid-column: 1 / -1;
+    }
+
+    .doc__missing {
+      justify-self: center;
+    }
+  }
+
+  .documents__empty {
+    font-size: 16px;
+  }
+
+  .documents__empty[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filters__pill,
+    .doc__download {
+      transition: none;
+    }
+  }
+</style>
