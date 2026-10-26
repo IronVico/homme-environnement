@@ -85,15 +85,17 @@ const contentLang = lang === 'en' ? 'fr' : undefined;
         <ul class="ways">
           {
             ways.map((way) => (
-              <li class="card way" data-reveal>
-                <span class="icon-disc">
-                  <way.icon size={24} />
-                </span>
-                <h3 class="way__title">{way.title}</h3>
-                <p class="way__text">{way.text}</p>
-                <a class="way__link text-link" href={way.href}>
-                  {way.link}
-                  <ArrowRight size={18} />
+              <li class="way-item" data-reveal>
+                <a class="card way card-lift" href={way.href}>
+                  <span class="icon-disc">
+                    <way.icon size={24} />
+                  </span>
+                  <h3 class="way__title">{way.title}</h3>
+                  <p class="way__text">{way.text}</p>
+                  <span class="way__link">
+                    {way.link}
+                    <ArrowRight class="way__arrow" size={18} />
+                  </span>
                 </a>
               </li>
             ))
@@ -208,7 +210,7 @@ const contentLang = lang === 'en' ? 'fr' : undefined;
     background: var(--surface);
   }
 
-  /* Six façons d'agir : la carte n'est pas cliquable, seul son lien l'est. */
+  /* Six façons d'agir : cartes cliquables (élévation au survol, comme les cartes projet). */
   .ways {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -230,12 +232,24 @@ const contentLang = lang === 'en' ? 'fr' : undefined;
     }
   }
 
+  .way-item {
+    display: flex;
+  }
+
   .way {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
     padding: var(--space-7);
     border-radius: var(--radius-card-lg);
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  a.way:hover {
+    color: var(--texte);
   }
 
   .way__title {
@@ -250,38 +264,30 @@ const contentLang = lang === 'en' ? 'fr' : undefined;
     line-height: 1.6;
   }
 
-  /* Lien texte avec flèche, poussé en bas de la carte. */
-  .text-link {
+  /* Libellé et flèche, poussés en bas de la carte. */
+  .way__link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    margin-top: auto;
+    padding-top: 6px;
     font-size: 16px;
     font-weight: 600;
-    text-decoration: none;
   }
 
-  .text-link :global(svg) {
+  .way :global(.way__arrow) {
     flex-shrink: 0;
     transition: transform var(--transition-ui);
   }
 
-  .text-link:hover :global(svg) {
+  a.way:hover :global(.way__arrow),
+  a.way:focus-visible :global(.way__arrow) {
     transform: translateX(var(--nudge-arrow-hover));
   }
 
-  .way__link {
-    align-self: flex-start;
-    min-height: 24px;
-    margin-top: auto;
-    padding-top: 6px;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .text-link :global(svg) {
-      transition: none;
-    }
-
-    .text-link:hover :global(svg) {
+    a.way:hover :global(.way__arrow),
+    a.way:focus-visible :global(.way__arrow) {
       transform: none;
     }
   }
