@@ -14,10 +14,9 @@ export const PRIVACY_UPDATED: string | null = null;
 export const NEWSLETTER_TOOL: string | null = null;
 
 /**
- * Outil de mesure d'audience sans cookie. TODO ONG : à fournir ; le site n'en charge
- * aucun pour l'instant (ni Vercel Analytics ni autre).
+ * Outil de mesure d'audience sans cookie, chargé dans BaseLayout (<Analytics />).
  */
-export const ANALYTICS_TOOL: string | null = null;
+export const ANALYTICS_TOOL: string | null = 'Vercel Web Analytics';
 
 /** Durées de conservation (texte affiché tel quel). TODO ONG : à fournir. */
 export const RETENTION = {
