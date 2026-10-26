@@ -40,6 +40,10 @@ export interface SiteFigures {
   medicinalPlants?: number;
   /** Lacs. */
   lakes?: number;
+  /** Familles ayant accès à l'eau potable grâce à l'adduction solaire. */
+  families?: number;
+  /** Élèves sensibilisés dans les écoles. */
+  pupils?: number;
 }
 
 /**
@@ -143,4 +147,6 @@ export const SITE_FIGURES: Record<string, SiteFigures | null> = {
     lemurSpecies: 8,
   },
   angodroabe: null, // À FOURNIR
+  // Burkina Faso : un seul site, mêmes chiffres que la page pays (BURKINA, à fournir).
+  'kollo-guiaro': { hectares: BURKINA.hectares, families: BURKINA.families, pupils: BURKINA.pupils },
 };
