@@ -788,8 +788,7 @@ const fr = {
     list: {
       titleStrong: 'Nos partenaires',
       titleLight: 'et bailleurs',
-      // TODO ONG : chapeau à remplacer quand la liste et les logos seront complets.
-      lead: "Les logos seront ajoutés dès que l'ONG les aura transmis.",
+      lead: 'Fondations, institutions, chercheurs, entreprises et associations : ils soutiennent nos actions sur le terrain.',
       filtersLabel: 'Filtrer par type de partenaire',
       all: 'Tous',
       /** {count} : nombre de partenaires affichés. */
