@@ -23,6 +23,11 @@ export interface Partner {
    * maquette (voir SHOW_PROVISIONAL_LOGOS), sinon monogramme aux initiales.
    */
   logo?: ImageMetadata;
+  /**
+   * Version monochrome du logo (src/assets/logos/partenaires-mono/<id>.png, fond transparent),
+   * utilisée comme masque en mode sombre. Rattachée automatiquement par identifiant.
+   */
+  logoMono?: ImageMetadata;
   /** Monogramme affiché sans logo, quand les initiales calculées ne conviennent pas. */
   monogram?: string;
 }
@@ -208,7 +213,16 @@ function logoFor(id: string): ImageMetadata | undefined {
   return partnerLogos[`../assets/logos/partenaires/${id}.png`] ?? partnerLogos[`../assets/logos/partenaires/${id}.jpg`];
 }
 
-export const PARTNERS: Partner[] = RAW_PARTNERS.map((partner) => ({ ...partner, logo: partner.logo ?? logoFor(partner.id) }));
+const partnerMonoLogos = import.meta.glob<ImageMetadata>('../assets/logos/partenaires-mono/*.png', {
+  import: 'default',
+  eager: true,
+});
+
+export const PARTNERS: Partner[] = RAW_PARTNERS.map((partner) => ({
+  ...partner,
+  logo: partner.logo ?? logoFor(partner.id),
+  logoMono: partnerMonoLogos[`../assets/logos/partenaires-mono/${partner.id}.png`],
+}));
 
 /**
  * Logos provisoires de la maquette (src/assets/logos/partenaires-provisoires) : ce ne sont PAS

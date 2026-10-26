@@ -143,7 +143,16 @@ const breadcrumb = [
               <li class="card partner-card" data-type={partner.type}>
                 <span class="partner-card__logo">
                   {partner.logo ? (
-                    <Image class="partner-card__logo-img" src={partner.logo} alt="" height={52} densities={[1, 2]} />
+                    <>
+                      <Image class="partner-card__logo-img" src={partner.logo} alt="" height={52} densities={[1, 2]} />
+                      {partner.logoMono && (
+                        <span
+                          class="partner-card__logo-mono"
+                          aria-hidden="true"
+                          style={`--logo: url(${partner.logoMono.src}); aspect-ratio: ${partner.logoMono.width} / ${partner.logoMono.height}`}
+                        />
+                      )}
+                    </>
                   ) : partner.logoSvg ? (
                     <span class="partner-card__logo-svg" set:html={partner.logoSvg} />
                   ) : (
@@ -444,7 +453,7 @@ const breadcrumb = [
     height: 88px;
     padding: 8px 12px;
     border-radius: 14px;
-    background: var(--disque);
+    background: var(--surface);
   }
 
   .partner-card__logo :global(.partner-card__logo-img) {
@@ -452,6 +461,34 @@ const breadcrumb = [
     max-height: 52px;
     width: auto;
     height: auto;
+  }
+
+  /* Mode sombre : logo monochrome (masque) à la couleur du texte, à la place du logo en couleur. */
+  .partner-card__logo-mono {
+    display: none;
+    height: 44px;
+    max-width: 100%;
+    background-color: var(--texte-doux);
+    -webkit-mask: var(--logo) center / contain no-repeat;
+    mask: var(--logo) center / contain no-repeat;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .partner-card__logo:has(.partner-card__logo-mono) :global(.partner-card__logo-img) {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .partner-card__logo-mono {
+      display: block;
+    }
+  }
+
+  :global(:root[data-theme='dark']) .partner-card__logo:has(.partner-card__logo-mono) :global(.partner-card__logo-img) {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .partner-card__logo-mono {
+    display: block;
   }
 
   /* Logo provisoire (SVG en ligne) : hauteur fixe, comme les vrais logos. */
