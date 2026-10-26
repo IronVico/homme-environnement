@@ -93,6 +93,8 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
           </ul>
         )
       }
+      {/* Pastilles libres au-dessus du titre (fiche projet : thème, pays et sites). */}
+      <slot name="chips" />
       <h1 class="page-hero__title" data-reveal>
         <span class="page-hero__strong">{titleStrong}</span><br />
         <span class="page-hero__light">{titleLight}</span>

@@ -19,3 +19,29 @@ export const PROJECT_ICONS = [
   'droplets',
   'droplet',
 ] as const;
+
+/**
+ * Pictogrammes de la fiche projet (Lucide) : chiffres de la bande sauge et étapes
+ * « Comment ça marche », choisis dans le frontmatter du projet. Correspondance dans ProjectPage.
+ * Contient tous les PROJECT_ICONS : la pastille de thème du hero reprend l'icône du projet.
+ */
+export const PROJECT_DETAIL_ICONS = [
+  'droplets',
+  'leaf',
+  'flask',
+  'users',
+  'sprout',
+  'trees',
+  'search',
+  'store',
+  'shield',
+  'map-pin',
+  'calendar',
+  'droplet',
+  'sun',
+  'graduation-cap',
+  'hand-heart',
+  'tent',
+  'flower',
+  'coins',
+] as const;
