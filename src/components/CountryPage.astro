@@ -161,7 +161,7 @@ const breadcrumb = [
       spaced
     >
       <div class="cta__buttons">
-        <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
+        <Button href={donatePath(lang)} variant="don"><span lang={lang === 'en' ? 'en' : undefined}>{dict.ui.donate}</span></Button>
         <Button href={secondary.href} variant="on-dark">{secondary.label}</Button>
       </div>
     </PhotoBanner>

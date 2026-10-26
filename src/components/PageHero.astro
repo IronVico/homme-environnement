@@ -27,7 +27,8 @@ interface Props {
   /** Bouton secondaire, facultatif ; une ancre (« #sites ») affiche une flèche vers le bas. */
   cta?: { label: string; href: string };
   /** Bouton Don (pêche), placé avant le bouton secondaire. */
-  donate?: { label: string; href: string };
+  /** lang : libellé déjà traduit dans une page dont le contenu est encore en français (lang="fr"). */
+  donate?: { label: string; href: string; lang?: string };
   /**
    * Bouton principal (basalte), placé avant le bouton secondaire ; flèche vers la droite par défaut,
    * enveloppe à la place de la flèche pour un lien mailto (icon: 'mail').
@@ -104,7 +105,7 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
       {
         (donate || primary || cta) && (
           <div class="page-hero__ctas" data-reveal>
-            {donate && <Button href={donate.href} variant="don">{donate.label}</Button>}
+            {donate && <Button href={donate.href} variant="don"><span lang={donate.lang}>{donate.label}</span></Button>}
             {primary && <Button href={primary.href} variant="primary" arrow={primary.arrow} icon={primary.icon}>{primary.label}</Button>}
             {cta && (
               <Button href={cta.href} variant="secondary" arrow={cta.href.length > 1 && cta.href.startsWith('#') ? 'down' : 'right'}>

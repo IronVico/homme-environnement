@@ -139,7 +139,7 @@ const breadcrumb = [
                 data-source-url={photo.license?.source}
               >
                 <figure class="photo__figure">
-                  <a class="photo__link" href={photo.full} aria-label={fill(page.list.open, { title: photo.title })} data-open>
+                  <a class="photo__link" href={photo.full} aria-label={fill(page.list.open, { title: photo.title })} aria-haspopup="dialog" data-open>
                     <Picture
                       class="photo__img"
                       src={photo.image}
@@ -201,6 +201,8 @@ const breadcrumb = [
               <p class="viewer__title" id="viewer-title" data-viewer-title></p>
               <p class="viewer__credit" data-viewer-credit></p>
             </div>
+            <!-- Photo précédente / suivante : position et titre annoncés (le focus reste sur le bouton). -->
+            <p class="visually-hidden" aria-live="polite" data-viewer-live></p>
           </div>
         </dialog>
       </div>
@@ -251,6 +253,7 @@ const breadcrumb = [
     const title = dialog.querySelector<HTMLElement>('[data-viewer-title]')!;
     const credit = dialog.querySelector<HTMLElement>('[data-viewer-credit]')!;
     const counter = dialog.querySelector<HTMLElement>('[data-viewer-position]')!;
+    const live = dialog.querySelector<HTMLElement>('[data-viewer-live]')!;
 
     let visible: HTMLElement[] = [];
     let index = 0;
@@ -283,6 +286,8 @@ const breadcrumb = [
         credit.textContent = creditLabel;
       }
       counter.textContent = position.replace('{index}', String(index + 1)).replace('{count}', String(visible.length));
+      // À l'ouverture, le dialogue s'annonce déjà (titre et position) : rien à ajouter.
+      live.textContent = dialog.open ? `${counter.textContent}. ${text}` : '';
       const single = visible.length < 2;
       dialog.querySelectorAll<HTMLButtonElement>('[data-viewer-prev], [data-viewer-next]').forEach((button) => {
         button.hidden = single;
@@ -470,10 +475,18 @@ const breadcrumb = [
     transition: transform 500ms ease;
   }
 
-  /* Contour blanc à l'intérieur de la photo : le contour basalte ne se verrait pas sur une photo sombre. */
+  /*
+   * Focus dessiné autour de la vignette (le cadre coupe ce qui dépasse) : sur le fond de page,
+   * il suit le thème et se voit quelle que soit la photo (un contour blanc dans la photo
+   * disparaissait sur les zones claires).
+   */
   .photo__link:focus-visible {
-    outline: 3px solid var(--blanc);
-    outline-offset: -6px;
+    outline: none;
+  }
+
+  .photo__figure:has(.photo__link:focus-visible) {
+    outline: 2px solid var(--texte);
+    outline-offset: 3px;
   }
 
   /*

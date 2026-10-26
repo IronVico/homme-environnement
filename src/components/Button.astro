@@ -68,7 +68,8 @@ const type: 'button' | undefined = href === undefined ? 'button' : undefined;
     flex-shrink: 0;
   }
 
-  button.btn {
+  /* :where() : sans poids, pour que la bordure des variantes à contour (secondary, on-dark) l'emporte. */
+  :where(button).btn {
     border: 0;
     font-family: inherit;
     cursor: pointer;
