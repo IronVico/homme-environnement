@@ -258,8 +258,6 @@ const fr = {
       titleStrong: 'Notre site',
       titleLight: 'au Burkina Faso',
       lead: "Un site, Kollo et Guiaro, où nous agissons avec les familles pour l'eau, la terre et l'école.",
-      /** Pas encore de fiche : la carte du site mène aux projets de la page. */
-      link: 'Voir les projets du site',
       map: {
         label: 'Carte du site au Burkina Faso',
         capital: 'Ouagadougou',
@@ -358,6 +356,28 @@ const fr = {
       all: 'Tous les sites à Madagascar',
       /** {name} : site suivant. */
       next: 'Site suivant : {name}',
+    },
+    /**
+     * Textes propres aux fiches des sites du Burkina Faso (maquette FicheKollo), à la place
+     * des textes ci-dessus. `heroActions` : bouton du hero vers les actions du site ;
+     * `projects` : second bouton de la carte d'appel ; `nav.other` : lien vers l'autre pays
+     * quand le pays n'a qu'un site.
+     */
+    burkina: {
+      title: '{name}, Burkina Faso',
+      country: 'Burkina Faso',
+      photoCaption: '{name}, Burkina Faso',
+      mapLabel: 'Carte du Burkina Faso : {name} ({region})',
+      heroActions: 'Nos actions sur le site',
+      projects: 'Tous nos projets',
+      species: {
+        titleStrong: 'Faune et flore',
+        titleLight: 'du site',
+      },
+      nav: {
+        all: 'Le Burkina Faso',
+        other: 'Nos sites à Madagascar',
+      },
     },
   },
   // Page « Nos projets » (maquette NosProjets). Les projets sont dans src/content/projets.
@@ -1292,8 +1312,6 @@ const fr = {
       titleLight: 'de nos sites ?',
       text: "Volontaire, stagiaire, visiteur ou photographe : si vous avez photographié l'un de nos sites, écrivez-nous. Avec votre accord, nous les publierons ici, avec votre nom.",
       contact: 'Nous contacter',
-      /** Objet du mail prérempli, en attendant la page Contact. */
-      mailSubject: 'Photos de nos sites',
     },
   },
 
@@ -1385,8 +1403,107 @@ const fr = {
       titleLight: 'un document ?',
       text: 'Un rapport plus ancien, une étude citée sur nos pages ou des données pour un travail de recherche : écrivez-nous, nous vous orienterons vers le bon document.',
       contact: 'Nous contacter',
-      /** Objet du mail prérempli, en attendant la page Contact. */
-      mailSubject: "Recherche d'un document",
+    },
+  },
+  /**
+   * Page « Contact » (maquettes Contact / ContactMobile). Envoi du formulaire : api/contact.ts.
+   * Sujets de la liste : clés de CONTACT_SUBJECTS (src/lib/contact.ts).
+   */
+  contact: {
+    title: 'Contact',
+    description:
+      "Une question sur nos programmes, un don, un stage ou un partenariat ? Écrivez à L'Homme & l'Environnement : nous orienterons votre message vers la bonne personne de l'équipe.",
+    hero: {
+      titleStrong: 'Écrivez-nous,',
+      titleLight: 'on vous répond.',
+      lead: "Une question sur nos programmes, un don, un stage ou un partenariat ? Laissez-nous un message, nous l'orienterons vers la bonne personne de l'équipe.",
+    },
+    sectionLabel: 'Formulaire et coordonnées',
+    form: {
+      titleStrong: 'Votre',
+      titleLight: 'message',
+      // Phrase coupée autour de l'astérisque (masqué aux lecteurs d'écran : les champs sont marqués « requis »).
+      requiredBefore: "Les champs marqués d'un astérisque (",
+      requiredAfter: ') sont obligatoires.',
+      name: 'Nom et prénom',
+      email: 'Adresse e-mail',
+      emailPlaceholder: 'nom@exemple.fr',
+      emailHelp: 'Uniquement pour vous répondre.',
+      subject: 'Sujet',
+      subjectPlaceholder: 'Choisir un sujet',
+      subjects: {
+        don: 'Don et reçu fiscal',
+        stage: 'Stage et volontariat',
+        entreprise: 'Partenariat entreprise',
+        presse: 'Presse',
+        autre: 'Autre',
+      },
+      message: 'Message',
+      messageHelp: 'Précisez si besoin le site ou le projet concerné.',
+      consent: "J'accepte que mes données personnelles soient utilisées uniquement pour répondre à ma demande.",
+      privacyLink: 'Lire la politique de confidentialité',
+      /** Champ piège anti-spam, invisible : lu seulement si un lecteur d'écran y arrive malgré tout. */
+      trap: 'Ne remplissez pas ce champ',
+      submit: 'Envoyer',
+      errors: {
+        nom: 'Indiquez votre nom et votre prénom.',
+        email: 'Indiquez votre adresse e-mail.',
+        emailInvalid: 'Cette adresse e-mail semble incomplète. Exemple : nom@exemple.fr',
+        sujet: 'Choisissez un sujet dans la liste.',
+        message: 'Écrivez votre message.',
+        consentement: 'Cochez cette case pour que nous puissions vous répondre.',
+        /** {max} : nombre de caractères autorisés. */
+        tooLong: 'Ce texte est trop long : {max} caractères au maximum.',
+      },
+      sending: 'Envoi en cours…',
+      sent: "Merci, votre message est bien parti. Nous vous répondrons à l'adresse indiquée.",
+      /** Envoi impossible (serveur non configuré ou en panne) : lien mailto prérempli à la suite. */
+      failed: "Le message n'a pas pu partir. Vous pouvez l'envoyer depuis votre messagerie : ",
+      failedLink: 'ouvrir un e-mail prérempli',
+      /** Sans JavaScript, la page revient à cette ancre en cas d'échec. */
+      failedNoScript: "Le message n'a pas pu partir. Vous pouvez nous écrire directement à ",
+    },
+    ways: {
+      label: 'Autres façons de nous joindre',
+      write: 'Écrire',
+      headOffice: 'Siège en France',
+      orgName: "L'Homme & l'Environnement",
+      madagascar: 'Bureau à Madagascar',
+      social: 'Réseaux sociaux',
+      socialText: 'Suivez la vie de nos sites, au fil des saisons.',
+    },
+    todo: {
+      toConfirm: '[à confirmer]',
+      address: '[adresse à fournir]',
+      missing: '[à fournir]',
+      accounts: '[comptes à confirmer]',
+    },
+    faqNote: {
+      title: "Pour un stage ou un don, consultez d'abord nos questions fréquentes",
+      text: "Durée des missions, reçu fiscal, soutien mensuel : la réponse s'y trouve peut-être déjà.",
+      stages: 'Questions sur les stages',
+      don: 'Questions sur les dons',
+    },
+    more: {
+      titleStrong: 'Vous cherchez',
+      // Trait d'union insécable (U+2011) : « peut-être » ne se coupe pas en fin de ligne sur mobile.
+      titleLight: 'peut‑être…',
+      lead: 'Les demandes les plus fréquentes ont déjà leur page.',
+      don: {
+        title: 'Faire un don',
+        text: 'Soutenir nos programmes par un don ponctuel ou mensuel, en ligne via HelloAsso.',
+        cta: 'Voir la page don',
+      },
+      stages: {
+        title: 'Stages et volontariat',
+        text: 'Rejoindre nos équipes sur le terrain, pour une mission construite avec vous.',
+        cta: 'Découvrir les missions',
+      },
+      entreprises: {
+        title: 'Entreprises',
+        text: 'Engager votre entreprise dans une filière fondée sur la nature, aux côtés des communautés locales.',
+        cta: 'Devenir partenaire',
+      },
     },
   },
 };
