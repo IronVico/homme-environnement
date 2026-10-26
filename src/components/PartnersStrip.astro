@@ -1,11 +1,12 @@
 ---
 /**
- * Bande des partenaires et bailleurs : une sélection des logos fournis par l'ONG
- * (src/assets/logos/partenaires, voir src/data/partenaires.ts).
+ * Bande des partenaires et bailleurs : une sélection des logos fournis par l'ONG, en version
+ * monochrome (src/assets/logos/partenaires-mono, générés depuis src/assets/logos/partenaires).
+ * Chaque logo sert de masque et prend la couleur du texte doux du thème (clair ou sombre).
  * En mobile (≤ 900px), la liste défile en boucle, avec un bouton Pause ; avec
  * prefers-reduced-motion, elle reste en grille.
  */
-import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import PauseButton from './PauseButton.astro';
 import { getPartner } from '../data/partenaires';
 
@@ -27,7 +28,15 @@ const FEATURED = [
   'pure-trade',
 ];
 
-const partners = FEATURED.map(getPartner).filter((p) => p.logo);
+const monoLogos = import.meta.glob<ImageMetadata>('../assets/logos/partenaires-mono/*.png', {
+  import: 'default',
+  eager: true,
+});
+
+const partners = FEATURED.map(getPartner).flatMap((partner) => {
+  const mono = monoLogos[`../assets/logos/partenaires-mono/${partner.id}.png`];
+  return mono ? [{ name: partner.name, mono }] : [];
+});
 
 // La seconde série sert uniquement à boucler le défilement : masquée aux lecteurs d'écran.
 const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((p) => ({ ...p, dup: true }))];
@@ -41,7 +50,12 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
         {
           track.map((p) => (
             <li class:list={['partners__logo', { 'partners__logo--dup': p.dup }]} aria-hidden={p.dup ? 'true' : undefined}>
-              <Image class="partners__img" src={p.logo!} alt={p.dup ? '' : p.name} height={56} densities={[1, 2]} />
+              <span
+                class="partners__mark"
+                role={p.dup ? undefined : 'img'}
+                aria-label={p.dup ? undefined : p.name}
+                style={`--logo: url(${p.mono.src}); aspect-ratio: ${p.mono.width} / ${p.mono.height}`}
+              ></span>
             </li>
           ))
         }
@@ -85,17 +99,16 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 12px 16px;
-    border-radius: var(--radius-card);
-    background: var(--surface);
   }
 
-  .partners__logo :global(.partners__img) {
+  /* Logo monochrome : le PNG sert de masque, la couleur vient du thème. */
+  .partners__mark {
     display: block;
-    width: auto;
+    height: 52px;
     max-width: 100%;
-    height: 56px;
-    object-fit: contain;
+    background-color: var(--texte-doux);
+    -webkit-mask: var(--logo) center / contain no-repeat;
+    mask: var(--logo) center / contain no-repeat;
   }
 
   .partners__logo--dup {
