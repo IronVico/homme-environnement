@@ -285,29 +285,9 @@ const contentLang = lang === 'en' ? 'fr' : undefined;
     transform: translateX(var(--nudge-arrow-hover));
   }
 
-  /* Survol : la pastille grossit avec un léger rebond, le pictogramme bascule. */
-  .way .icon-disc,
-  .way .icon-disc :global(svg) {
-    transition: transform 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  a.way:hover .icon-disc,
-  a.way:focus-visible .icon-disc {
-    transform: scale(1.1);
-  }
-
-  a.way:hover .icon-disc :global(svg),
-  a.way:focus-visible .icon-disc :global(svg) {
-    transform: rotate(-10deg);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     a.way:hover :global(.way__arrow),
-    a.way:focus-visible :global(.way__arrow),
-    a.way:hover .icon-disc,
-    a.way:focus-visible .icon-disc,
-    a.way:hover .icon-disc :global(svg),
-    a.way:focus-visible .icon-disc :global(svg) {
+    a.way:focus-visible :global(.way__arrow) {
       transform: none;
     }
   }
