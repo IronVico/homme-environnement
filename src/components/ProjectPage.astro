@@ -29,7 +29,7 @@ import Trees from '@lucide/astro/icons/trees';
 import Users from '@lucide/astro/icons/users';
 import { Picture } from 'astro:assets';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import { donatePath, fieldPath, pagePath, projectPath, sitePath } from '../data/navigation';
+import { donatePath, fieldPath, pagePath, projectPath } from '../data/navigation';
 import { PARTNERS } from '../data/partenaires';
 import type { PROJECT_DETAIL_ICONS } from '../data/projets';
 import { getLang, localeUrl, t } from '../i18n';
@@ -108,12 +108,8 @@ const countryMaps = await Promise.all(
       country,
       label: dict.projets.countries[country],
       map: country === 'madagascar' ? dict.madagascar.sites.map : dict.burkina.sites.map,
-      // Pas de fiche pour le Burkina Faso : la carte du site mène aux projets de la page pays.
       all: country === 'madagascar' ? pagePath(lang, 'madagascar') : pagePath(lang, 'burkina'),
-      sites: sites.map((site) => ({
-        ...site,
-        href: country === 'madagascar' ? site.href : `${pagePath(lang, 'burkina')}#projets`,
-      })),
+      sites,
     };
   }),
 );
@@ -127,10 +123,10 @@ const placeChips = countryMaps.map((group) => ({
   label: [group.label, group.sites.map((site) => site.name).join(', ')].filter(Boolean).join(' · '),
 }));
 
-// Bouton secondaire du hero : la fiche du site quand le projet n'a qu'un site (à Madagascar), sinon la carte.
-const singleSite = siteCount === 1 && countryMaps[0]?.country === 'madagascar' ? countryMaps[0].sites[0] : undefined;
+// Bouton secondaire du hero : la fiche du site quand le projet n'a qu'un site, sinon la carte.
+const singleSite = siteCount === 1 ? countryMaps[0]?.sites[0] : undefined;
 const heroCta = singleSite
-  ? { label: fill(page.site, { name: singleSite.name }), href: sitePath(lang, singleSite.id) }
+  ? { label: fill(page.site, { name: singleSite.name }), href: singleSite.href }
   : { label: `${page.where.titleStrong} ${page.where.titleLight}`, href: '#ou' };
 
 // Bande de chiffres : celle du projet, sinon le nombre de sites et deux chiffres à fournir.
