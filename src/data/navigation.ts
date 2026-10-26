@@ -1,4 +1,7 @@
 import { localeUrl, t, type Lang } from '../i18n';
+import type { COUNTRIES } from './projets';
+
+type Country = (typeof COUNTRIES)[number];
 
 export interface NavLink {
   label: string;
@@ -67,9 +70,17 @@ export function pagePath(lang: Lang, page: keyof typeof PAGES): string {
   return localeUrl(lang, PAGES[page]);
 }
 
-/** URL de la fiche d'un site de Madagascar : « vohimana » → « /sites/madagascar/vohimana ». */
-export function sitePath(lang: Lang, site: string): string {
-  return localeUrl(lang, `${PAGES.madagascar}/${site}`);
+/**
+ * URL de la fiche d'un site, sous la page de son pays :
+ * « vohimana » → « /sites/madagascar/vohimana », (« kollo-guiaro », 'burkina-faso') → « /sites/burkina-faso/kollo-guiaro ».
+ */
+export function sitePath(lang: Lang, site: string, country: Country = 'madagascar'): string {
+  return localeUrl(lang, `${countryPath(country)}/${site}`);
+}
+
+/** Chemin de la page d'un pays, sans préfixe de langue. */
+function countryPath(country: Country): string {
+  return country === 'burkina-faso' ? PAGES.burkina : PAGES.madagascar;
 }
 
 /**

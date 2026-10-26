@@ -258,8 +258,6 @@ const fr = {
       titleStrong: 'Notre site',
       titleLight: 'au Burkina Faso',
       lead: "Un site, Kollo et Guiaro, où nous agissons avec les familles pour l'eau, la terre et l'école.",
-      /** Pas encore de fiche : la carte du site mène aux projets de la page. */
-      link: 'Voir les projets du site',
       map: {
         label: 'Carte du site au Burkina Faso',
         capital: 'Ouagadougou',
@@ -358,6 +356,28 @@ const fr = {
       all: 'Tous les sites à Madagascar',
       /** {name} : site suivant. */
       next: 'Site suivant : {name}',
+    },
+    /**
+     * Textes propres aux fiches des sites du Burkina Faso (maquette FicheKollo), à la place
+     * des textes ci-dessus. `heroActions` : bouton du hero vers les actions du site ;
+     * `projects` : second bouton de la carte d'appel ; `nav.other` : lien vers l'autre pays
+     * quand le pays n'a qu'un site.
+     */
+    burkina: {
+      title: '{name}, Burkina Faso',
+      country: 'Burkina Faso',
+      photoCaption: '{name}, Burkina Faso',
+      mapLabel: 'Carte du Burkina Faso : {name} ({region})',
+      heroActions: 'Nos actions sur le site',
+      projects: 'Tous nos projets',
+      species: {
+        titleStrong: 'Faune et flore',
+        titleLight: 'du site',
+      },
+      nav: {
+        all: 'Le Burkina Faso',
+        other: 'Nos sites à Madagascar',
+      },
     },
   },
   // Page « Nos projets » (maquette NosProjets). Les projets sont dans src/content/projets.

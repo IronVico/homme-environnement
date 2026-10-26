@@ -44,8 +44,7 @@ export async function getExplorerSites(
       mapPosition: site.data.mapPosition,
       figure: siteHectares(site.id),
       figureMissing: labels.figuresMissing,
-      // TODO fiche site Kollo et Guiaro : en attendant, la carte mène aux projets de la page pays.
-      href: country === 'madagascar' ? sitePath(lang, site.id) : '#projets',
-      linkLabel: country === 'madagascar' ? labels.link : dict.burkina.sites.link,
+      href: sitePath(lang, site.id, country),
+      linkLabel: labels.link,
     }));
 }
