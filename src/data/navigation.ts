@@ -30,6 +30,7 @@ export const PAGES = {
   burkina: 'sites/burkina-faso',
   projets: 'projets',
   stages: 's-engager/stages-volontariat',
+  entreprises: 's-engager/entreprises',
   equipe: 'ong/equipe',
   partenaires: 'ong/partenaires',
   don: 's-engager/faire-un-don',
@@ -139,8 +140,8 @@ const FOOTER_HREFS = [
     projectsByTheme('filieres'),
     PAGES.projets,
   ],
-  // TODO pages Particuliers et Entreprises.
-  [HOME_ENGAGE, PAGES.stages, HOME_ENGAGE],
+  // TODO page Particuliers.
+  [HOME_ENGAGE, PAGES.stages, PAGES.entreprises],
   [PAGES.rapports, PAGES.galerie, PAGES.contact],
 ];
 const LEGAL_HREFS = [PAGES.mentionsLegales, PAGES.confidentialite];

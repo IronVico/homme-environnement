@@ -615,6 +615,123 @@ const fr = {
       ],
     },
   },
+  // Page « Entreprises » (S'engager, maquettes Entreprises / EntreprisesMobile). « [à …] » : à fournir par l'ONG.
+  entreprises: {
+    title: 'Entreprises',
+    description:
+      "Mécénat financier, mécénat de compétences ou programme Net Positive Impact : engagez votre entreprise avec L'Homme & l'Environnement pour la biodiversité et les communautés locales.",
+    hero: {
+      titleStrong: 'Engager votre entreprise',
+      titleLight: 'pour le vivant.',
+      lead: 'Depuis 1993, nous associons des entreprises à la protection de la biodiversité avec les communautés locales. Mécénat, compétences ou filières : construisons ensemble un engagement concret et mesurable.',
+      write: 'Nous écrire',
+      offers: 'Nos formes de partenariat',
+      imageAlt: 'Un couple de lémurs macaco dans les arbres : le mâle noir et la femelle rousse aux favoris blancs',
+      caption: 'Lémurs macaco, Mont-Passot [crédit photo à fournir]',
+    },
+    offers: {
+      titleStrong: 'Trois façons',
+      titleLight: 'de vous engager.',
+      lead: 'Chaque partenariat est construit sur mesure, selon vos enjeux et nos besoins sur le terrain.',
+      cards: [
+        {
+          title: 'Mécénat financier',
+          text: 'Financez un site, un programme de reboisement ou une filière. Votre soutien est affecté à un projet identifié et suivi dans la durée.',
+        },
+        {
+          title: 'Mécénat de compétences',
+          text: "Mettez l'expertise de vos collaborateurs au service de nos projets : gestion, ingénierie, communication, recherche, logistique.",
+        },
+        {
+          title: 'Programme Net Positive Impact',
+          text: 'Un accompagnement pour aller au-delà de la compensation et laisser un impact positif sur la biodiversité. [contenu à préciser]',
+        },
+      ],
+    },
+    why: {
+      titleStrong: 'Pourquoi',
+      titleLight: 'nous\u00a0?',
+      items: [
+        {
+          title: 'Sur le terrain depuis 1993',
+          text: 'Depuis 1993 à Madagascar, aux côtés des communautés qui vivent de la forêt.',
+        },
+        {
+          title: 'Des projets mesurables',
+          text: "Chaque partenariat s'appuie sur un site, des objectifs et des indicateurs suivis, partagés avec vous.",
+        },
+        {
+          title: 'Des filières durables',
+          text: 'Nous savons faire vivre la forêt debout, comme avec Aroma Forest et ses huiles essentielles, issues de filières créées avec les paysans.',
+        },
+      ],
+      imageAlt: "Cueillette de fleurs d'ylang-ylang au Mont-Passot",
+      caption: "Cueillette d'ylang-ylang, Mont-Passot — © Olivier Behra",
+    },
+    steps: {
+      titleStrong: 'Comment',
+      titleLight: 'ça se passe\u00a0?',
+      text: 'Un partenariat se construit en quatre étapes, à votre rythme. Chaque projet est construit avec vous, selon vos enjeux et nos besoins sur le terrain.',
+      button: 'Nous écrire',
+      items: [
+        {
+          title: 'Premier échange',
+          text: 'Nous faisons connaissance : vos enjeux, vos attentes, vos moyens et nos besoins sur le terrain.',
+        },
+        {
+          title: 'Choix du site ou du projet',
+          text: 'Nous vous proposons un site, un programme ou une filière en cohérence avec votre activité.',
+        },
+        {
+          title: 'Convention',
+          text: 'Objectifs, budget, durée, indicateurs et communication sont formalisés dans une convention de partenariat.',
+        },
+        {
+          title: 'Suivi et restitution',
+          text: "Vous recevez des comptes rendus réguliers et pouvez venir constater l'avancement sur place.",
+        },
+      ],
+    },
+    partners: {
+      titleStrong: 'Ils nous font',
+      titleLight: 'confiance',
+      link: 'Tous nos partenaires',
+    },
+    faq: {
+      titleStrong: 'Questions',
+      titleLight: 'fréquentes',
+      items: [
+        {
+          question: 'Quelle déduction fiscale pour mon entreprise ?',
+          answer:
+            "Les dons des entreprises à notre association ouvrent droit à une réduction d'impôt de 60 % de leur montant, dans la limite prévue par la loi [à confirmer]. Un reçu fiscal est émis pour chaque versement.",
+        },
+        {
+          question: 'Existe-t-il un montant minimum ?',
+          answer:
+            "Il n'y a pas de format unique : chaque partenariat est dimensionné selon le projet choisi et vos moyens. Les montants indicatifs par type de projet seront précisés ici [à fournir].",
+        },
+        {
+          question: 'Pouvons-nous communiquer sur notre engagement ?',
+          answer:
+            "Oui. Les conditions d'utilisation de notre nom, de notre logo et des contenus issus du terrain sont définies ensemble dans la convention de partenariat.",
+        },
+        {
+          question: "Nos collaborateurs peuvent-ils s'impliquer ?",
+          answer:
+            'Oui, par le mécénat de compétences ou, selon les projets, par des visites sur le terrain. Les formats possibles sont étudiés au cas par cas [à confirmer].',
+        },
+      ],
+    },
+    cta: {
+      titleStrong: 'Parlons',
+      titleLight: 'de votre projet.',
+      text: 'Écrivez-nous pour un premier échange. Adresse de contact entreprises : [à fournir].',
+      write: 'Nous écrire',
+      partners: 'Voir nos partenaires',
+      mailSubject: 'Partenariat entreprise',
+    },
+  },
   // Page « Équipe » (maquette PageEquipe). Les membres sont dans src/data/equipe.ts.
   equipe: {
     title: 'Équipe',

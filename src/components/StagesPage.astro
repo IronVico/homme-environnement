@@ -25,7 +25,6 @@ import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getExplorerSites } from '../lib/explorer-sites';
 import Breadcrumb from './Breadcrumb.astro';
-import Button from './Button.astro';
 import Faq, { type FaqAnswer } from './Faq.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
@@ -33,6 +32,7 @@ import InfoNote from './InfoNote.astro';
 import PageHero from './PageHero.astro';
 import SectionHeading from './SectionHeading.astro';
 import SitesExplorer from './SitesExplorer.astro';
+import StepsBlock from './StepsBlock.astro';
 
 import heroRepas from '../assets/photos/engager-entreprises.jpg';
 import mosaicGuide from '../assets/photos/engager-terrain.jpg';
@@ -252,30 +252,14 @@ const breadcrumb = [
 
     <section id="candidater" class="section section--tinted" aria-labelledby="candidater-titre">
       <div class="container">
-        <div class="apply two-cols">
-          <div class="stack stack--20">
-            <SectionHeading id="candidater-titre" strong={page.apply.titleStrong} light={page.apply.titleLight} />
-            <p class="body-text" data-reveal>{page.apply.text}</p>
-            <div class="apply__buttons" data-reveal>
-              <Button href={mailto} variant="primary" icon="mail">{page.apply.button}</Button>
-            </div>
-          </div>
-          <ol class="steps">
-            {
-              page.apply.steps.map((step, i) => (
-                <li class="step" data-reveal>
-                  <span class="step__num" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <span class="step__body">
-                    <span class="step__title">{step.title}</span>
-                    <span class="step__text">{step.text}</span>
-                  </span>
-                </li>
-              ))
-            }
-          </ol>
-        </div>
+        <StepsBlock
+          id="candidater-titre"
+          titleStrong={page.apply.titleStrong}
+          titleLight={page.apply.titleLight}
+          text={page.apply.text}
+          button={{ label: page.apply.button, href: mailto }}
+          steps={page.apply.steps}
+        />
       </div>
     </section>
 
@@ -547,65 +531,5 @@ const breadcrumb = [
 
   .fees-card :global(.fees-card__icon--out) {
     color: var(--texte-doux);
-  }
-
-  /* Candidater */
-  /* Sur la section vert clair, le bloc devient une carte blanche. */
-  .apply {
-    padding: clamp(28px, 5vw, 64px);
-    border: 1px solid var(--bordure-carte);
-    border-radius: var(--radius-block);
-    background: var(--surface);
-    box-shadow: var(--shadow-card);
-  }
-
-  .apply__buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-  }
-
-  .steps {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .step {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .step__num {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-pill);
-    background: var(--disque);
-    font-size: var(--fs-body);
-    font-weight: 800;
-  }
-
-  .step__body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .step__title {
-    font-size: 19px;
-    font-weight: 800;
-  }
-
-  .step__text {
-    font-size: 16px;
-    line-height: 1.55;
   }
 </style>
