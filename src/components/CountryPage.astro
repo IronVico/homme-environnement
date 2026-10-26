@@ -1,0 +1,193 @@
+---
+/**
+ * Page pays (Madagascar, Burkina Faso), commune aux deux langues (/sites/<pays> et
+ * /en/sites/<pays>) : hero, bande de chiffres, carte des sites, projets du pays et
+ * bandeau de don. Textes dans src/i18n (clé du pays), sites et projets dans les
+ * collections (src/content), chiffres dans src/data/chiffres.ts.
+ */
+import { getCollection } from 'astro:content';
+import { BURKINA, MADAGASCAR } from '../data/chiffres';
+import { donatePath, fieldPath, pagePath, projectPath } from '../data/navigation';
+import type { COUNTRIES } from '../data/projets';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getExplorerSites } from '../lib/explorer-sites';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import ProjectCard from './ProjectCard.astro';
+import ProjectGrid from './ProjectGrid.astro';
+import SectionHeading from './SectionHeading.astro';
+import SitesExplorer from './SitesExplorer.astro';
+import StatsBand from './StatsBand.astro';
+
+import heroBurkina from '../assets/photos/pays-burkina-elephants.jpg';
+import heroMadagascar from '../assets/photos/pays-madagascar.jpg';
+import ctaKollo from '../assets/photos/engager-donner.jpg';
+import ctaSouimanga from '../assets/photos/pilier-biodiversite-souimanga.jpg';
+
+interface Props {
+  country: (typeof COUNTRIES)[number];
+}
+
+const { country } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = country === 'madagascar' ? dict.madagascar : dict.burkina;
+
+const withCount = (text: string, count: number) => text.replace('{count}', String(count));
+
+const sites = await getExplorerSites(lang, [], country);
+
+// Projets menés dans le pays ; leurs cartes citent tous leurs sites, de tous les pays.
+const allSites = await getCollection('sites');
+const siteNames = new Map(allSites.map((site) => [site.id, site.data.name]));
+const projects = (await getCollection('projets', ({ data }) => data.countries.includes(country))).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+// Chiffres de la bande sauge (src/data/chiffres.ts) ; une valeur absente s'affiche « [à fournir] ».
+const missing = dict.site.missing;
+const statValues =
+  country === 'madagascar'
+    ? ([
+        { value: MADAGASCAR.hectares, prefix: '≈', illustration: 'sites' },
+        {
+          value: MADAGASCAR.beneficiaries,
+          prefix: '≈',
+          illustration: 'share',
+          ratio: MADAGASCAR.beneficiaries / MADAGASCAR.inhabitants,
+        },
+        { value: MADAGASCAR.threatenedSpecies, illustration: 'families' },
+      ] as const)
+    : ([
+        { value: BURKINA.hectares ?? missing, illustration: 'sites' },
+        { value: BURKINA.families ?? missing, illustration: 'water' },
+        { value: BURKINA.pupils ?? missing, illustration: 'families' },
+      ] as const);
+
+const stats = statValues.map((stat, i) => {
+  const text = page.stats[i]!;
+  // Pas d'unité derrière « [à fournir] ».
+  const unit = typeof stat.value === 'number' ? text.unit : undefined;
+  return { ...stat, unit, text: text.text, illustrationLabel: text.illustrationLabel };
+});
+
+const heroText = 'text' in page.hero ? page.hero.text : undefined;
+const secondary =
+  'field' in page.cta
+    ? { label: page.cta.field, href: fieldPath(lang) }
+    : { label: page.cta.projects, href: pagePath(lang, 'projets') };
+
+const PHOTOS = {
+  madagascar: { hero: heroMadagascar, heroPosition: '50% 55%', cta: ctaSouimanga },
+  'burkina-faso': { hero: heroBurkina, heroPosition: '50% 60%', cta: ctaKollo },
+};
+const photos = PHOTOS[country];
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[1]!, href: '#' }, // TODO page « Nos sites »
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={photos.hero} ogImageAlt={page.hero.imageAlt}>
+  <Header current="sites" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  {/* TODO traduction : sur /en/, le contenu de la page est encore en français. */}
+  <main id="contenu" lang={lang === 'en' ? 'fr' : undefined}>
+    <PageHero
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      text={heroText}
+      image={photos.hero}
+      imageAlt={page.hero.imageAlt}
+      imagePosition={photos.heroPosition}
+      cta={{ label: withCount(page.hero.cta, sites.length), href: '#sites' }}
+    />
+
+    <StatsBand stats={stats} label={page.statsLabel} />
+
+    <section id="sites" class="section" aria-labelledby="sites-titre">
+      <div class="container stack">
+        <SectionHeading
+          id="sites-titre"
+          strong={withCount(page.sites.titleStrong, sites.length)}
+          light={page.sites.titleLight}
+          lead={page.sites.lead}
+        />
+        <SitesExplorer map={page.sites.map} sites={sites} country={country} />
+      </div>
+    </section>
+
+    <section id="projets" class="section section--tinted" aria-labelledby="projets-titre">
+      <div class="container stack stack--40">
+        <SectionHeading
+          id="projets-titre"
+          strong={page.projects.titleStrong}
+          light={page.projects.titleLight}
+          lead={page.projects.lead}
+        />
+        <ProjectGrid>
+          {
+            projects.map(({ id, data }) => (
+              <ProjectCard
+                icon={data.icon}
+                title={data.title}
+                text={data.summary}
+                sites={[...data.sites.map((ref) => siteNames.get(ref.id) ?? ref.id), ...data.otherSites]}
+                sitesLabel={dict.projectCard.sitesLabel}
+                href={projectPath(lang, id)}
+                linkLabel={dict.projectCard.link}
+              />
+            ))
+          }
+        </ProjectGrid>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="soutenir-titre"
+      titleStrong={page.cta.titleStrong}
+      titleLight={page.cta.titleLight}
+      text={page.cta.text}
+      image={photos.cta}
+      imagePosition="50% 45%"
+      spaced
+    >
+      <div class="cta__buttons">
+        <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
+        <Button href={secondary.href} variant="on-dark">{secondary.label}</Button>
+      </div>
+    </PhotoBanner>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .section--tinted {
+    background: var(--section);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .stack--40 {
+    gap: 40px;
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

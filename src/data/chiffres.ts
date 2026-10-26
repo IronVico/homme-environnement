@@ -42,6 +42,19 @@ export interface SiteFigures {
   lakes?: number;
 }
 
+/**
+ * Chiffres de la page Burkina Faso (un seul site, Kollo et Guiaro).
+ * TODO ONG : valeurs à fournir ; tant qu'elles manquent, la page affiche « [à fournir] ».
+ */
+export const BURKINA: { hectares?: number; families?: number; pupils?: number } = {
+  /** Surface protégée à Kollo et Guiaro, en hectares. */
+  hectares: undefined,
+  /** Familles ayant accès à l'eau potable grâce à l'adduction solaire. */
+  families: undefined,
+  /** Élèves sensibilisés dans les écoles. */
+  pupils: undefined,
+};
+
 export const MADAGASCAR = {
   /** Surface protégée sur l'ensemble des sites (≈) : somme des sites connus, sans Angodroabe. */
   hectares: 5250,

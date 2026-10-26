@@ -55,15 +55,15 @@ species:
     text: "Le saro, plante endémique. Son huile essentielle aux propriétés antivirales reste peu valorisée."
 actionsLead: "Reconnecter la forêt, et donner aux habitants les moyens d'en vivre."
 actions:
-  - icon: reboisement
+  - icon: trees
     title: Restaurer les corridors forestiers
     text: "Reboiser pour reconnecter les fragments de forêt, et rendre au sifaka et au lémur mongoz des habitats où circuler."
     project: reboisement
-  - icon: agriculture
+  - icon: sprout
     title: Des filières locales durables
     text: "Raphia, artisanat et culture du saro pour ses huiles essentielles : des revenus qui donnent de la valeur à la forêt."
     project: chaines-de-valeur
-  - icon: tourisme
+  - icon: tent
     title: Une station scientifique et écotouristique
     text: "Un camp permanent pour accueillir chercheurs, étudiants, écovolontaires et visiteurs, et suivre la faune du site."
     project: ecotourisme

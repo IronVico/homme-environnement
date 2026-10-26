@@ -20,8 +20,9 @@ interface Props {
    *
    * ring : 30 traits (années). bars : barres croissantes. dots : pastilles (1 = 1 000 ha).
    * sites : 5 pastilles en cercle (un par site). share : anneau rempli à value %. families : deux silhouettes.
+   * water : goutte au-dessus de vagues (accès à l'eau).
    */
-  illustration?: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families';
+  illustration?: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families' | 'water';
   /** Nom de l'illustration pour les lecteurs d'écran (l'icône de la variante est décorative). */
   illustrationLabel?: string;
   /** share : part de l'anneau remplie, entre 0 et 1 (par défaut value / 100). */
@@ -159,6 +160,22 @@ const dots = [
           <path class="stat-card__step stat-card__dot" style="--i: 2; fill: var(--texte)" d="M10 82c2-14 10-22 20-22s18 8 20 22Z" />
           <path class="stat-card__step stat-card__dot" style="--i: 3; fill: var(--texte)" d="M50 82c2-14 10-22 20-22s18 8 20 22Z" />
           <circle class="stat-card__step stat-card__dot" style="--i: 4; fill: var(--don)" cx="50" cy="54" r="7" />
+        </>
+      )
+    }
+    {
+      illustration === 'water' && (
+        <>
+          <path class="stat-card__step stat-card__dot" style="--i: 0; fill: var(--accent)" d="M50 10C42 26 26 42 26 60a24 24 0 0 0 48 0C74 42 58 26 50 10Z" />
+          <path
+            class="stat-card__step stat-card__dot"
+            style="--i: 1; stroke: var(--texte)"
+            d="M14 86c8-6 16-6 24 0s16 6 24 0 16-6 24 0"
+            fill="none"
+            stroke-width="7"
+            stroke-linecap="round"
+          />
+          <circle class="stat-card__step stat-card__dot" style="--i: 2; fill: var(--don)" cx="42" cy="58" r="7" />
         </>
       )
     }

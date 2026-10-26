@@ -80,19 +80,19 @@ species:
       source: https://commons.wikimedia.org/wiki/File:Male_Long-nosed_Chameleon_(Calumma_gallus),_Vohimana_reserve,_Madagascar.jpg
 actionsLead: Protéger la forêt en donnant aux habitants les moyens d'en vivre autrement.
 actions:
-  - icon: surveillance
+  - icon: shield
     title: Surveillance forestière
     text: Des gardes forestiers issus des villages patrouillent la réserve et suivent la faune.
     project: surveillance-forestiere
-  - icon: laboratoire
+  - icon: flask
     title: Plantes médicinales et laboratoire
     text: Plus de 160 plantes recensées, transformées sur place en huiles essentielles et remèdes.
     project: plantes-medicinales
-  - icon: tourisme
+  - icon: tent
     title: Écotourisme communautaire
     text: "Gîte, sentiers et guides locaux : chaque visite finance la protection de la forêt."
     project: ecotourisme
-  - icon: agriculture
+  - icon: sprout
     title: Chaînes de valeur agricoles
     text: Des cultures durables pour remplacer la culture sur brûlis, première cause de déforestation.
     project: chaines-de-valeur

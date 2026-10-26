@@ -1,16 +1,22 @@
 import { getCollection } from 'astro:content';
 import { SITE_FIGURES } from '../data/chiffres';
 import { sitePath } from '../data/navigation';
+import type { COUNTRIES } from '../data/projets';
 import { t, type Lang } from '../i18n';
 
 const NBSP = ' ';
 
 /**
- * Sites de Madagascar mis en forme pour SitesExplorer (carte et cartes des sites),
+ * Sites d'un pays mis en forme pour SitesExplorer (carte et cartes des sites),
  * dans l'ordre de la collection. `exclude` : sites à ne pas montrer (identifiants).
  */
-export async function getExplorerSites(lang: Lang, exclude: string[] = []) {
-  const labels = t(lang).madagascar.sites;
+export async function getExplorerSites(
+  lang: Lang,
+  exclude: string[] = [],
+  country: (typeof COUNTRIES)[number] = 'madagascar',
+) {
+  const dict = t(lang);
+  const labels = dict.madagascar.sites;
   const numberLocale = lang === 'en' ? 'en-GB' : 'fr-FR';
   const formatNumber = (value: number) => value.toLocaleString(numberLocale).replace(/\s/g, NBSP);
 
@@ -22,7 +28,7 @@ export async function getExplorerSites(lang: Lang, exclude: string[] = []) {
 
   const sites = await getCollection(
     'sites',
-    ({ id, data }) => data.country === 'madagascar' && !exclude.includes(id),
+    ({ id, data }) => data.country === country && !exclude.includes(id),
   );
 
   return sites
@@ -38,7 +44,8 @@ export async function getExplorerSites(lang: Lang, exclude: string[] = []) {
       mapPosition: site.data.mapPosition,
       figure: siteHectares(site.id),
       figureMissing: labels.figuresMissing,
-      href: sitePath(lang, site.id),
-      linkLabel: labels.link,
+      // TODO fiche site Kollo et Guiaro : en attendant, la carte mène aux projets de la page pays.
+      href: country === 'madagascar' ? sitePath(lang, site.id) : '#projets',
+      linkLabel: country === 'madagascar' ? labels.link : dict.burkina.sites.link,
     }));
 }
