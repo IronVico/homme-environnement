@@ -18,10 +18,12 @@
     "@lucide/astro": "^1.60.0",
     "@vercel/analytics": "^2.0.1",
     "astro": "^7.4.1",
+    "nodemailer": "^7.0.13",
     "pdfjs-dist": "^6.4.299"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.11",
+    "@types/nodemailer": "^7.0.12",
     "typescript": "^6.0.3"
   }
 }

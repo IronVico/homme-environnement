@@ -115,6 +115,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Rapports et études » encore en français (copie de fr.ts).
   rapports: structuredClone(fr.rapports),
+
+  // TODO traduction : page « Contact » encore en français (copie de fr.ts).
+  contact: structuredClone(fr.contact),
 };
 
 export default en;
