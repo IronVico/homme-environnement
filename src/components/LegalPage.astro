@@ -41,9 +41,9 @@ const breadcrumb = [{ label: t(lang).ui.breadcrumbHome, href: localeUrl(lang) }]
   <Breadcrumb items={breadcrumb} current={title} />
 
   <main id="contenu">
-    <section class="legal-hero container">
+    <section class="legal-hero container" aria-labelledby="legal-titre">
       <div class="legal-hero__text">
-        <h1 class="legal-hero__title" data-reveal>
+        <h1 id="legal-titre" class="legal-hero__title" data-reveal>
           <span class="legal-hero__strong">{hero.titleStrong}</span>
           {' '}
           <span class:list={['legal-hero__light', { 'legal-hero__light--stacked': hero.stacked }]}>
