@@ -31,6 +31,7 @@ export const PAGES = {
   don: 's-engager/faire-un-don',
   mentionsLegales: 'mentions-legales',
   confidentialite: 'confidentialite',
+  galerie: 'ressources/galerie',
 } as const;
 
 /** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
@@ -41,6 +42,12 @@ export const STAGES_EMAIL = 'contact.vsc@homme-environnement.org';
  * TODO ONG : confirmer l'adresse (celle de la maquette).
  */
 export const PARTNERS_EMAIL = 'contact@homme-environnement.org';
+
+/**
+ * Adresse générale de l'ONG (bouton « Nous contacter » de la Galerie, mailto).
+ * TODO page Contact : renvoyer vers elle. TODO ONG : confirmer l'adresse.
+ */
+export const CONTACT_EMAIL = 'contact@homme-environnement.org';
 
 /**
  * Section « S'engager » de l'accueil : destination des liens S'engager tant que la page
@@ -119,7 +126,8 @@ const FOOTER_HREFS = [
   ],
   // TODO pages Particuliers et Entreprises.
   [HOME_ENGAGE, PAGES.stages, HOME_ENGAGE],
-  ['#', '#', '#'],
+  // TODO pages Rapports et études, et Contact.
+  ['#', PAGES.galerie, '#'],
 ];
 const LEGAL_HREFS = [PAGES.mentionsLegales, PAGES.confidentialite];
 
