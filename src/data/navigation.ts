@@ -39,6 +39,7 @@ export const PAGES = {
   galerie: 'ressources/galerie',
   rapports: 'ressources/rapports',
   contact: 'contact',
+  particuliers: 's-engager/particuliers',
 } as const;
 
 /** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
@@ -140,8 +141,7 @@ const FOOTER_HREFS = [
     projectsByTheme('filieres'),
     PAGES.projets,
   ],
-  // TODO page Particuliers.
-  [HOME_ENGAGE, PAGES.stages, PAGES.entreprises],
+  [PAGES.particuliers, PAGES.stages, PAGES.entreprises],
   [PAGES.rapports, PAGES.galerie, PAGES.contact],
 ];
 const LEGAL_HREFS = [PAGES.mentionsLegales, PAGES.confidentialite];

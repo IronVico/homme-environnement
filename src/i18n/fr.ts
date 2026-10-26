@@ -1506,6 +1506,118 @@ const fr = {
       },
     },
   },
+
+  particuliers: {
+    title: 'Particuliers',
+    description:
+      "Don, adhésion, stage, séjour à Vohimana, achat solidaire ou simple partage : toutes les façons d'agir avec L'Homme & l'Environnement à Madagascar et au Burkina Faso.",
+    hero: {
+      titleStrong: 'Chacun peut agir,',
+      titleLight: 'à sa mesure.',
+      lead: 'Un don, une adhésion, quelques semaines sur le terrain ou un simple partage : chaque geste aide les communautés de Madagascar et du Burkina Faso à protéger la forêt dont elles vivent.',
+      allWays: "Voir toutes les façons d'agir",
+      imageAlt: 'Un guide présente la forêt à un groupe de visiteurs',
+      caption: 'Visite guidée en forêt, Madagascar',
+    },
+    ways: {
+      titleStrong: 'Six façons',
+      titleLight: "d'agir.",
+      lead: "Choisissez l'engagement qui vous ressemble, et combinez-les si vous le souhaitez.",
+      /** Dans l'ordre de la maquette ; destinations dans ParticuliersPage. */
+      cards: [
+        {
+          title: 'Faire un don',
+          text: "Ponctuel ou mensuel, votre don finance directement nos programmes de terrain. Il ouvre droit à une réduction d'impôt de 66 % de son montant [à confirmer].",
+          link: 'Faire un don',
+        },
+        {
+          title: 'Devenir membre',
+          text: "Rejoignez l'association pour une cotisation de 18 à 25 € par an : vous suivez nos actions de près et soutenez notre indépendance.",
+          link: "Adhérer à l'association",
+        },
+        {
+          title: 'Venir sur le terrain',
+          text: 'Stage, volontariat ou mission de recherche : rejoignez nos équipes à Madagascar sur de vrais projets de conservation.',
+          link: 'Découvrir les missions',
+        },
+        {
+          title: 'Séjourner à Vohimana',
+          text: "Découvrez la forêt de Vohimana avec des guides locaux. L'écotourisme fait vivre les habitants et finance la protection du site.",
+          link: 'Préparer mon séjour',
+        },
+        {
+          title: 'Acheter solidaire',
+          text: 'Dans notre boutique, retrouvez notamment les huiles essentielles Aroma Forest, issues des filières que nous avons créées avec les paysans.',
+          link: 'Visiter la boutique',
+        },
+        {
+          title: 'Relayer nos actions',
+          text: "Abonnez-vous à notre lettre d'information et suivez-nous sur les réseaux sociaux : faire connaître nos projets, c'est déjà agir.",
+          link: "S'abonner à la lettre",
+        },
+      ],
+    },
+    impact: {
+      titleStrong: 'Ce que votre engagement',
+      titleLight: 'change.',
+      items: [
+        {
+          title: 'Des forêts qui repoussent',
+          text: 'Votre soutien finance le reboisement des zones dégradées, avec des pépinières tenues par les habitants.',
+        },
+        {
+          title: 'Des gardes forestiers sur le terrain',
+          text: 'Il permet de rémunérer les gardes, recrutés dans les villages, qui surveillent les sanctuaires au quotidien.',
+        },
+        {
+          title: 'Des filières qui font vivre',
+          text: 'Il aide à structurer des filières durables, comme les plantes aromatiques, pour que la forêt debout rapporte plus que la forêt coupée.',
+        },
+      ],
+      noteTitle: 'Des chiffres à venir',
+      noteText:
+        "Le détail de l'utilisation des fonds sera publié ici à partir de notre dernier rapport d'activité [à fournir].",
+      imageAlt: 'Des cueilleurs de plantes aromatiques à Vohimana',
+      caption: 'Cueilleurs de plantes, Vohimana — © Olivier Behra',
+    },
+    faq: {
+      titleStrong: 'Questions',
+      titleLight: 'fréquentes',
+      items: [
+        {
+          question: 'Mon don est-il déductible des impôts ?',
+          answer:
+            'Oui : en tant que particulier imposable en France, vous pouvez déduire 66 % du montant de votre don de votre impôt sur le revenu, dans la limite prévue par la loi [à confirmer]. Un reçu fiscal vous est envoyé pour chaque don.',
+        },
+        {
+          question: 'Quelle différence entre un don et une adhésion ?',
+          answer:
+            "L'adhésion fait de vous un membre de l'association, pour une cotisation de 18 à 25 € par an. Le don, libre et sans engagement, finance directement nos programmes. Les droits liés à l'adhésion (vote en assemblée générale, etc.) sont précisés dans nos statuts [à confirmer].",
+        },
+        {
+          question: 'Puis-je choisir le projet que je soutiens ?',
+          answer:
+            'Les modalités pour affecter un don à un site ou à un projet précis sont en cours de définition [à confirmer]. En attendant, écrivez-nous : nous vous dirons où votre soutien est le plus utile.',
+        },
+        {
+          question: 'Comment organiser un séjour à Vohimana ?',
+          answer:
+            "Contactez-nous pour connaître les périodes d'accueil, les conditions d'hébergement et les tarifs [à fournir]. Les visites se font avec des guides formés issus des villages voisins.",
+        },
+        {
+          question: 'Où trouver les produits Aroma Forest ?',
+          answer:
+            'Les huiles essentielles Aroma Forest et nos autres produits solidaires sont disponibles dans notre boutique en ligne [lien à fournir]. Chaque achat soutient les paysans de nos filières.',
+        },
+      ],
+    },
+    cta: {
+      titleStrong: 'Chaque geste',
+      titleLight: 'compte pour le vivant.',
+      text: 'Soutenez nos programmes par un don, ou venez les découvrir sur le terrain avec nos équipes.',
+      field: 'Venir sur le terrain',
+    },
+  },
 };
 
 export default fr;

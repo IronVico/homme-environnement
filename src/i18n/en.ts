@@ -121,6 +121,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Contact » encore en français (copie de fr.ts).
   contact: structuredClone(fr.contact),
+
+  // TODO traduction : page « Particuliers » encore en français (copie de fr.ts).
+  particuliers: structuredClone(fr.particuliers),
 };
 
 export default en;

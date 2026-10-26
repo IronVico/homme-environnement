@@ -1,0 +1,375 @@
+---
+/**
+ * Page « Particuliers » (S'engager), commune aux deux langues
+ * (/s-engager/particuliers et /en/s-engager/particuliers).
+ * Textes dans src/i18n (clé `particuliers`), liens HelloAsso dans src/data/don.ts.
+ */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Compass from '@lucide/astro/icons/compass';
+import Handshake from '@lucide/astro/icons/handshake';
+import Heart from '@lucide/astro/icons/heart';
+import Info from '@lucide/astro/icons/info';
+import Megaphone from '@lucide/astro/icons/megaphone';
+import Shield from '@lucide/astro/icons/shield';
+import ShoppingBag from '@lucide/astro/icons/shopping-bag';
+import Sprout from '@lucide/astro/icons/sprout';
+import Tent from '@lucide/astro/icons/tent';
+import Users from '@lucide/astro/icons/users';
+import { Picture } from 'astro:assets';
+import { HELLOASSO } from '../data/don';
+import { donatePath, engagePath, pagePath, sitePath } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Faq from './Faq.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import InfoNote from './InfoNote.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import SectionHeading from './SectionHeading.astro';
+
+import heroGuide from '../assets/photos/engager-terrain.jpg';
+import impactCueilleurs from '../assets/photos/equipe-collectrices-vohimana.jpg';
+import ctaPaysage from '../assets/photos/pays-madagascar.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.particuliers;
+
+// Destinations des six cartes, dans l'ordre de page.ways.cards.
+// Adhésion et boutique : page de l'association sur HelloAsso tant que leurs formulaires ne sont pas fournis.
+const ways = [
+  { icon: Heart, href: donatePath(lang) },
+  { icon: Users, href: HELLOASSO.membership || HELLOASSO.association },
+  { icon: Compass, href: pagePath(lang, 'stages') },
+  { icon: Tent, href: sitePath(lang, 'vohimana') }, // TODO offre de séjour : section dédiée de la fiche
+  { icon: ShoppingBag, href: HELLOASSO.shop || HELLOASSO.association },
+  { icon: Megaphone, href: `${localeUrl(lang)}#newsletter-titre` }, // Lettre d'information de l'accueil
+].map((way, i) => ({ ...way, ...page.ways.cards[i]! }));
+
+const impactIcons = [Sprout, Shield, Handshake];
+
+const faqItems = page.faq.items.map(({ question, answer }) => ({ question, answer: [answer] }));
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[3]!, href: engagePath(lang) }, // TODO page « S'engager »
+];
+
+// Contenu encore en français sur la page anglaise (TODO traduction).
+const contentLang = lang === 'en' ? 'fr' : undefined;
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={heroGuide} ogImageAlt={page.hero.imageAlt}>
+  <Header current="engager" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <main id="contenu" lang={contentLang}>
+    <PageHero
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      image={heroGuide}
+      imageAlt={page.hero.imageAlt}
+      imagePosition="50% 30%"
+      caption={page.hero.caption}
+      donate={{ label: dict.ui.donate, href: donatePath(lang) }}
+      cta={{ label: page.hero.allWays, href: '#agir' }}
+    />
+
+    <section id="agir" class="section" aria-labelledby="agir-titre">
+      <div class="container stack stack--40">
+        <SectionHeading id="agir-titre" strong={page.ways.titleStrong} light={page.ways.titleLight} lead={page.ways.lead} />
+        <ul class="ways">
+          {
+            ways.map((way) => (
+              <li class="way-item" data-reveal>
+                <a class="card way card-lift" href={way.href}>
+                  <span class="icon-disc">
+                    <way.icon size={24} />
+                  </span>
+                  <h3 class="way__title">{way.title}</h3>
+                  <p class="way__text">{way.text}</p>
+                  <span class="way__link">
+                    {way.link}
+                    <ArrowRight class="way__arrow" size={18} />
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="impact-titre">
+      <div class="container impact">
+        <div class="stack stack--32">
+          <SectionHeading id="impact-titre" strong={page.impact.titleStrong} light={page.impact.titleLight} />
+          <ul class="impact__list">
+            {
+              page.impact.items.map((item, i) => {
+                const Icon = impactIcons[i]!;
+                return (
+                  <li class="impact__item" data-reveal>
+                    <span class="icon-disc icon-disc--surface">
+                      <Icon size={24} />
+                    </span>
+                    <span class="impact__body">
+                      <span class="impact__title">{item.title}</span>
+                      <span class="impact__text">{item.text}</span>
+                    </span>
+                  </li>
+                );
+              })
+            }
+          </ul>
+          <div data-reveal>
+            <InfoNote icon={Info} title={page.impact.noteTitle} text={page.impact.noteText} />
+          </div>
+        </div>
+        <figure class="impact__figure" data-reveal>
+          <Picture
+            class="impact__photo"
+            src={impactCueilleurs}
+            alt={page.impact.imageAlt}
+            formats={['avif', 'webp']}
+            widths={[400, 640, 900, 1200]}
+            sizes="(max-width: 900px) 100vw, 400px"
+          />
+          <figcaption class="impact__caption">{page.impact.caption}</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="faq" class="section" aria-labelledby="faq-titre">
+      <div class="container stack stack--32">
+        <SectionHeading id="faq-titre" strong={page.faq.titleStrong} light={page.faq.titleLight} />
+        <Faq items={faqItems} />
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="appel-titre"
+      titleStrong={page.cta.titleStrong}
+      titleLight={page.cta.titleLight}
+      text={page.cta.text}
+      image={ctaPaysage}
+      imagePosition="50% 50%"
+    >
+      <div class="cta__buttons">
+        <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
+        <Button href={pagePath(lang, 'stages')} variant="on-dark">{page.cta.field}</Button>
+      </div>
+    </PhotoBanner>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .section--tinted {
+    background: var(--section);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stack--32 {
+    gap: var(--space-8);
+  }
+
+  .stack--40 {
+    gap: 40px;
+  }
+
+  .card {
+    border: 1px solid var(--bordure-carte);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .icon-disc {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+    color: var(--texte);
+  }
+
+  /* Sur la section vert clair : disque de la couleur des cartes. */
+  .icon-disc--surface {
+    background: var(--surface);
+  }
+
+  /* Six façons d'agir : cartes cliquables (élévation au survol, comme les cartes projet). */
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 1000px) {
+    .ways {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .ways {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .way-item {
+    display: flex;
+  }
+
+  .way {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--space-7);
+    border-radius: var(--radius-card-lg);
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  a.way:hover {
+    color: var(--texte);
+  }
+
+  .way__title {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+  }
+
+  .way__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* Libellé et flèche, poussés en bas de la carte. */
+  .way__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .way :global(.way__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  a.way:hover :global(.way__arrow),
+  a.way:focus-visible :global(.way__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a.way:hover :global(.way__arrow),
+    a.way:focus-visible :global(.way__arrow) {
+      transform: none;
+    }
+  }
+
+  /* Ce que votre engagement change : texte sur deux colonnes de la grille, photo sur la troisième. */
+  .impact {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 40px 64px;
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .impact {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .impact__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .impact__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .impact__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .impact__title {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .impact__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .impact__figure {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  /* Arche réduite (photo sur une seule colonne). */
+  .impact__figure :global(.impact__photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 96px 96px var(--radius-card-sm) var(--radius-card-sm);
+  }
+
+  @media (max-width: 700px) {
+    .impact__figure :global(.impact__photo) {
+      aspect-ratio: 4 / 3;
+      border-radius: 40px 40px var(--radius-card-sm) var(--radius-card-sm);
+    }
+  }
+
+  /* Sur vert clair : légende en couleur de texte (l'ardoise est réservée au fond blanc). */
+  .impact__caption {
+    font-size: var(--fs-caption);
+    color: var(--texte);
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>
