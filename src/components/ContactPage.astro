@@ -1,0 +1,508 @@
+---
+/**
+ * Page « Contact » (maquettes Contact / ContactMobile), commune aux deux langues (/contact et
+ * /en/contact). Textes dans src/i18n (clé `contact`), coordonnées dans src/data/contact.ts.
+ * Haut de page sur courbes de niveau ; la section du formulaire passe au-dessus des courbes.
+ * Formulaire : ContactForm (envoi par la fonction Vercel api/contact.ts).
+ */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Building from '@lucide/astro/icons/building';
+import CircleQuestionMark from '@lucide/astro/icons/circle-question-mark';
+import Compass from '@lucide/astro/icons/compass';
+import Handshake from '@lucide/astro/icons/handshake';
+import Heart from '@lucide/astro/icons/heart';
+import Mail from '@lucide/astro/icons/mail';
+import MapPin from '@lucide/astro/icons/map-pin';
+import Share2 from '@lucide/astro/icons/share-2';
+import { CONTACT_SOCIALS, MADAGASCAR_OFFICE } from '../data/contact';
+import { PUBLISHER } from '../data/mentions-legales';
+import { CONTACT_EMAIL, donatePath, pagePath, SOCIAL_URLS } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import ContactForm from './ContactForm.astro';
+import ContourPattern from './ContourPattern.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import InfoNote from './InfoNote.astro';
+import SectionHeading from './SectionHeading.astro';
+import TodoPill from './TodoPill.astro';
+
+import ogPhoto from '../assets/photos/hero-artisane-vohimana.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.contact;
+
+const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
+
+// « Vous cherchez peut-être… » : les demandes fréquentes qui ont déjà leur page.
+// TODO page Entreprises : renvoyer la carte Entreprises vers elle (la maquette pointe vers Partenaires).
+const moreCards = [
+  { icon: Heart, href: donatePath(lang), ...page.more.don },
+  { icon: Compass, href: pagePath(lang, 'stages'), ...page.more.stages },
+  { icon: Handshake, href: pagePath(lang, 'partenaires'), ...page.more.entreprises },
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={ogPhoto} noindex>
+  <Header current="contact" />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <!-- TODO traduction : sur la page anglaise, le contenu est encore en français. -->
+  <main id="contenu" lang={lang === 'en' ? 'fr' : undefined}>
+    <div class="contact-top">
+      <ContourPattern variant="hero" class="contact-top__contours" />
+      <section class="contact-hero container" aria-labelledby="contact-h1">
+        <h1 id="contact-h1" class="contact-hero__title" data-reveal>
+          <span class="contact-hero__strong">{page.hero.titleStrong}</span><br />
+          <span class="contact-hero__light">{page.hero.titleLight}</span>
+        </h1>
+        <p class="contact-hero__lead" data-reveal>{page.hero.lead}</p>
+      </section>
+
+      <section class="contact-main container" aria-label={page.sectionLabel}>
+        <div class="contact-card contact-card--form" data-reveal>
+          <div class="contact-card__head">
+            <h2 id="contact-form-titre" class="contact-card__title">
+              <span class="contact-card__strong">{page.form.titleStrong}</span>{' '}
+              <span class="contact-card__light">{page.form.titleLight}</span>
+            </h2>
+            <p class="contact-card__note">
+              {page.form.requiredBefore}<span aria-hidden="true">*</span>{page.form.requiredAfter}
+            </p>
+          </div>
+          <ContactForm labelledby="contact-form-titre" />
+        </div>
+
+        <div class="ways" role="group" aria-label={page.ways.label}>
+          <div class="way" data-reveal>
+            <span class="way__icon" aria-hidden="true"><Mail size={22} /></span>
+            <div class="way__body">
+              <h3 class="way__title">{page.ways.write}</h3>
+              <p class="way__text">
+                <a class="way__email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+                {' '}<TodoPill>{page.todo.toConfirm}</TodoPill>
+              </p>
+            </div>
+          </div>
+
+          <div class="way" data-reveal>
+            <span class="way__icon" aria-hidden="true"><Building size={22} /></span>
+            <div class="way__body">
+              <h3 class="way__title">{page.ways.headOffice}</h3>
+              <p class="way__text">
+                {page.ways.orgName}<br />
+                {PUBLISHER.headOffice ?? <TodoPill>{page.todo.address}</TodoPill>}
+              </p>
+            </div>
+          </div>
+
+          <div class="way" data-reveal>
+            <span class="way__icon" aria-hidden="true"><MapPin size={22} /></span>
+            <div class="way__body">
+              <h3 class="way__title">{page.ways.madagascar}</h3>
+              <p class="way__text">
+                {
+                  MADAGASCAR_OFFICE ? (
+                    MADAGASCAR_OFFICE.map((line, i) => (
+                      <>
+                        {i > 0 && <br />}
+                        {line}
+                      </>
+                    ))
+                  ) : (
+                    <TodoPill>{page.todo.missing}</TodoPill>
+                  )
+                }
+              </p>
+            </div>
+          </div>
+
+          <div class="way" data-reveal>
+            <span class="way__icon" aria-hidden="true"><Share2 size={22} /></span>
+            <div class="way__body">
+              <h3 class="way__title">{page.ways.social}</h3>
+              <p class="way__text way__text--sm">
+                {page.ways.socialText} <TodoPill>{page.todo.accounts}</TodoPill>
+              </p>
+              <ul class="socials" role="list">
+                {
+                  CONTACT_SOCIALS.map((social) => (
+                    <li>
+                      <a class="socials__pill" href={SOCIAL_URLS[social.id]} rel="noopener">
+                        {/* Tracés des anciennes icônes Lucide de marque (ISC), comme dans le footer. */}
+                        {social.id === 'facebook' && (
+                          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                          </svg>
+                        )}
+                        {social.id === 'instagram' && (
+                          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                            <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                          </svg>
+                        )}
+                        {social.id === 'linkedin' && (
+                          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                            <rect width="4" height="12" x="2" y="9" />
+                            <circle cx="4" cy="4" r="2" />
+                          </svg>
+                        )}
+                        {social.label}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+
+          <div data-reveal>
+            <InfoNote icon={CircleQuestionMark} title={page.faqNote.title}>
+              {page.faqNote.text}
+              <span class="faq-links">
+                <a href={`${pagePath(lang, 'stages')}#faq`}>{page.faqNote.stages}</a>
+                <a href={`${donatePath(lang)}#faq`}>{page.faqNote.don}</a>
+              </span>
+            </InfoNote>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="more" aria-labelledby="more-titre">
+      <div class="container more__inner">
+        <SectionHeading id="more-titre" strong={page.more.titleStrong} light={page.more.titleLight} lead={page.more.lead} />
+        <ul class="more__grid" role="list">
+          {
+            moreCards.map(({ icon: Icon, href, title, text, cta }) => (
+              <li data-reveal>
+                <a class="more-card card-lift" href={href}>
+                  <span class="more-card__icon" aria-hidden="true">
+                    <Icon size={22} />
+                  </span>
+                  <span class="more-card__title">{title}</span>
+                  <span class="more-card__text">{text}</span>
+                  <span class="more-card__cta">
+                    {cta}
+                    <ArrowRight class="more-card__arrow" size={18} />
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Haut de page et formulaire : les courbes passent derrière les deux, le formulaire au-dessus. */
+  .contact-top {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  .contact-top :global(.contact-top__contours) {
+    z-index: -1;
+  }
+
+  .contact-hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-top: clamp(24px, 4vw, 48px);
+    padding-bottom: clamp(32px, 4vw, 56px);
+  }
+
+  .contact-hero__title {
+    max-width: 800px;
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+  }
+
+  .contact-hero__strong {
+    font-weight: 800;
+  }
+
+  .contact-hero__light {
+    font-weight: 300;
+  }
+
+  .contact-hero__lead {
+    max-width: 640px;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  /* Formulaire (7/12) et coordonnées (5/12), l'un sous l'autre sous 900px. */
+  .contact-main {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+    gap: var(--space-8);
+    padding-bottom: var(--space-section);
+  }
+
+  @media (max-width: 900px) {
+    .contact-main {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .contact-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .contact-card__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .contact-card__title {
+    font-size: clamp(26px, 2.4vw, 32px);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+
+  .contact-card__strong {
+    font-weight: 800;
+  }
+
+  .contact-card__light {
+    font-weight: 300;
+  }
+
+  .contact-card__note {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .ways {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Cartes d'information : pas de survol (elles ne sont pas cliquables, seuls leurs liens le sont). */
+  .way {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding: var(--space-6);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .way__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+    color: var(--texte);
+  }
+
+  .way__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .way__title {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .way__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .way__text--sm {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .way__email {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 6px 0 0;
+    list-style: none;
+  }
+
+  /* Pastilles réseaux : blanches bordées, basalte plein au survol (comme « Télécharger » des Rapports). */
+  .socials__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 10px 18px;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color var(--transition-ui),
+      color var(--transition-ui),
+      border-color var(--transition-ui);
+  }
+
+  .socials__pill:hover {
+    border-color: var(--bouton-plein);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .socials__pill svg {
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .faq-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    padding-top: 6px;
+    font-weight: 600;
+  }
+
+  .more {
+    background: var(--section);
+  }
+
+  .more__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding-block: var(--space-section);
+  }
+
+  .more__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 900px) {
+    .more__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .more__grid li {
+    display: flex;
+  }
+
+  .more-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    padding: var(--space-7);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  .more-card:hover {
+    color: var(--texte);
+  }
+
+  .more-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+  }
+
+  .more-card__title {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .more-card__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .more-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* La flèche glisse vers la droite quand la carte s'élève. */
+  .more-card :global(.more-card__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .more-card:hover :global(.more-card__arrow),
+  .more-card:focus-visible :global(.more-card__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .socials__pill {
+      transition: none;
+    }
+
+    .more-card:hover :global(.more-card__arrow),
+    .more-card:focus-visible :global(.more-card__arrow) {
+      transform: none;
+    }
+  }
+</style>

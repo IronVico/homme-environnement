@@ -37,6 +37,7 @@ export const PAGES = {
   confidentialite: 'confidentialite',
   galerie: 'ressources/galerie',
   rapports: 'ressources/rapports',
+  contact: 'contact',
 } as const;
 
 /** Adresse de candidature aux stages et au volontariat (bouton mailto, jamais affichée en texte sur la page). */
@@ -49,8 +50,8 @@ export const STAGES_EMAIL = 'contact.vsc@homme-environnement.org';
 export const PARTNERS_EMAIL = 'contact@homme-environnement.org';
 
 /**
- * Adresse générale de l'ONG (boutons « Nous contacter » de la Galerie et des Rapports, mailto).
- * TODO page Contact : renvoyer vers elle. TODO ONG : confirmer l'adresse.
+ * Adresse générale de l'ONG, affichée sur la page Contact (et lien mailto de secours si le
+ * formulaire ne part pas). TODO ONG : confirmer l'adresse.
  */
 export const CONTACT_EMAIL = 'contact@homme-environnement.org';
 
@@ -115,6 +116,7 @@ export function fieldPath(lang: Lang, _site?: string): string {
 export const SOCIAL_URLS = {
   linkedin: '#', // TODO URL de la page LinkedIn de l'ONG
   facebook: '#', // TODO URL de la page Facebook de l'ONG
+  instagram: '#', // TODO URL du compte Instagram de l'ONG (page Contact ; compte à confirmer)
 };
 
 /** Sections de la page L'ONG (ancres) : footer, sous-menu du header et accueil. */
@@ -125,7 +127,7 @@ export function ongPath(lang: Lang, section: keyof typeof ONG_ANCHORS): string {
   return `${pagePath(lang, 'ong')}#${ONG_ANCHORS[section]}`;
 }
 
-const MAIN_HREFS = [PAGES.ong, '#', PAGES.projets, HOME_ENGAGE, '#', '#'];
+const MAIN_HREFS = [PAGES.ong, '#', PAGES.projets, HOME_ENGAGE, '#', PAGES.contact];
 const FOOTER_HREFS = [
   [`${PAGES.ong}#${ONG_ANCHORS.approach}`, `${PAGES.ong}#${ONG_ANCHORS.history}`, PAGES.equipe, PAGES.partenaires],
   [PAGES.madagascar, PAGES.burkina],
@@ -139,8 +141,7 @@ const FOOTER_HREFS = [
   ],
   // TODO pages Particuliers et Entreprises.
   [HOME_ENGAGE, PAGES.stages, HOME_ENGAGE],
-  // TODO page Contact.
-  [PAGES.rapports, PAGES.galerie, '#'],
+  [PAGES.rapports, PAGES.galerie, PAGES.contact],
 ];
 const LEGAL_HREFS = [PAGES.mentionsLegales, PAGES.confidentialite];
 
