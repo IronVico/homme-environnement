@@ -1133,6 +1133,53 @@ const fr = {
       after: ". Nous vous répondrons dans un délai d'un mois, comme le prévoit le RGPD.",
     },
   },
+  galerie: {
+    title: 'Galerie photos',
+    description:
+      "Forêts, lacs de cratère, filières et villages : les sites de L'Homme & l'Environnement à Madagascar et au Burkina Faso, en photos.",
+    hero: {
+      titleStrong: 'Le terrain,',
+      titleLight: 'en images.',
+      // TODO ONG : liste des photographes à fournir.
+      lead: "Forêts, lacs de cratère, filières et villages : nos sites à Madagascar et au Burkina Faso, vus par ceux qui les arpentent. La plupart de ces photos sont signées Olivier Behra, fondateur de l'ONG ; merci aussi aux photographes qui nous confient leurs images. [Liste des photographes à fournir]",
+    },
+    list: {
+      titleStrong: 'Nos sites',
+      titleLight: 'en photos',
+      /** {count} : nombre de photos affichées. */
+      countOne: '{count} photo',
+      countMany: '{count} photos',
+      filtersLabel: 'Filtrer par site',
+      all: 'Tous',
+      /** {title} : titre de la photo. */
+      open: 'Agrandir la photo : {title}',
+      /** Crédit absent des données (src/data/galerie.ts). */
+      creditMissing: '[crédit photo à fournir]',
+      /** Lien vers la photo d'origine (licence libre). */
+      source: 'source',
+      newTab: '(nouvel onglet)',
+    },
+    /** Lieux qui ne sont pas des sites de src/content/sites (voir GALLERY_PLACES). */
+    places: {
+      'burkina-faso': 'Burkina Faso',
+    },
+    viewer: {
+      label: 'Visionneuse de photos',
+      close: 'Fermer',
+      previous: 'Photo précédente',
+      next: 'Photo suivante',
+      /** {index} : rang de la photo, {count} : nombre de photos affichées. */
+      position: 'Photo {index} sur {count}',
+    },
+    cta: {
+      titleStrong: 'Vous avez des photos',
+      titleLight: 'de nos sites ?',
+      text: "Volontaire, stagiaire, visiteur ou photographe : si vous avez photographié l'un de nos sites, écrivez-nous. Avec votre accord, nous les publierons ici, avec votre nom.",
+      contact: 'Nous contacter',
+      /** Objet du mail prérempli, en attendant la page Contact. */
+      mailSubject: 'Photos de nos sites',
+    },
+  },
 };
 
 export default fr;

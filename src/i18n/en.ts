@@ -109,6 +109,9 @@ const en: Dictionary = {
 
   // TODO traduction : page « Confidentialité » encore en français (copie de fr.ts).
   confidentialite: structuredClone(fr.confidentialite),
+
+  // TODO traduction : page « Galerie photos » encore en français (copie de fr.ts).
+  galerie: structuredClone(fr.galerie),
 };
 
 export default en;
