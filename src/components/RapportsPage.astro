@@ -78,86 +78,85 @@ const breadcrumb = [
         </h1>
         <p class="reports-hero__lead" data-reveal>{page.hero.lead}</p>
       </section>
+      <section class="featured container" aria-labelledby="une-titre">
+        <article class="featured__card" data-reveal>
+          <div class="featured__visual">
+            <ReportCover
+              class="featured__cover"
+              title={featured.title}
+              titleStrong={featuredTitle.strong}
+              titleLight={featuredTitle.light}
+              image={featured.cover}
+            />
+          </div>
+          <div class="featured__body">
+            <ul class="featured__tags">
+              <li class="featured__tag featured__tag--strong">{page.featured.badge}</li>
+              <li class="featured__tag">{page.types[featured.type]}</li>
+            </ul>
+            <h2 id="une-titre" class="featured__title">
+              <span class="featured__strong">{featuredTitle.strong}</span>
+              {featuredTitle.light && ' '}
+              {featuredTitle.light && <span class="featured__light">{featuredTitle.light}</span>}
+            </h2>
+            {featured.summary && <p class="featured__summary">{featured.summary}</p>}
+            <ul class="featured__meta">
+              <li class="featured__meta-format"><FileText size={18} />PDF</li>
+              <li>{featured.size ?? <TodoPill>{page.todo.size}</TodoPill>}</li>
+              <li>{featured.pages ? fill(page.featured.pages, { count: String(featured.pages) }) : <TodoPill>{page.todo.pages}</TodoPill>}</li>
+              <li>
+                {
+                  featured.published ? (
+                    fill(page.featured.published, { date: featured.published })
+                  ) : (
+                    <>
+                      {page.featured.published.split('{date}')[0]}
+                      <TodoPill>{page.todo.date}</TodoPill>
+                    </>
+                  )
+                }
+              </li>
+            </ul>
+            {
+              featured.file ? (
+                <div class="featured__actions" data-read-actions>
+                  <Button
+                    class="featured__read featured__read--dialog"
+                    variant="primary"
+                    icon="book"
+                    aria-haspopup="dialog"
+                    data-reader-open
+                    data-file={featured.file}
+                    data-title={featured.title}
+                    hidden
+                  >
+                    {page.featured.read}
+                  </Button>
+                  <Button
+                    class="featured__read featured__read--link"
+                    href={featured.file}
+                    variant="primary"
+                    icon="book"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {page.featured.read}
+                    <span class="visually-hidden">{` ${page.reader.newTab}`}</span>
+                  </Button>
+                  <Button href={featured.file} variant="secondary" icon="download" download>
+                    {page.featured.download}
+                  </Button>
+                </div>
+              ) : (
+                <p>
+                  <TodoPill>{page.todo.file}</TodoPill>
+                </p>
+              )
+            }
+          </div>
+        </article>
+      </section>
     </div>
-
-    <section class="featured container" aria-labelledby="une-titre">
-      <article class="featured__card" data-reveal>
-        <div class="featured__visual">
-          <ReportCover
-            class="featured__cover"
-            title={featured.title}
-            titleStrong={featuredTitle.strong}
-            titleLight={featuredTitle.light}
-            image={featured.cover}
-          />
-        </div>
-        <div class="featured__body">
-          <ul class="featured__tags">
-            <li class="featured__tag featured__tag--strong">{page.featured.badge}</li>
-            <li class="featured__tag">{page.types[featured.type]}</li>
-          </ul>
-          <h2 id="une-titre" class="featured__title">
-            <span class="featured__strong">{featuredTitle.strong}</span>
-            {featuredTitle.light && ' '}
-            {featuredTitle.light && <span class="featured__light">{featuredTitle.light}</span>}
-          </h2>
-          {featured.summary && <p class="featured__summary">{featured.summary}</p>}
-          <ul class="featured__meta">
-            <li class="featured__meta-format"><FileText size={18} />PDF</li>
-            <li>{featured.size ?? <TodoPill>{page.todo.size}</TodoPill>}</li>
-            <li>{featured.pages ? fill(page.featured.pages, { count: String(featured.pages) }) : <TodoPill>{page.todo.pages}</TodoPill>}</li>
-            <li>
-              {
-                featured.published ? (
-                  fill(page.featured.published, { date: featured.published })
-                ) : (
-                  <>
-                    {page.featured.published.split('{date}')[0]}
-                    <TodoPill>{page.todo.date}</TodoPill>
-                  </>
-                )
-              }
-            </li>
-          </ul>
-          {
-            featured.file ? (
-              <div class="featured__actions" data-read-actions>
-                <Button
-                  class="featured__read featured__read--dialog"
-                  variant="primary"
-                  icon="book"
-                  aria-haspopup="dialog"
-                  data-reader-open
-                  data-file={featured.file}
-                  data-title={featured.title}
-                  hidden
-                >
-                  {page.featured.read}
-                </Button>
-                <Button
-                  class="featured__read featured__read--link"
-                  href={featured.file}
-                  variant="primary"
-                  icon="book"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  {page.featured.read}
-                  <span class="visually-hidden">{` ${page.reader.newTab}`}</span>
-                </Button>
-                <Button href={featured.file} variant="secondary" icon="download" download>
-                  {page.featured.download}
-                </Button>
-              </div>
-            ) : (
-              <p>
-                <TodoPill>{page.todo.file}</TodoPill>
-              </p>
-            )
-          }
-        </div>
-      </article>
-    </section>
 
     <section id="documents" class="documents" aria-labelledby="documents-titre">
       <div
@@ -168,10 +167,10 @@ const breadcrumb = [
       >
         <div class="documents__head">
           <SectionHeading id="documents-titre" strong={page.list.titleStrong} light={page.list.titleLight} lead={page.list.lead} />
-          <p class="documents__count" aria-live="polite" data-count>{countLabel(REPORTS.length)}</p>
+          <p class="documents__count" aria-live="polite" data-count data-reveal>{countLabel(REPORTS.length)}</p>
         </div>
 
-        <div class="filters" role="group" aria-label={page.list.filtersLabel} data-filters hidden>
+        <div class="filters" role="group" aria-label={page.list.filtersLabel} data-filters data-reveal hidden>
           {
             filters.map((filter) => (
               <button
@@ -189,7 +188,7 @@ const breadcrumb = [
         <ul class="docs" role="list">
           {
             REPORTS.map((report) => (
-              <li class="doc" id={`document-${report.id}`} data-type={report.type}>
+              <li class="doc" id={`document-${report.id}`} data-type={report.type} data-reveal>
                 <span class="doc__icon" aria-hidden="true">
                   <FileText size={24} />
                 </span>
@@ -282,6 +281,7 @@ const breadcrumb = [
 </script>
 
 <style>
+  /* Hero et carte À la une : le motif passe derrière les deux, sans être coupé entre eux. */
   .reports-hero-wrap {
     position: relative;
     isolation: isolate;
