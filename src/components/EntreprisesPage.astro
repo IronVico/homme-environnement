@@ -33,8 +33,8 @@ const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const page = dict.entreprises;
 
-// Boutons « Nous écrire » : formulaire de contact, sujet « Partenariat et mécénat ».
-const contact = contactPath(lang, 'partenariat');
+// Boutons « Nous écrire » : formulaire de contact, sujet « Partenariat entreprise ».
+const contact = contactPath(lang, 'entreprise');
 
 const offers = page.offers.cards.map((card, i) => ({ ...card, Icon: [HandCoins, Briefcase, Leaf][i]! }));
 

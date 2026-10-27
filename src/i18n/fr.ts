@@ -1478,7 +1478,7 @@ const fr = {
       subjects: {
         don: 'Don et reçu fiscal',
         stage: 'Stage et volontariat',
-        partenariat: 'Partenariat et mécénat',
+        entreprise: 'Partenariat entreprise',
         presse: 'Presse',
         autre: 'Autre',
       },

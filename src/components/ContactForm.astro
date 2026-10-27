@@ -183,7 +183,7 @@ const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) })
     const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     let sending = false;
 
-    // Sujet présélectionné quand on arrive d'un bouton « Nous écrire » (?sujet=partenariat).
+    // Sujet présélectionné quand on arrive d'un bouton « Nous écrire » (?sujet=entreprise).
     const preset = new URLSearchParams(window.location.search).get(CONTACT_SUBJECT_PARAM);
     const subjectSelect = form.querySelector<HTMLSelectElement>('select[name="sujet"]');
     if (subjectSelect && preset && isContactSubject(preset)) subjectSelect.value = preset;
