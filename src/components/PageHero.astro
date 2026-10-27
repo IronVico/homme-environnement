@@ -400,20 +400,37 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
     }
   }
 
-  /* Mobile : portrait pleine largeur en 4:3, plus près du texte, pour que la citation
-     arrive au plus tôt dans le premier écran ; arche 120px, citation sous la photo. */
+  /*
+   * Mobile : le hero remplit l'écran et la citation s'arrête à 16px du bas ; la photo
+   * prend toute la hauteur qui reste (au moins du 4:3, sinon on défile). Arche 120px,
+   * citation passée sous la photo.
+   */
   @media (max-width: 700px) {
     .page-hero--portrait {
+      --hero-pb: 16px;
       row-gap: var(--space-6);
     }
 
     .page-hero--portrait .page-hero__figure {
+      flex: 1 1 auto;
+      grid-template-rows: 1fr auto;
       max-width: none;
       margin-bottom: 0;
     }
 
+    .page-hero__portrait {
+      display: grid;
+    }
+
+    .page-hero__portrait :global(picture) {
+      display: contents;
+    }
+
     .page-hero--portrait :global(.page-hero__photo) {
-      aspect-ratio: 4 / 3;
+      aspect-ratio: auto;
+      width: 100%;
+      height: 100%;
+      min-height: calc((100vw - 2 * var(--gutter)) * 3 / 4);
       border-radius: var(--radius-arch) var(--radius-arch) 16px 16px;
     }
 
