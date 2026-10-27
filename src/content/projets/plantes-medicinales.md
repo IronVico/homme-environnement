@@ -14,7 +14,6 @@ tagline: le savoir de la forêt de Vohimana.
 intro: "Plus de 160 plantes recensées avec les tradipraticiens, transformées sur place en huiles essentielles et en remèdes. Un savoir qui soigne les villages et fait vivre la forêt au lieu de la défricher."
 heroPhoto: ../../assets/photos/equipe-collectrices-vohimana.jpg
 photoAlt: Collectrices de plantes médicinales à Vohimana
-photoCaption: Collectrices de plantes, Vohimana
 figures:
   - { icon: leaf, value: 160, suffix: "+", text: "plantes médicinales recensées à Vohimana." }
   - { icon: flask, value: 1, text: "laboratoire de transformation sur le site." }

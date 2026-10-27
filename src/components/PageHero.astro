@@ -2,7 +2,7 @@
 /**
  * Hero des pages internes (pays, sites) : titre en deux temps, phrase de contexte,
  * un bouton secondaire, photo verticale en arche à droite (même format sur toutes les pages).
- * Options des fiches site : pastille de lieu, bouton Don avant le bouton secondaire, légende.
+ * Options des fiches site : pastille de lieu, bouton Don avant le bouton secondaire.
  * Options des pages S'engager : étiquettes, second paragraphe, bouton principal (basalte).
  * Variante portrait (page Équipe) : portrait d'une personne, avatar aux initiales sans photo,
  * carte citation qui chevauche le bas de la photo ; reste vertical (4:5) une fois empilé.
@@ -40,8 +40,6 @@ interface Props {
   text?: string;
   /** Pastille de lieu au-dessus du titre : « Madagascar · Centre-Est ». */
   badge?: string;
-  /** Légende sous la photo (crédit). */
-  caption?: string;
   /**
    * Variante portrait : la photo (`image`, facultative) est le portrait de `name`.
    * Citation facultative, dans une carte qui chevauche le bas de la photo.
@@ -62,7 +60,6 @@ const {
   tags,
   text,
   badge,
-  caption,
   portrait,
 } = Astro.props;
 
@@ -161,7 +158,6 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
           </figcaption>
         )
       }
-      {caption && <figcaption class="page-hero__caption" data-reveal>{caption}</figcaption>}
     </figure>
   </section>
 </div>
@@ -298,11 +294,6 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
     aspect-ratio: 4 / 5;
     object-fit: cover;
     border-radius: 160px 160px 20px 20px;
-  }
-
-  .page-hero__caption {
-    font-size: var(--fs-caption);
-    color: var(--texte-doux);
   }
 
   /* Empilé : la photo passe sous le texte et prend toute la largeur. */
