@@ -75,7 +75,7 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
 ---
 
 <div class="page-hero-wrap">
-  <section class:list={['page-hero', 'container', { 'page-hero--portrait': portrait }]}>
+  <section class:list={['page-hero', 'container', { 'page-hero--portrait': portrait, 'page-hero--photo': image && !portrait }]}>
     <div class="page-hero__text">
       {
         badge && (
@@ -340,6 +340,26 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
   @media (max-width: 700px) {
     .page-hero :global(.page-hero__photo) {
       border-radius: 40px 40px 16px 16px;
+    }
+
+    /* Le hero remplit l'écran : la photo prend toute la hauteur qui reste et s'arrête
+       à 16px du bas (au moins du 16:9, sinon on défile). Même règle que le portrait. */
+    .page-hero--photo {
+      --hero-pb: 16px;
+    }
+
+    .page-hero--photo .page-hero__figure {
+      flex: 1 1 auto;
+    }
+
+    .page-hero--photo .page-hero__figure :global(picture) {
+      display: contents;
+    }
+
+    .page-hero--photo :global(.page-hero__photo) {
+      flex: 1 1 0;
+      aspect-ratio: auto;
+      min-height: calc((100vw - 2 * var(--gutter)) * 9 / 16);
     }
   }
 
