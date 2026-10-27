@@ -23,7 +23,7 @@ Elles viennent de l'audit WCAG 2.2 AA du site (PR #15) : la cible est AA, en mod
 
 - **Survol réservé à ce qui est interactif** (lien, bouton, carte cliquable `a.card-lift`). Aucun effet de survol (zoom, rebond, élévation) sur une carte, une photo ou une icône qui ne fait rien. Une carte qui contient un lien n'est pas cliquable : seul le lien a un survol.
 - **`prefers-reduced-motion`** : toute animation ou transition de mouvement a sa version coupée.
-- **Ce qui bouge seul plus de 5 s** (défilement, carrousel, rotation, vidéo) a un bouton Pause : composant `PauseButton` dans un parent `[data-motion]`, l'animation s'arrête sur `[data-paused]`.
+- **Ce qui bouge seul** (défilement, carrousel, rotation, vidéo) n'a **pas** de bouton Pause : choix de design validé à la recette V1, écart assumé à WCAG 2.2.2 (pause d'un contenu qui bouge plus de 5 s). Le mouvement doit rester discret et non essentiel : aucun contenu porté uniquement par ce qui défile, version figée avec `prefers-reduced-motion`.
 
 ## Noms, images, structure
 

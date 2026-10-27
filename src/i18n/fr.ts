@@ -48,8 +48,6 @@ const fr = {
     shareEmail: 'Partager par email',
     shareCopy: 'Copier le lien',
     shareCopied: 'Lien copié',
-    pauseMotion: 'Mettre en pause le défilement',
-    playMotion: 'Reprendre le défilement',
     newsletterPending: "Merci. Les inscriptions ouvriront très bientôt : votre adresse n'a pas encore été enregistrée.",
   },
 
