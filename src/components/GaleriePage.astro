@@ -298,11 +298,12 @@ const breadcrumb = [
 </script>
 
 <style>
-  /* Motif topographique derrière le hero, comme les autres pages. */
+  /* Motif topographique derrière le hero, comme les autres pages ; il déborde vers le bas
+     sur la galerie (coupé seulement sur les côtés). */
   .gallery-hero-wrap {
     position: relative;
     isolation: isolate;
-    overflow: clip;
+    overflow-x: clip;
   }
 
   .gallery-hero-wrap :global(.gallery-hero__contours) {
