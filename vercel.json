@@ -1,11 +1,40 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "claude/**": false
+    }
+  },
   "redirects": [
-    { "source": "/actions/madagascar", "destination": "/sites/madagascar", "statusCode": 301 },
-    { "source": "/actions/madagascar/", "destination": "/sites/madagascar", "statusCode": 301 },
-    { "source": "/en/actions/madagascar", "destination": "/en/sites/madagascar", "statusCode": 301 },
-    { "source": "/en/actions/madagascar/", "destination": "/en/sites/madagascar", "statusCode": 301 },
-    { "source": "/madagascar", "destination": "/sites/madagascar", "statusCode": 301 },
-    { "source": "/madagascar/", "destination": "/sites/madagascar", "statusCode": 301 }
+    {
+      "source": "/actions/madagascar",
+      "destination": "/sites/madagascar",
+      "statusCode": 301
+    },
+    {
+      "source": "/actions/madagascar/",
+      "destination": "/sites/madagascar",
+      "statusCode": 301
+    },
+    {
+      "source": "/en/actions/madagascar",
+      "destination": "/en/sites/madagascar",
+      "statusCode": 301
+    },
+    {
+      "source": "/en/actions/madagascar/",
+      "destination": "/en/sites/madagascar",
+      "statusCode": 301
+    },
+    {
+      "source": "/madagascar",
+      "destination": "/sites/madagascar",
+      "statusCode": 301
+    },
+    {
+      "source": "/madagascar/",
+      "destination": "/sites/madagascar",
+      "statusCode": 301
+    }
   ]
 }
