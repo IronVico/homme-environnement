@@ -15,7 +15,7 @@ import Plus from '@lucide/astro/icons/plus';
 import Sprout from '@lucide/astro/icons/sprout';
 import { Picture } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import { donatePath, PARTNERS_EMAIL, pagePath, sitePath } from '../data/navigation';
+import { contactPath, donatePath, pagePath, sitePath } from '../data/navigation';
 import { PARTNER_TYPES, PARTNERS } from '../data/partenaires';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -66,7 +66,8 @@ const countLabel = (count: number) => (count > 1 ? page.list.countMany : page.li
 
 const ways = page.ways.cards.map((card, i) => ({ ...card, Icon: [Coins, Microscope, Sprout][i]! }));
 
-const mailto = `mailto:${PARTNERS_EMAIL}?subject=${encodeURIComponent(page.cta.mailSubject)}`;
+// Boutons « Nous écrire » : formulaire de contact, sujet « Partenariat et mécénat ».
+const contact = contactPath(lang, 'partenariat');
 
 const breadcrumb = [
   { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
@@ -85,7 +86,7 @@ const breadcrumb = [
       lead={page.hero.lead}
       image={heroPhoto}
       imageAlt={page.hero.imageAlt}
-      primary={{ label: page.hero.become, href: mailto, icon: 'mail' }}
+      primary={{ label: page.hero.become, href: contact, icon: 'mail' }}
       cta={{ label: page.hero.list, href: `#${LIST_ID}` }}
     />
 
@@ -172,7 +173,7 @@ const breadcrumb = [
               <span class="join-card__title">{page.list.join.title}</span>
               <span class="join-card__lead">{page.list.join.text}</span>
             </span>
-            <a class="join-card__link text-link text-link--on-dark" href={mailto}>
+            <a class="join-card__link text-link text-link--on-dark" href={contact}>
               <span class="text-link__label">{page.list.join.link}</span>
               <ArrowRight class="join-card__arrow" size={18} />
             </a>
@@ -217,7 +218,7 @@ const breadcrumb = [
         imagePosition="50% 45%"
       >
         <div class="cta__buttons">
-          <Button href={mailto} variant="on-dark-primary" icon="mail">{page.cta.write}</Button>
+          <Button href={contact} variant="on-dark-primary" icon="mail">{page.cta.write}</Button>
           <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
         </div>
       </PhotoBanner>

@@ -8,8 +8,15 @@
 export const CONTACT_ENDPOINT = '/api/contact';
 
 /** Sujets de la liste, dans l'ordre affiché ; libellés dans src/i18n (contact.form.subjects). */
-export const CONTACT_SUBJECTS = ['don', 'stage', 'entreprise', 'presse', 'autre'] as const;
+export const CONTACT_SUBJECTS = ['don', 'stage', 'partenariat', 'presse', 'autre'] as const;
 export type ContactSubject = (typeof CONTACT_SUBJECTS)[number];
+
+/**
+ * Lien vers le formulaire avec un sujet présélectionné : /contact/?sujet=partenariat#formulaire
+ * (paramètre lu par le script de ContactForm.astro, ancre sur la carte du formulaire).
+ */
+export const CONTACT_SUBJECT_PARAM = 'sujet';
+export const CONTACT_FORM_ANCHOR = 'formulaire';
 
 /** Noms des champs envoyés (attribut name). */
 export const CONTACT_FIELDS = ['nom', 'email', 'sujet', 'message', 'consentement'] as const;

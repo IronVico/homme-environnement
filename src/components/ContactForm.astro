@@ -158,7 +158,14 @@ const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) })
 </form>
 
 <script>
-  import { readContactValues, validateContactField, type ContactError, type ContactField } from '../lib/contact';
+  import {
+    CONTACT_SUBJECT_PARAM,
+    isContactSubject,
+    readContactValues,
+    validateContactField,
+    type ContactError,
+    type ContactField,
+  } from '../lib/contact';
 
   type Control = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
@@ -175,6 +182,11 @@ const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) })
     const status = form.querySelector<HTMLElement>('[data-status]')!;
     const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     let sending = false;
+
+    // Sujet présélectionné quand on arrive d'un bouton « Nous écrire » (?sujet=partenariat).
+    const preset = new URLSearchParams(window.location.search).get(CONTACT_SUBJECT_PARAM);
+    const subjectSelect = form.querySelector<HTMLSelectElement>('select[name="sujet"]');
+    if (subjectSelect && preset && isContactSubject(preset)) subjectSelect.value = preset;
 
     const showError = (control: Control, error: ContactError | null) => {
       const message = document.getElementById(`${control.id}-erreur`);

@@ -9,7 +9,7 @@ import Check from '@lucide/astro/icons/check';
 import HandCoins from '@lucide/astro/icons/hand-coins';
 import Leaf from '@lucide/astro/icons/leaf';
 import { Picture } from 'astro:assets';
-import { engagePath, PARTNERS_EMAIL, pagePath } from '../data/navigation';
+import { contactPath, engagePath, pagePath } from '../data/navigation';
 import { getPartner } from '../data/partenaires';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -32,8 +32,8 @@ const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const page = dict.entreprises;
 
-// TODO ONG : adresse de contact des entreprises (en attendant, celle des partenariats).
-const mailto = `mailto:${PARTNERS_EMAIL}?subject=${encodeURIComponent(page.cta.mailSubject)}`;
+// Boutons « Nous écrire » : formulaire de contact, sujet « Partenariat et mécénat ».
+const contact = contactPath(lang, 'partenariat');
 
 const offers = page.offers.cards.map((card, i) => ({ ...card, Icon: [HandCoins, Briefcase, Leaf][i]! }));
 
@@ -61,7 +61,7 @@ const breadcrumb = [
       image={heroPhoto}
       imageAlt={page.hero.imageAlt}
       imagePosition="50% 40%"
-      primary={{ label: page.hero.write, href: mailto, icon: 'mail' }}
+      primary={{ label: page.hero.write, href: contact, icon: 'mail' }}
       cta={{ label: page.hero.offers, href: '#offres' }}
     />
 
@@ -132,7 +132,7 @@ const breadcrumb = [
           titleStrong={page.steps.titleStrong}
           titleLight={page.steps.titleLight}
           text={page.steps.text}
-          button={{ label: page.steps.button, href: mailto }}
+          button={{ label: page.steps.button, href: contact }}
           steps={page.steps.items}
         />
       </div>
@@ -172,7 +172,7 @@ const breadcrumb = [
       imagePosition="50% 50%"
     >
       <div class="cta__buttons">
-        <Button href={mailto} variant="on-dark-primary" icon="mail">{page.cta.write}</Button>
+        <Button href={contact} variant="on-dark-primary" icon="mail">{page.cta.write}</Button>
         <Button href={pagePath(lang, 'partenaires')} variant="on-dark">{page.cta.partners}</Button>
       </div>
     </PhotoBanner>

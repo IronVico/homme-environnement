@@ -772,7 +772,6 @@ const fr = {
       text: 'Écrivez-nous pour un premier échange. Adresse de contact entreprises : [à fournir].',
       write: 'Nous écrire',
       partners: 'Voir nos partenaires',
-      mailSubject: 'Partenariat entreprise',
     },
   },
   // Page « Équipe » (maquette PageEquipe). Les membres sont dans src/data/equipe.ts.
@@ -1004,8 +1003,6 @@ const fr = {
       titleLight: 'parlons-en.',
       text: 'Mécénat financier ou de compétences, programme Net Positive Impact, partenariat de recherche : nous construisons chaque partenariat avec vous.',
       write: 'Nous écrire',
-      /** Objet du mail prérempli par le bouton « Nous écrire ». */
-      mailSubject: 'Proposition de partenariat',
     },
   },
   don: {
@@ -1479,7 +1476,7 @@ const fr = {
       subjects: {
         don: 'Don et reçu fiscal',
         stage: 'Stage et volontariat',
-        entreprise: 'Partenariat entreprise',
+        partenariat: 'Partenariat et mécénat',
         presse: 'Presse',
         autre: 'Autre',
       },
