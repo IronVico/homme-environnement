@@ -18,6 +18,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { fill } from '../lib/don';
 import Breadcrumb from './Breadcrumb.astro';
 import Button from './Button.astro';
+import ContourPattern from './ContourPattern.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
 import PhotoBanner from './PhotoBanner.astro';
@@ -84,15 +85,18 @@ const breadcrumb = [
   <Breadcrumb items={breadcrumb} current={page.title} />
 
   <main id="contenu">
-    <section class="gallery-hero container" aria-labelledby="galerie-h1">
-      <div class="gallery-hero__text">
-        <h1 id="galerie-h1" class="gallery-hero__title" data-reveal>
-          <span class="gallery-hero__strong">{page.hero.titleStrong}</span><br />
-          <span class="gallery-hero__light">{page.hero.titleLight}</span>
-        </h1>
-        <p class="gallery-hero__lead" data-reveal>{page.hero.lead}</p>
-      </div>
-    </section>
+    <div class="gallery-hero-wrap">
+      <ContourPattern variant="hero" class="gallery-hero__contours" />
+      <section class="gallery-hero container" aria-labelledby="galerie-h1">
+        <div class="gallery-hero__text">
+          <h1 id="galerie-h1" class="gallery-hero__title" data-reveal>
+            <span class="gallery-hero__strong">{page.hero.titleStrong}</span><br />
+            <span class="gallery-hero__light">{page.hero.titleLight}</span>
+          </h1>
+          <p class="gallery-hero__lead" data-reveal>{page.hero.lead}</p>
+        </div>
+      </section>
+    </div>
 
     <section id="photos" class="gallery-section" aria-labelledby="galerie-titre">
       <div
@@ -329,6 +333,17 @@ const breadcrumb = [
 </script>
 
 <style>
+  /* Motif topographique derrière le hero, comme les autres pages. */
+  .gallery-hero-wrap {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  .gallery-hero-wrap :global(.gallery-hero__contours) {
+    z-index: -1;
+  }
+
   .gallery-hero {
     padding-top: clamp(24px, 4vw, 48px);
     padding-bottom: clamp(40px, 5vw, 64px);
