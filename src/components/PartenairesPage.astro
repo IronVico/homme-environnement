@@ -8,7 +8,6 @@
  */
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Coins from '@lucide/astro/icons/coins';
-import ExternalLink from '@lucide/astro/icons/external-link';
 import MapPin from '@lucide/astro/icons/map-pin';
 import Microscope from '@lucide/astro/icons/microscope';
 import Plus from '@lucide/astro/icons/plus';
@@ -19,13 +18,13 @@ import { contactPath, donatePath, pagePath, sitePath } from '../data/navigation'
 import { PARTNER_TYPES, PARTNERS } from '../data/partenaires';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { fill } from '../lib/don';
 import Breadcrumb from './Breadcrumb.astro';
 import Button from './Button.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
 import PageHero from './PageHero.astro';
 import PartnerCard from './PartnerCard.astro';
+import PartnerLink from './PartnerLink.astro';
 import PhotoBanner from './PhotoBanner.astro';
 import SectionHeading from './SectionHeading.astro';
 
@@ -150,16 +149,7 @@ const breadcrumb = [
                         {partner.siteNames.join(', ')}
                       </span>
                     )}
-                    {partner.url && (
-                      <a class="partner-card__link text-link" href={partner.url} target="_blank" rel="noopener">
-                        <span class="text-link__label">{page.list.website}</span>
-                        <span class="visually-hidden">
-                          {' '}
-                          {fill(page.list.websiteOf, { name: partner.name })} {page.list.newTab}
-                        </span>
-                        <ExternalLink class="partner-card__external" size={14} />
-                      </a>
-                    )}
+                    <PartnerLink partner={partner} />
                   </span>
                 )}
               </PartnerCard>
@@ -437,26 +427,6 @@ const breadcrumb = [
     color: var(--sauge);
   }
 
-  /* Toujours calé à droite, avec ou sans sites à gauche. */
-  .partner-card__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-left: auto;
-    font-weight: 600;
-  }
-
-  .partner-card__link :global(.partner-card__external) {
-    flex-shrink: 0;
-    transition: transform var(--transition-ui);
-  }
-
-  /* Lien externe : l'icône glisse vers le haut et la droite, dans le sens de la flèche. */
-  .partner-card__link:hover :global(.partner-card__external),
-  .partner-card__link:focus-visible :global(.partner-card__external) {
-    transform: translate(2px, -2px);
-  }
-
   /*
    * Liens texte : même survol que les liens d'action des titres de section (SectionHeading) :
    * filet sauge au repos, trait tracé de gauche à droite au survol, icône qui glisse.
@@ -635,7 +605,6 @@ const breadcrumb = [
 
   @media (prefers-reduced-motion: reduce) {
     .text-link__label,
-    .partner-card__link :global(.partner-card__external),
     .filters__pill,
     .join-card__link :global(.join-card__arrow),
     .featured__link :global(.featured__arrow) {

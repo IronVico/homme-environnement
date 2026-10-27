@@ -20,6 +20,7 @@ import Footer from './Footer.astro';
 import Header from './Header.astro';
 import PageHero from './PageHero.astro';
 import PartnerCard from './PartnerCard.astro';
+import PartnerLink from './PartnerLink.astro';
 import PhotoBanner from './PhotoBanner.astro';
 import SectionHeading from './SectionHeading.astro';
 import StepsBlock from './StepsBlock.astro';
@@ -149,7 +150,13 @@ const breadcrumb = [
         <ul class="partners">
           {
             partners.map((partner) => (
-              <PartnerCard partner={partner} typeLabel={dict.partenaires.types[partner.type]} data-reveal />
+              <PartnerCard partner={partner} typeLabel={dict.partenaires.types[partner.type]} data-reveal>
+                {partner.url && (
+                  <span class="partner-foot">
+                    <PartnerLink partner={partner} />
+                  </span>
+                )}
+              </PartnerCard>
             ))
           }
         </ul>
@@ -207,6 +214,13 @@ const breadcrumb = [
 
   /* Trois façons de vous engager, puis partenaires : 3 colonnes, 2 en tablette, 1 en mobile. */
   .offers,
+  /* Lien « Site web » en bas à droite de la carte. */
+  .partner-foot {
+    display: flex;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+
   .partners {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -200,7 +200,12 @@ const RAW_PARTNERS: Partner[] = [
     type: 'associations',
     sites: ['vohimana'],
   },
-  { id: 'sages-femmes-sans-frontieres', name: 'Sages-femmes sans frontières', type: 'associations' },
+  {
+    id: 'sages-femmes-sans-frontieres',
+    name: 'Sages-femmes sans frontières',
+    type: 'associations',
+    url: 'https://www.sfsf.fr/',
+  },
   { id: 'amis-de-coralie', name: 'Les Amis de Coralie', type: 'associations' },
   { id: 'madagascar-voakajy', name: 'Madagascar Voakajy', type: 'associations' },
   {
@@ -208,7 +213,6 @@ const RAW_PARTNERS: Partner[] = [
     name: 'Maison familiale rurale de Vohimana',
     type: 'associations',
     sites: ['vohimana'],
-    url: 'https://www.sfsf.fr/',
   },
   { id: 'rugby-french-flair', name: 'Rugby French Flair', type: 'associations' }, // type à confirmer
 ];

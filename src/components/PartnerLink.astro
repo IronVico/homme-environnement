@@ -1,0 +1,81 @@
+---
+/**
+ * Lien « Site web » d'une carte partenaire (pages Partenaires et Entreprises), ouvert dans
+ * un nouvel onglet ; toujours calé à droite de la carte. Rien sans URL.
+ * Même survol que les liens d'action des titres de section : filet sauge au repos, trait
+ * tracé de gauche à droite au survol, icône qui glisse dans le sens de la flèche.
+ */
+import ExternalLink from '@lucide/astro/icons/external-link';
+import type { Partner } from '../data/partenaires';
+import { getLang, t } from '../i18n';
+import { fill } from '../lib/don';
+
+interface Props {
+  partner: Partner;
+}
+
+const { partner } = Astro.props;
+const list = t(getLang(Astro.currentLocale)).partenaires.list;
+---
+
+{
+  partner.url && (
+    <a class="partner-link" href={partner.url} target="_blank" rel="noopener">
+      <span class="partner-link__label">{list.website}</span>
+      <span class="visually-hidden">
+        {' '}
+        {fill(list.websiteOf, { name: partner.name })} {list.newTab}
+      </span>
+      <ExternalLink class="partner-link__icon" size={14} />
+    </a>
+  )
+}
+
+<style>
+  .partner-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  .partner-link:hover {
+    color: var(--texte);
+  }
+
+  .partner-link__label {
+    padding-bottom: 3px;
+    background:
+      linear-gradient(var(--texte), var(--texte)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--sauge), var(--sauge)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .partner-link:hover .partner-link__label,
+  .partner-link:focus-visible .partner-link__label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  .partner-link :global(.partner-link__icon) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .partner-link:hover :global(.partner-link__icon),
+  .partner-link:focus-visible :global(.partner-link__icon) {
+    transform: translate(2px, -2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner-link__label,
+    .partner-link :global(.partner-link__icon) {
+      transition: none;
+    }
+  }
+</style>
