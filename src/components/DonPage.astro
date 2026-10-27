@@ -88,7 +88,6 @@ const breadcrumb = [
           </h1>
           <p class="don-hero__lead" data-reveal>{page.hero.lead}</p>
         </div>
-        <p class="don-hero__caption">{page.hero.caption}</p>
       </div>
     </div>
 
@@ -397,14 +396,6 @@ const breadcrumb = [
     max-width: 560px;
     font-size: var(--fs-body-lg);
     line-height: var(--lh-body);
-  }
-
-  .don-hero__caption {
-    position: absolute;
-    right: 20px;
-    bottom: 14px;
-    font-size: var(--fs-caption);
-    opacity: 0.85;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -830,10 +821,6 @@ const breadcrumb = [
     .don-hero {
       height: 460px;
       border-radius: var(--radius-card-lg);
-    }
-
-    .don-hero__caption {
-      display: none;
     }
 
     /* Le texte occupe plus de hauteur : le dégradé monte plus haut. */

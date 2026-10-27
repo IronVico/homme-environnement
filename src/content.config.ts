@@ -209,8 +209,6 @@ const projets = defineCollection({
       heroPhotoPosition: z.string().optional(),
       /** Texte alternatif de la photo du hero (les cartes la traitent en décor). */
       photoAlt: z.string().optional(),
-      /** Légende sous la photo du hero (lieu seulement : pas de crédit photo sur le site). */
-      photoCaption: z.string().optional(),
       /**
        * Bande de chiffres, dans l'ordre d'affichage. `value` : nombre (formaté selon la langue)
        * ou texte tel quel ; `prefix` (« ≈ »), `suffix` (« + ») et `unit` (« ha ») l'entourent.
