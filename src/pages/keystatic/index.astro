@@ -1,0 +1,17 @@
+---
+// PROTOTYPE : page statique qui monte l'admin Keystatic. Sur l'hébergeur, une règle de
+// réécriture (.htaccess) renvoie /keystatic/* vers cette page.
+import KeystaticApp from '../../components/admin/KeystaticApp';
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Administration du site</title>
+  </head>
+  <body>
+    <KeystaticApp client:only="react" />
+  </body>
+</html>

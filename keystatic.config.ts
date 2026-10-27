@@ -8,7 +8,9 @@ import { COUNTRIES, PROJECT_ICONS, PROJECT_THEMES } from './src/data/projets';
 const options = (values: readonly string[]) => values.map((value) => ({ label: value, value }));
 
 export default config({
-  storage: { kind: 'local' },
+  // Keystatic Cloud : connexion et commits gérés par keystatic.cloud, aucune route serveur.
+  storage: { kind: 'cloud' },
+  cloud: { project: 'homme-environnement/site' },
   ui: { brand: { name: "L'Homme & l'Environnement" } },
   collections: {
     projets: collection({
