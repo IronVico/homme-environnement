@@ -658,6 +658,13 @@ const fr = {
         },
       ],
     },
+    cta: {
+      titleStrong: 'Prêt à nous rejoindre',
+      titleLight: 'sur le terrain ?',
+      text: "Envoyez votre candidature à tout moment de l'année, ou posez-nous d'abord vos questions.",
+      apply: 'Envoyer ma candidature',
+      ask: 'Poser une question',
+    },
   },
   // Page « Entreprises » (S'engager, maquettes Entreprises / EntreprisesMobile). « [à …] » : à fournir par l'ONG.
   entreprises: {
@@ -769,7 +776,7 @@ const fr = {
     cta: {
       titleStrong: 'Parlons',
       titleLight: 'de votre projet.',
-      text: 'Écrivez-nous pour un premier échange. Adresse de contact entreprises : [à fournir].',
+      text: 'Écrivez-nous pour un premier échange.',
       write: 'Nous écrire',
       partners: 'Voir nos partenaires',
     },

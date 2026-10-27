@@ -20,7 +20,7 @@ import Sprout from '@lucide/astro/icons/sprout';
 import Users from '@lucide/astro/icons/users';
 import X from '@lucide/astro/icons/x';
 import { Picture } from 'astro:assets';
-import { engagePath, STAGES_EMAIL } from '../data/navigation';
+import { contactPath, engagePath, STAGES_EMAIL } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getExplorerSites } from '../lib/explorer-sites';
@@ -29,7 +29,9 @@ import Faq, { type FaqAnswer } from './Faq.astro';
 import Footer from './Footer.astro';
 import Header from './Header.astro';
 import InfoNote from './InfoNote.astro';
+import Button from './Button.astro';
 import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
 import SectionHeading from './SectionHeading.astro';
 import SitesExplorer from './SitesExplorer.astro';
 import StepsBlock from './StepsBlock.astro';
@@ -39,6 +41,7 @@ import mosaicGuide from '../assets/photos/engager-terrain.jpg';
 import mosaicClasse from '../assets/photos/pilier-responsabilisation-classe.jpg';
 import mosaicLac from '../assets/photos/stages-lac-mont-passot.jpg';
 import mosaicVari from '../assets/photos/stages-vari-canopee.jpg';
+import ctaPhoto from '../assets/photos/site-mont-passot.jpg';
 
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
@@ -269,6 +272,20 @@ const breadcrumb = [
         <Faq items={faqItems} />
       </div>
     </section>
+
+    <PhotoBanner
+      id="appel-titre"
+      titleStrong={page.cta.titleStrong}
+      titleLight={page.cta.titleLight}
+      text={page.cta.text}
+      image={ctaPhoto}
+      imagePosition="50% 50%"
+    >
+      <div class="cta__buttons">
+        <Button href={mailto} variant="on-dark-primary" icon="mail">{page.cta.apply}</Button>
+        <Button href={contactPath(lang, 'stage')} variant="on-dark">{page.cta.ask}</Button>
+      </div>
+    </PhotoBanner>
   </main>
 
   <Footer />
@@ -531,5 +548,11 @@ const breadcrumb = [
 
   .fees-card :global(.fees-card__icon--out) {
     color: var(--texte-doux);
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
   }
 </style>
