@@ -85,6 +85,7 @@ const RAW_PARTNERS: Partner[] = [
     type: 'recherche',
     role: 'Formation et recherche à Madagascar.',
     // TODO URL (univ-antananarivo.mg ne répond pas en octobre 2026)
+    url: 'https://www.univ-antananarivo.mg/',
   },
   {
     id: 'universite-mahajanga',
@@ -92,6 +93,7 @@ const RAW_PARTNERS: Partner[] = [
     type: 'recherche',
     role: 'Formation et recherche dans le Nord-Ouest de Madagascar.',
     // TODO URL (univ-mahajanga.mg n'est plus le site de l'université)
+    url: 'https://www.mahajanga-univ.mg/',
   },
   {
     id: 'cnarp',
@@ -113,31 +115,37 @@ const RAW_PARTNERS: Partner[] = [
     id: 'sos-lemurs',
     name: 'SOS Lemurs (UICN)',
     type: 'bailleurs',
+    url: 'https://www.iucnsos.org/initiative/sos-lemurs/',
   },
   {
     id: 'franklinia',
     name: 'Fondation Franklinia',
     type: 'bailleurs',
+    url: 'https://fondationfranklinia.org/',
   },
   {
     id: 'oif',
     name: 'Organisation internationale de la Francophonie',
     type: 'bailleurs',
+    url: 'https://www.francophonie.org/',
   },
   {
     id: 'catholic-relief-services',
     name: 'Catholic Relief Services',
     type: 'bailleurs',
+    url: 'https://www.crs.org/',
   },
   {
     id: 'ministere-environnement',
     name: "Ministère de l'Environnement et du Développement durable",
     type: 'bailleurs', // type à confirmer (institution publique malgache)
+    url: 'https://www.environnement.mg/',
   },
   {
     id: 'ministere-tourisme',
     name: "Ministère du Tourisme et de l'Artisanat",
     type: 'bailleurs', // type à confirmer (institution publique malgache)
+    url: 'https://www.mta.gov.mg/',
   },
   {
     id: 'office-tourisme-alaotra-mangoro',
@@ -149,6 +157,7 @@ const RAW_PARTNERS: Partner[] = [
     id: 'parc-zoologique-paris',
     name: 'Parc zoologique de Paris (MNHN)',
     type: 'recherche',
+    url: 'https://www.parczoologiquedeparis.fr/fr',
   },
   {
     id: 'pure-trade',
@@ -199,6 +208,7 @@ const RAW_PARTNERS: Partner[] = [
     name: 'Maison familiale rurale de Vohimana',
     type: 'associations',
     sites: ['vohimana'],
+    url: 'https://www.sfsf.fr/',
   },
   { id: 'rugby-french-flair', name: 'Rugby French Flair', type: 'associations' }, // type à confirmer
 ];
