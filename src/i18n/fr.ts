@@ -1334,11 +1334,6 @@ const fr = {
       all: 'Tous',
       /** {title} : titre de la photo. */
       open: 'Agrandir la photo : {title}',
-      /** Crédit absent des données (src/data/galerie.ts). */
-      creditMissing: '[crédit photo à fournir]',
-      /** Lien vers la photo d'origine (licence libre). */
-      source: 'source',
-      newTab: '(nouvel onglet)',
     },
     /** Lieux qui ne sont pas des sites de src/content/sites (voir GALLERY_PLACES). */
     places: {

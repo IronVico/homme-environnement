@@ -11,7 +11,7 @@ import ChevronRight from '@lucide/astro/icons/chevron-right';
 import X from '@lucide/astro/icons/x';
 import { getImage, Picture } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import { GALLERY_PHOTOS, GALLERY_PLACES, type GalleryCredit, type GalleryPlace } from '../data/galerie';
+import { GALLERY_PHOTOS, GALLERY_PLACES, type GalleryPlace } from '../data/galerie';
 import { pagePath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -40,11 +40,6 @@ function placeName(place: GalleryPlace): string {
   return name;
 }
 
-function creditText(credit: GalleryCredit | undefined): string {
-  if (!credit) return page.list.creditMissing;
-  return 'license' in credit ? `${credit.author}, ${credit.license}` : `© ${credit.author}`;
-}
-
 // Version agrandie (visionneuse) : 2000px de large au plus, jamais plus que l'original.
 const photos = await Promise.all(
   GALLERY_PHOTOS.map(async (photo) => {
@@ -52,8 +47,6 @@ const photos = await Promise.all(
     return {
       ...photo,
       placeName: placeName(photo.place),
-      creditLabel: creditText(photo.credit),
-      license: photo.credit && 'license' in photo.credit ? photo.credit : undefined,
       full: full.src,
     };
   }),
@@ -105,8 +98,6 @@ const breadcrumb = [
         data-count-one={page.list.countOne}
         data-count-many={page.list.countMany}
         data-position={page.viewer.position}
-        data-source={page.list.source}
-        data-new-tab={page.list.newTab}
       >
         <div class="gallery-head">
           <SectionHeading id="galerie-titre" strong={page.list.titleStrong} light={page.list.titleLight} />
@@ -136,11 +127,6 @@ const breadcrumb = [
                 data-place={photo.place}
                 data-title={photo.title}
                 data-alt={photo.alt}
-                data-credit={photo.creditLabel}
-                data-author={photo.license?.author}
-                data-license={photo.license?.license}
-                data-license-url={photo.license?.licenseUrl}
-                data-source-url={photo.license?.source}
               >
                 <figure class="photo__figure">
                   <a class="photo__link" href={photo.full} aria-label={fill(page.list.open, { title: photo.title })} aria-haspopup="dialog" data-open>
@@ -156,7 +142,6 @@ const breadcrumb = [
                   </a>
                   <figcaption class="photo__caption">
                     <span class="photo__title">{photo.title}</span>
-                    <span class="photo__credit">{photo.creditLabel}</span>
                   </figcaption>
                 </figure>
               </li>
@@ -203,7 +188,6 @@ const breadcrumb = [
             </button>
             <div class="viewer__caption">
               <p class="viewer__title" id="viewer-title" data-viewer-title></p>
-              <p class="viewer__credit" data-viewer-credit></p>
             </div>
             <!-- Photo précédente / suivante : position et titre annoncés (le focus reste sur le bouton). -->
             <p class="visually-hidden" aria-live="polite" data-viewer-live></p>
@@ -236,7 +220,7 @@ const breadcrumb = [
     const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-value]')];
     const items = [...root.querySelectorAll<HTMLElement>('[data-place]')];
     const count = root.querySelector<HTMLElement>('[data-count]');
-    const { countOne = '', countMany = '', position = '', source = '', newTab = '' } = root.dataset;
+    const { countOne = '', countMany = '', position = '' } = root.dataset;
 
     const select = (value: string) => {
       buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.value === value)));
@@ -255,7 +239,6 @@ const breadcrumb = [
     if (!dialog || typeof dialog.showModal !== 'function') return;
     const img = dialog.querySelector<HTMLImageElement>('[data-viewer-img]')!;
     const title = dialog.querySelector<HTMLElement>('[data-viewer-title]')!;
-    const credit = dialog.querySelector<HTMLElement>('[data-viewer-credit]')!;
     const counter = dialog.querySelector<HTMLElement>('[data-viewer-position]')!;
     const live = dialog.querySelector<HTMLElement>('[data-viewer-live]')!;
 
@@ -263,32 +246,14 @@ const breadcrumb = [
     let index = 0;
     let opener: HTMLElement | null = null;
 
-    const link = (href: string, label: string) => {
-      const a = document.createElement('a');
-      a.href = href;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.textContent = label;
-      const hint = document.createElement('span');
-      hint.className = 'visually-hidden';
-      hint.textContent = ` ${newTab}`;
-      a.append(hint);
-      return a;
-    };
 
     const show = (i: number) => {
       index = (i + visible.length) % visible.length;
       const item = visible[index]!;
-      const { title: text = '', alt = '', credit: creditLabel = '', author, license, licenseUrl, sourceUrl } = item.dataset;
+      const { title: text = '', alt = '' } = item.dataset;
       img.src = item.querySelector<HTMLAnchorElement>('[data-open]')!.href;
       img.alt = alt;
       title.textContent = text;
-      // Licence libre : auteur, lien vers la licence et vers la photo d'origine (obligatoires).
-      if (author && license && licenseUrl && sourceUrl) {
-        credit.replaceChildren(`${author}, `, link(licenseUrl, license), ' · ', link(sourceUrl, source));
-      } else {
-        credit.textContent = creditLabel;
-      }
       counter.textContent = position.replace('{index}', String(index + 1)).replace('{count}', String(visible.length));
       // À l'ouverture, le dialogue s'annonce déjà (titre et position) : rien à ajouter.
       live.textContent = dialog.open ? `${counter.textContent}. ${text}` : '';
@@ -529,10 +494,6 @@ const breadcrumb = [
     line-height: 1.35;
   }
 
-  .photo__credit {
-    font-size: 13px;
-  }
-
   /* Écran à pointeur : légende au survol et au focus de la photo, masquée par Échap (WCAG 1.4.13). */
   @media (hover: hover) and (min-width: 601px) {
     .photo__caption {
@@ -693,14 +654,6 @@ const breadcrumb = [
   .viewer__title {
     font-size: var(--fs-body);
     font-weight: 600;
-  }
-
-  .viewer__credit {
-    font-size: 14px;
-  }
-
-  .viewer__credit :global(a) {
-    color: var(--blanc);
   }
 
   :global(html:has(.viewer[open])) {
