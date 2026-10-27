@@ -182,14 +182,39 @@ const RAW_PARTNERS: Partner[] = [
   { id: 'amare-global', name: 'Amare Global', type: 'entreprises' },
   { id: 'bougies-denis-fils', name: 'Bougies Denis & Fils', type: 'entreprises' },
   { id: 'efficite', name: 'EffiCité', type: 'entreprises' },
-  { id: 'floribis', name: 'Floribis', type: 'entreprises' },
-  { id: 'humy', name: 'Humy', type: 'entreprises' },
+  {
+    id: 'floribis',
+    name: 'Floribis',
+    type: 'entreprises',
+    url: 'https://floribis.com/',
+  },
+  {
+    id: 'humy',
+    name: 'Humy',
+    type: 'entreprises',
+    url: 'https://humy.org/',
+  },
   { id: 'imagin', name: "Imag'in", type: 'entreprises' }, // type à confirmer
-  { id: 'laboratoires-teane', name: 'Laboratoires Tēane', type: 'entreprises' },
-  { id: 'mahay-expedition', name: 'Mahay Expédition', type: 'entreprises' },
+  {
+    id: 'laboratoires-teane',
+    name: 'Laboratoires Tēane',
+    type: 'entreprises',
+    url: 'https://teane.com/',
+  },
+  {
+    id: 'mahay-expedition',
+    name: 'Mahay Expédition',
+    type: 'entreprises',
+    url: 'https://www.mahayexpedition.com/',
+  },
   { id: 'marmalade-fish', name: 'Marmalade Fish', type: 'entreprises' },
   { id: 'perfumista', name: 'Perfumista', type: 'entreprises' },
-  { id: 'univet-nature', name: 'Univet Nature', type: 'entreprises' },
+  {
+    id: 'univet-nature',
+    name: 'Univet Nature',
+    type: 'entreprises',
+    url: 'https://univetnature.org/',
+  },
   { id: 'films-de-pierre', name: 'Les Films de Pierre', type: 'entreprises' },
   { id: 'behave', name: 'Behave', type: 'entreprises' }, // type à confirmer
   { id: 'ravenala', name: 'Ravenala', type: 'entreprises' }, // type à confirmer
@@ -199,6 +224,7 @@ const RAW_PARTNERS: Partner[] = [
     name: 'Caméléon Center Conservation',
     type: 'associations',
     sites: ['vohimana'],
+    url: 'https://www.cameleoncenterconservation.org/',
   },
   {
     id: 'sages-femmes-sans-frontieres',
@@ -207,14 +233,24 @@ const RAW_PARTNERS: Partner[] = [
     url: 'https://www.sfsf.fr/',
   },
   { id: 'amis-de-coralie', name: 'Les Amis de Coralie', type: 'associations' },
-  { id: 'madagascar-voakajy', name: 'Madagascar Voakajy', type: 'associations' },
+  {
+    id: 'madagascar-voakajy',
+    name: 'Madagascar Voakajy',
+    type: 'associations',
+    url: 'https://www.madagasikara-voakajy.org/',
+  },
   {
     id: 'maison-familiale-rurale',
     name: 'Maison familiale rurale de Vohimana',
     type: 'associations',
     sites: ['vohimana'],
   },
-  { id: 'rugby-french-flair', name: 'Rugby French Flair', type: 'associations' }, // type à confirmer
+  {
+    id: 'rugby-french-flair',
+    name: 'Rugby French Flair',
+    type: 'associations', // type à confirmer
+    url: 'https://www.rugby-french-flair.com/',
+  },
 ];
 
 /** Logos fournis par l'ONG (src/assets/logos/partenaires/<id>.png|jpg), rattachés par identifiant. */
