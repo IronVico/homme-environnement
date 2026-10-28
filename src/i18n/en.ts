@@ -127,16 +127,6 @@ const en: Dictionary = {
 
   // TODO traduction : page « Particuliers » encore en français (copie de fr.ts).
   particuliers: structuredClone(fr.particuliers),
-
-  notFound: {
-    title: 'Page not found',
-    description: 'This page does not exist or has moved.',
-    titleStrong: 'Page not found.',
-    titleLight: 'The trail ends here.',
-    lead: 'This page does not exist, or it moved when the new website launched. Start again from the home page, or write to us if you are looking for something specific.',
-    home: 'Back to home',
-    contact: 'Contact us',
-  },
 };
 
 export default en;

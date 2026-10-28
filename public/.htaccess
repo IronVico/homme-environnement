@@ -6,11 +6,19 @@ Options -Indexes
 DirectoryIndex index.html
 AddDefaultCharset utf-8
 
-# Pages 404 du site (src/pages/404.astro et src/pages/en/404.astro, publiée en /en/404/).
+# Pages d'erreur du site (src/pages/404.astro, src/pages/en/404.astro et src/pages/500.astro).
+# Sous /en/, la 404 anglaise est servie directement (sans passer par la bascule en JavaScript).
+# Les réponses d'erreur de api/contact.php (JSON) ne sont pas remplacées : seules les erreurs
+# produites par Apache lui-même passent par ces pages.
 ErrorDocument 404 /404.html
 <If "%{REQUEST_URI} =~ m#^/en(/|$)#">
   ErrorDocument 404 /en/404/index.html
 </If>
+ErrorDocument 403 /404.html
+ErrorDocument 500 /500.html
+ErrorDocument 502 /500.html
+ErrorDocument 503 /500.html
+ErrorDocument 504 /500.html
 
 # Règles du formulaire de contact, lues par api/contact.php sur le disque : pas d'accès par le Web.
 <Files "contact-fields.json">
