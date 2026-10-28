@@ -37,5 +37,7 @@ export function localeUrl(lang: Lang, path = ''): string {
 export function pathWithoutLocale(pathname: string): string {
   const segments = pathname.replace(/^\/+/, '').split('/');
   if (isLang(segments[0]) && segments[0] !== defaultLang) segments.shift();
+  // Page 404 : pas d'équivalent à proposer dans l'autre langue, le sélecteur mène à l'accueil.
+  if (segments[0] === '404') return '';
   return segments.join('/');
 }
