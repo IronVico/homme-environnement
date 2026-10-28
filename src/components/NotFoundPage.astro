@@ -1,0 +1,270 @@
+---
+/**
+ * Page 404, commune aux deux langues (/404 et /en/404). Textes dans src/i18n (clé `notFound`).
+ * Carte sur photo assombrie (titre, phrase, retour à l'accueil), puis trois pages utiles.
+ *
+ * Langue : Vercel sert une seule page 404 pour tout le site, la française (dist/404.html).
+ * Sur une adresse en /en/…, le script de tête renvoie aussitôt vers la 404 anglaise
+ * (/en/404/?depuis=…), qui remet l'adresse demandée dans la barre d'adresse : page, header et
+ * footer sont alors entièrement en anglais. Sans JavaScript, la page reste en français.
+ */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Heart from '@lucide/astro/icons/heart';
+import Mail from '@lucide/astro/icons/mail';
+import Sprout from '@lucide/astro/icons/sprout';
+import { Picture } from 'astro:assets';
+import { donatePath, pagePath } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from './Button.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import SectionHeading from './SectionHeading.astro';
+
+import photo from '../assets/photos/hero-falaises-ambalakalanoro.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.notFound;
+
+const links = [
+  { icon: Sprout, href: pagePath(lang, 'projets'), ...page.links.projets },
+  { icon: Heart, href: donatePath(lang), ...page.links.don },
+  { icon: Mail, href: pagePath(lang, 'contact'), ...page.links.contact },
+];
+
+// Chemin de la 404 anglaise et motif des adresses anglaises, pour le script de tête.
+const enNotFound = localeUrl('en', '404');
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={photo} noindex>
+  {
+    lang === 'fr' ? (
+      <script is:inline slot="head" define:vars={{ enNotFound }}>
+        if (/^\/en(\/|$)/.test(location.pathname)) {
+          location.replace(`${enNotFound}?depuis=${encodeURIComponent(location.pathname + location.search + location.hash)}`);
+        }
+      </script>
+    ) : (
+      <script is:inline slot="head">
+        const depuis = new URLSearchParams(location.search).get('depuis');
+        if (depuis && /^\/en(\/|$)/.test(depuis)) history.replaceState(null, '', depuis);
+      </script>
+    )
+  }
+
+  <Header />
+
+  <main id="contenu">
+    <section class="not-found" aria-labelledby="not-found-titre">
+      <div class="not-found__card">
+        <Picture
+          class="not-found__photo"
+          src={photo}
+          alt=""
+          formats={['avif', 'webp']}
+          widths={[480, 800, 1300, 1800, 2600]}
+          sizes="(max-width: 1440px) 100vw, 1312px"
+          loading="eager"
+        />
+        <div class="not-found__voile" aria-hidden="true"></div>
+        <div class="not-found__content">
+          <p class="not-found__eyebrow eyebrow">{page.eyebrow}</p>
+          <h1 id="not-found-titre" class="not-found__title">
+            <span class="not-found__strong">{page.titleStrong}</span>{' '}
+            <span class="not-found__light">{page.titleLight}</span>
+          </h1>
+          <p class="not-found__text">{page.text}</p>
+          <Button href={localeUrl(lang)} variant="on-dark-primary">{page.home}</Button>
+        </div>
+      </div>
+    </section>
+
+    <section class="useful" aria-labelledby="useful-titre">
+      <div class="container useful__inner">
+        <SectionHeading id="useful-titre" strong={page.linksTitle} />
+        <ul class="useful__grid" role="list">
+          {
+            links.map(({ icon: Icon, href, title, text }) => (
+              <li data-reveal>
+                <a class="useful-card card-lift" href={href}>
+                  <span class="useful-card__icon" aria-hidden="true">
+                    <Icon size={22} />
+                  </span>
+                  <span class="useful-card__title">
+                    {title}
+                    <ArrowRight class="useful-card__arrow" size={20} aria-hidden="true" />
+                  </span>
+                  <span class="useful-card__text">{text}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding: var(--space-8) var(--gutter) 0;
+  }
+
+  /* Carte sur photo : texte blanc sur voile, quel que soit le thème (comme PhotoBanner). */
+  .not-found__card {
+    position: relative;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    overflow: hidden;
+    border-radius: var(--radius-block);
+    color: var(--blanc);
+  }
+
+  .not-found__card :global(.not-found__photo) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .not-found__voile {
+    position: absolute;
+    inset: 0;
+    background: var(--voile);
+  }
+
+  .not-found__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+    max-width: 760px;
+    padding: clamp(32px, 7vw, 96px) clamp(24px, 6vw, 72px);
+  }
+
+  /* Sur la photo assombrie, le contour de focus basalte ne se verrait pas : blanc. */
+  .not-found__content :global(:focus-visible) {
+    outline-color: var(--blanc);
+  }
+
+  /* Sur-titre blanc : la couleur douce du thème ne passe pas sur le voile. */
+  .not-found__eyebrow {
+    color: var(--blanc);
+  }
+
+  .not-found__title {
+    font-size: var(--fs-display);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .not-found__strong {
+    font-weight: 800;
+  }
+
+  .not-found__light {
+    font-weight: 300;
+  }
+
+  .not-found__text {
+    max-width: 56ch;
+    font-size: var(--fs-body-lg);
+    line-height: 1.6;
+  }
+
+  .useful__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding-block: var(--space-section);
+  }
+
+  .useful__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .useful__grid li {
+    display: flex;
+  }
+
+  .useful-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    padding: var(--space-7);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+    color: var(--texte);
+    text-decoration: none;
+  }
+
+  .useful-card:hover {
+    color: var(--texte);
+  }
+
+  .useful-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+  }
+
+  .useful-card__title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .useful-card__text {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .useful-card :global(.useful-card__arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .useful-card:hover :global(.useful-card__arrow),
+  .useful-card:focus-visible :global(.useful-card__arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .useful-card :global(.useful-card__arrow) {
+      transition: none;
+    }
+
+    .useful-card:hover :global(.useful-card__arrow),
+    .useful-card:focus-visible :global(.useful-card__arrow) {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .useful__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -125,6 +125,22 @@ const en: Dictionary = {
 
   // TODO traduction : page « Particuliers » encore en français (copie de fr.ts).
   particuliers: structuredClone(fr.particuliers),
+
+  notFound: {
+    title: 'Page not found',
+    description: 'This page does not exist or has moved.',
+    eyebrow: 'Error 404',
+    titleStrong: 'This page',
+    titleLight: 'cannot be found.',
+    text: 'The link may be out of date, or the address may contain a typo. Start again from the home page or one of the pages below.',
+    home: 'Back to the home page',
+    linksTitle: 'Useful pages',
+    links: {
+      projets: { title: 'Our projects', text: 'Conservation, reforestation, health, aromatic plants: our work in the field.' },
+      don: { title: 'Donate', text: 'Support communities and forests in Madagascar and Burkina Faso.' },
+      contact: { title: 'Contact', text: 'A question, or a broken link to report? Write to us.' },
+    },
+  },
 };
 
 export default en;

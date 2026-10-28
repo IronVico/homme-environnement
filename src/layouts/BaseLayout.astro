@@ -74,6 +74,7 @@ const ogUrl = new URL(og.src, Astro.site);
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={ogImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#contenu">{dict.meta.skipLink}</a>

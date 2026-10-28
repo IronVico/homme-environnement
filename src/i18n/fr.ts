@@ -1661,6 +1661,22 @@ const fr = {
       field: 'Venir sur le terrain',
     },
   },
+  /** Page 404 (src/pages/404.astro et en/404.astro). */
+  notFound: {
+    title: 'Page introuvable',
+    description: "Cette page n'existe pas ou a changé d'adresse.",
+    eyebrow: 'Erreur 404',
+    titleStrong: 'Cette page',
+    titleLight: 'est introuvable.',
+    text: "Le lien est peut-être ancien, ou l'adresse contient une faute de frappe. Repartez de l'accueil ou de l'une des pages ci-dessous.",
+    home: "Retour à l'accueil",
+    linksTitle: 'Pages utiles',
+    links: {
+      projets: { title: 'Nos projets', text: 'Conservation, reboisement, santé, plantes aromatiques : nos actions sur le terrain.' },
+      don: { title: 'Faire un don', text: 'Soutenir les communautés et la forêt à Madagascar et au Burkina Faso.' },
+      contact: { title: 'Contact', text: 'Une question, un lien cassé à signaler ? Écrivez-nous.' },
+    },
+  },
 };
 
 export default fr;
