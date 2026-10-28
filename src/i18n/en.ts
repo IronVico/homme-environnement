@@ -141,6 +141,18 @@ const en: Dictionary = {
       contact: { title: 'Contact', text: 'A question, or a broken link to report? Write to us.' },
     },
   },
+
+  serverError: {
+    title: 'Server error',
+    description: 'The site is having a temporary problem.',
+    eyebrow: 'Server error',
+    titleStrong: 'The site is having',
+    titleLight: 'a problem.',
+    text: 'This is not your fault: our server is not responding properly right now. Please try again in a few minutes.',
+    retry: 'Try again',
+    home: 'Back to the home page',
+    contact: 'If the problem persists, write to us at ',
+  },
 };
 
 export default en;

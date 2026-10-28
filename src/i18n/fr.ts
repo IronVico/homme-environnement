@@ -1677,6 +1677,20 @@ const fr = {
       contact: { title: 'Contact', text: 'Une question, un lien cassé à signaler ? Écrivez-nous.' },
     },
   },
+
+  /** Page d'erreur serveur (src/pages/500.astro), servie par l'hébergeur pour les erreurs 5xx. */
+  serverError: {
+    title: 'Erreur du serveur',
+    description: 'Le site rencontre un problème temporaire.',
+    eyebrow: 'Erreur serveur',
+    titleStrong: 'Le site rencontre',
+    titleLight: 'un problème.',
+    text: "Ce n'est pas de votre fait : notre serveur ne répond pas correctement pour le moment. Réessayez dans quelques minutes.",
+    retry: 'Réessayer',
+    home: "Retour à l'accueil",
+    /** Suivi de l'adresse e-mail de l'ONG. */
+    contact: 'Si le problème continue, écrivez-nous à ',
+  },
 };
 
 export default fr;
