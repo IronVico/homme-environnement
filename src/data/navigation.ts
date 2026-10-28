@@ -1,4 +1,5 @@
 import { localeUrl, t, type Lang } from '../i18n';
+import { CONTACT_FORM_ANCHOR, CONTACT_SUBJECT_PARAM, type ContactSubject } from '../lib/contact';
 import type { COUNTRIES } from './projets';
 
 type Country = (typeof COUNTRIES)[number];
@@ -46,12 +47,6 @@ export const PAGES = {
 export const STAGES_EMAIL = 'contact.vsc@homme-environnement.org';
 
 /**
- * Adresse des demandes de partenariat (bouton « Nous écrire » de la page Partenaires, mailto).
- * TODO ONG : confirmer l'adresse (celle de la maquette).
- */
-export const PARTNERS_EMAIL = 'contact@homme-environnement.org';
-
-/**
  * Adresse générale de l'ONG, affichée sur la page Contact (et lien mailto de secours si le
  * formulaire ne part pas). TODO ONG : confirmer l'adresse.
  */
@@ -71,6 +66,11 @@ export function engagePath(lang: Lang): string {
 /** URL d'une page dans une langue : « sites/madagascar » → « /en/sites/madagascar ». */
 export function pagePath(lang: Lang, page: keyof typeof PAGES): string {
   return localeUrl(lang, PAGES[page]);
+}
+
+/** Formulaire de la page Contact, sujet présélectionné (boutons « Nous écrire »). */
+export function contactPath(lang: Lang, subject: ContactSubject): string {
+  return `${pagePath(lang, 'contact')}?${CONTACT_SUBJECT_PARAM}=${subject}#${CONTACT_FORM_ANCHOR}`;
 }
 
 /**

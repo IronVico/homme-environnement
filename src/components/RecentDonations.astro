@@ -3,13 +3,13 @@
  * Bandeau « derniers dons » au-dessus du formulaire de don : une carte à la fois,
  * qui tourne toutes les 4 s. N'affiche rien si la liste est vide.
  * Ne recevoir que de vrais dons (prénom et ville avec l'accord du donateur).
- * Bouton Pause dans le coin de la carte (WCAG 2.2.2), la rotation s'arrête aussi au survol.
+ * La rotation s'arrête au survol. Pas de bouton Pause : choix de Victor à la recette V1,
+ * écart assumé à WCAG 2.2.2 (voir la PR).
  * Avec prefers-reduced-motion : pas de rotation, seul le premier don s'affiche.
  */
 import Heart from '@lucide/astro/icons/heart';
 import type { RecentDonation } from '../data/don';
 import { getLang, t } from '../i18n';
-import PauseButton from './PauseButton.astro';
 
 interface Props {
   donations: RecentDonation[];
@@ -32,7 +32,7 @@ const parts = (donation: RecentDonation) =>
 
 {
   donations.length > 0 && (
-    <section class:list={['recent', { 'recent--single': donations.length === 1 }]} aria-label={recent.label} data-recent data-motion>
+    <section class:list={['recent', { 'recent--single': donations.length === 1 }]} aria-label={recent.label} data-recent>
       <span class="recent__stack" aria-hidden="true" />
       {donations.map((donation, i) => (
         <p class:list={['recent__item', { 'is-active': i === 0, 'is-next': i === 1 }]} aria-hidden={i === 0 ? undefined : 'true'}>
@@ -44,7 +44,6 @@ const parts = (donation: RecentDonation) =>
           </span>
         </p>
       ))}
-      {donations.length > 1 && <PauseButton size="sm" tooltipAlign="end" class="recent__pause" />}
     </section>
   )
 }
@@ -64,7 +63,7 @@ const parts = (donation: RecentDonation) =>
     root.addEventListener('mouseleave', () => (paused = false));
 
     window.setInterval(() => {
-      if (paused || root.hasAttribute('data-paused') || reduceMotion.matches || document.hidden) return;
+      if (paused || reduceMotion.matches || document.hidden) return;
       const leaving = items[current]!;
       current = (current + 1) % items.length;
       const next = items[(current + 1) % items.length]!;
@@ -173,19 +172,6 @@ const parts = (donation: RecentDonation) =>
 
   .recent__item.is-leaving > * {
     opacity: 1;
-  }
-
-  /* Place du bouton Pause, à droite (seulement s'il y a plusieurs dons). */
-  .recent:not(.recent--single) .recent__item {
-    padding-right: 52px;
-  }
-
-  /* Bouton Pause : coin droit de la carte du dessus, au-dessus de la pile. */
-  .recent :global(.recent__pause) {
-    position: absolute;
-    z-index: 4;
-    top: 21px;
-    right: 12px;
   }
 
   .recent__icon {

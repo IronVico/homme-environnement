@@ -3,11 +3,10 @@
  * Bande des partenaires et bailleurs : une sélection des logos fournis par l'ONG.
  * Mode clair : logos en couleur. Mode sombre : version monochrome (src/assets/logos/partenaires-mono)
  * utilisée comme masque, à la couleur du texte doux.
- * En mobile (≤ 900px), la liste défile en boucle, avec un bouton Pause ; avec
- * prefers-reduced-motion, elle reste en grille.
+ * En mobile (≤ 900px), la liste défile en boucle ; avec prefers-reduced-motion, elle reste en grille.
+ * Pas de bouton Pause : choix de Victor à la recette V1, écart assumé à WCAG 2.2.2 (voir la PR).
  */
 import { Image } from 'astro:assets';
-import PauseButton from './PauseButton.astro';
 import { getPartner } from '../data/partenaires';
 
 interface Props {
@@ -36,7 +35,7 @@ const partners = FEATURED.map(getPartner).flatMap((partner) =>
 const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((p) => ({ ...p, dup: true }))];
 ---
 
-<section class="partners" aria-labelledby="partenaires-titre" data-motion>
+<section class="partners" aria-labelledby="partenaires-titre">
   <div class="partners__inner container">
     <h2 id="partenaires-titre" class="partners__title eyebrow" data-reveal>{title}</h2>
     <div class="partners__marquee" data-reveal>
@@ -55,9 +54,6 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
           ))
         }
       </ul>
-    </div>
-    <div class="partners__controls">
-      <PauseButton />
     </div>
   </div>
 </section>
@@ -145,11 +141,7 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     }
   }
 
-  .partners__controls {
-    display: none;
-  }
-
-  /* Mobile : défilement en boucle, avec un bouton Pause (WCAG 2.2.2). Avec mouvement
+  /* Mobile : défilement en boucle, sans bouton Pause (choix de recette). Avec mouvement
      réduit, la grille reste en place : tous les logos visibles, sans défilement. */
   @media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
     .partners__track {
@@ -159,10 +151,6 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
       animation: partners-scroll 20s linear infinite;
     }
 
-    .partners[data-paused] .partners__track {
-      animation-play-state: paused;
-    }
-
     .partners__logo {
       flex: 0 0 auto;
       width: 180px;
@@ -170,11 +158,6 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
 
     .partners__logo--dup {
       display: flex;
-    }
-
-    .partners__controls {
-      display: flex;
-      justify-content: center;
     }
   }
 </style>

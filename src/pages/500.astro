@@ -1,0 +1,178 @@
+---
+/**
+ * Page d'erreur serveur (5xx), servie par l'hébergeur : sur Apache (OVH),
+ * `ErrorDocument 500 /500.html`, et de même pour 502, 503, 504. Vercel ne permet pas de
+ * remplacer ses pages 5xx pour un site statique.
+ *
+ * Page autonome, faite pour s'afficher même quand le serveur va mal : styles dans la page,
+ * aucun script, aucune feuille de style externe. Une seule page pour les deux langues
+ * (l'adresse demandée peut être en français ou en anglais) : français, puis anglais (lang="en").
+ * Textes dans src/i18n (clé `serverError`).
+ */
+import { CONTACT_EMAIL } from '../data/navigation';
+import { localeUrl, t, type Lang } from '../i18n';
+import tokens from '../styles/tokens.css?raw';
+
+const versions = (['fr', 'en'] as Lang[]).map((lang) => ({ lang, page: t(lang).serverError, home: localeUrl(lang) }));
+const fr = t('fr');
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{`${fr.serverError.title} | ${fr.meta.siteName}`}</title>
+    <meta name="description" content={fr.serverError.description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style is:inline set:html={tokens}></style>
+  </head>
+  <body>
+    <main class="erreur">
+      {
+        versions.map(({ lang, page, home }, index) => (
+          <section class="erreur__bloc" lang={lang === 'fr' ? undefined : lang} aria-labelledby={`erreur-titre-${lang}`}>
+            <p class="erreur__eyebrow">{page.eyebrow}</p>
+            {index === 0 ? (
+              <h1 id={`erreur-titre-${lang}`} class="erreur__titre">
+                <strong>{page.titleStrong}</strong> {page.titleLight}
+              </h1>
+            ) : (
+              <h2 id={`erreur-titre-${lang}`} class="erreur__titre">
+                <strong>{page.titleStrong}</strong> {page.titleLight}
+              </h2>
+            )}
+            <p>{page.text}</p>
+            <p class="erreur__actions">
+              {/* Lien vide : recharge l'adresse demandée. */}
+              <a class="erreur__bouton erreur__bouton--plein" href="">
+                {page.retry}
+              </a>
+              <a class="erreur__bouton" href={home}>
+                {page.home}
+              </a>
+            </p>
+            <p class="erreur__contact">
+              {page.contact}
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+            </p>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>
+
+<style is:inline>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--fond);
+    color: var(--texte);
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .erreur {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    max-width: 720px;
+    margin-inline: auto;
+    padding: clamp(48px, 10vw, 120px) var(--gutter);
+  }
+
+  .erreur__bloc {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .erreur__bloc + .erreur__bloc {
+    padding-top: var(--space-12);
+    border-top: 1px solid var(--trait);
+  }
+
+  .erreur__eyebrow {
+    margin: 0;
+    font-size: var(--fs-eyebrow);
+    font-weight: 600;
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--texte-doux);
+  }
+
+  .erreur__titre {
+    margin: 0;
+    font-size: var(--fs-h2);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .erreur__titre strong {
+    font-weight: 800;
+  }
+
+  .erreur p {
+    margin: 0;
+  }
+
+  .erreur__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-top: var(--space-2);
+  }
+
+  .erreur__bouton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 24px;
+    border: 2px solid var(--texte);
+    border-radius: var(--radius-pill);
+    color: var(--texte);
+    font-size: var(--fs-button);
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .erreur__bouton--plein {
+    border-color: var(--bouton-plein);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .erreur__bouton:hover {
+    border-color: var(--texte-fort);
+    background: var(--texte-fort);
+    color: var(--fond);
+  }
+
+  .erreur__contact a {
+    color: var(--texte);
+    overflow-wrap: anywhere;
+  }
+
+  .erreur__contact a:hover {
+    color: var(--texte-fort);
+  }
+
+  .erreur :focus-visible {
+    outline: 2px solid var(--texte);
+    outline-offset: 3px;
+  }
+</style>

@@ -6,6 +6,7 @@
  * Gabarit commun (fil d'Ariane, titre, sommaire collant) : LegalPage.
  */
 import ImageIcon from '@lucide/astro/icons/image';
+import { getCollection } from 'astro:content';
 import {
   HOST,
   LEGAL_CONTACT_EMAIL,
@@ -45,6 +46,17 @@ const publisherRows = [
 
 // Page encore incomplète : pas d'indexation (comme les fiches site).
 const complete = [...Object.values(PUBLISHER), LEGAL_UPDATED, SITE_DESIGNER].every((value) => value !== null);
+
+// Photos sous licence libre (espèces des fiches site) : la licence impose auteur, licence et
+// source ; ils sont donnés ici plutôt que sur les photos.
+const sites = await getCollection('sites');
+const commonsPhotos = sites.flatMap((site) =>
+  (site.data.species ?? []).flatMap((species) =>
+    species.credit && 'license' in species.credit
+      ? [{ name: species.name, site: site.data.name, ...species.credit }]
+      : [],
+  ),
+);
 
 const hero = { ...page.hero, updated: fill(page.hero.updated, { date: LEGAL_UPDATED ?? page.missing }) };
 ---
@@ -113,7 +125,25 @@ const hero = { ...page.hero, updated: fill(page.hero.updated, { date: LEGAL_UPDA
     <p>{page.credits.intro}</p>
     <ul class="legal-list">
       {PHOTOGRAPHERS.map((name) => <li>{name}</li>)}
-      <li>{page.credits.commons}</li>
+      <li>
+        {page.credits.commons}
+        <ul class="legal-list legal-list--nested">
+          {
+            commonsPhotos.map((photo) => (
+              <li>
+                <i>{photo.name}</i> ({photo.site}) : © {photo.author},{' '}
+                <a href={photo.licenseUrl} rel="license noopener" target="_blank">
+                  {photo.license}
+                </a>
+                ,{' '}
+                <a href={photo.source} rel="noopener" target="_blank">
+                  {page.credits.source}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </li>
     </ul>
   </section>
 
@@ -124,6 +154,10 @@ const hero = { ...page.hero, updated: fill(page.hero.updated, { date: LEGAL_UPDA
 </LegalPage>
 
 <style>
+  .legal-list--nested {
+    margin-top: var(--space-2);
+  }
+
   .legal-table {
     margin: 0;
     border-top: 1px solid var(--bordure-carte);

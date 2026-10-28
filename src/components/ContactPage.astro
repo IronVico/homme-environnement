@@ -18,6 +18,7 @@ import { CONTACT_SOCIALS, MADAGASCAR_OFFICE } from '../data/contact';
 import { PUBLISHER } from '../data/mentions-legales';
 import { CONTACT_EMAIL, donatePath, pagePath, SOCIAL_URLS } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
+import { CONTACT_FORM_ANCHOR } from '../lib/contact';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from './Breadcrumb.astro';
 import ContactForm from './ContactForm.astro';
@@ -62,7 +63,7 @@ const moreCards = [
       </section>
 
       <section class="contact-main container" aria-label={page.sectionLabel}>
-        <div class="contact-card contact-card--form" data-reveal>
+        <div id={CONTACT_FORM_ANCHOR} class="contact-card contact-card--form" data-reveal>
           <div class="contact-card__head">
             <h2 id="contact-form-titre" class="contact-card__title">
               <span class="contact-card__strong">{page.form.titleStrong}</span>{' '}

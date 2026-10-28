@@ -48,8 +48,6 @@ const fr = {
     shareEmail: 'Partager par email',
     shareCopy: 'Copier le lien',
     shareCopied: 'Lien copié',
-    pauseMotion: 'Mettre en pause le défilement',
-    playMotion: 'Reprendre le défilement',
     newsletterPending: "Merci. Les inscriptions ouvriront très bientôt : votre adresse n'a pas encore été enregistrée.",
   },
 
@@ -290,8 +288,6 @@ const fr = {
     title: '{name}, Madagascar',
     /** Pastille du hero : pays · région. */
     country: 'Madagascar',
-    /** Légende de la photo du hero (lieu seulement : pas de crédit photo sur le site). */
-    photoCaption: '{name}, Madagascar',
     /** Valeur ou texte pas encore fourni par l'ONG (affiché tel quel sur la page). */
     missing: '[à fournir]',
     photoMissing: '[Photo à fournir]',
@@ -330,8 +326,6 @@ const fr = {
         LC: 'Préoccupation mineure · UICN LC',
         endemique: 'Endémique',
       },
-      /** Lien vers la page de la photo sur Wikimedia Commons. */
-      source: 'Wikimedia Commons',
     },
     actions: {
       titleStrong: 'Nos actions',
@@ -366,7 +360,6 @@ const fr = {
     burkina: {
       title: '{name}, Burkina Faso',
       country: 'Burkina Faso',
-      photoCaption: '{name}, Burkina Faso',
       mapLabel: 'Carte du Burkina Faso : {name} ({region})',
       heroActions: 'Nos actions sur le site',
       projects: 'Tous nos projets',
@@ -390,7 +383,6 @@ const fr = {
       titleLight: 'au service du vivant et des communautés.',
       lead: 'Chaque projet allie protection de la nature et revenus pour les habitants. Ils sont menés avec les communautés locales, sur nos sites à Madagascar et au Burkina Faso.',
       imageAlt: 'Réunion des habitants sous un arbre, village de Kollo, Burkina Faso',
-      caption: 'Kollo, Burkina Faso',
     },
     list: {
       titleStrong: 'Tous nos projets',
@@ -666,6 +658,13 @@ const fr = {
         },
       ],
     },
+    cta: {
+      titleStrong: 'Prêt à nous rejoindre',
+      titleLight: 'sur le terrain ?',
+      text: "Envoyez votre candidature à tout moment de l'année, ou posez-nous d'abord vos questions.",
+      apply: 'Envoyer ma candidature',
+      ask: 'Poser une question',
+    },
   },
   // Page « Entreprises » (S'engager, maquettes Entreprises / EntreprisesMobile). « [à …] » : à fournir par l'ONG.
   entreprises: {
@@ -679,7 +678,6 @@ const fr = {
       write: 'Nous écrire',
       offers: 'Nos formes de partenariat',
       imageAlt: 'Un couple de lémurs macaco dans les arbres : le mâle noir et la femelle rousse aux favoris blancs',
-      caption: 'Lémurs macaco, Mont-Passot [crédit photo à fournir]',
     },
     offers: {
       titleStrong: 'Trois façons',
@@ -718,7 +716,7 @@ const fr = {
         },
       ],
       imageAlt: "Cueillette de fleurs d'ylang-ylang au Mont-Passot",
-      caption: "Cueillette d'ylang-ylang, Mont-Passot — © Olivier Behra",
+      caption: "Cueillette d'ylang-ylang, Mont-Passot",
     },
     steps: {
       titleStrong: 'Comment',
@@ -778,10 +776,9 @@ const fr = {
     cta: {
       titleStrong: 'Parlons',
       titleLight: 'de votre projet.',
-      text: 'Écrivez-nous pour un premier échange. Adresse de contact entreprises : [à fournir].',
+      text: 'Écrivez-nous pour un premier échange.',
       write: 'Nous écrire',
       partners: 'Voir nos partenaires',
-      mailSubject: 'Partenariat entreprise',
     },
   },
   // Page « Équipe » (maquette PageEquipe). Les membres sont dans src/data/equipe.ts.
@@ -837,7 +834,6 @@ const fr = {
       titleLight: 'avec ceux qui en vivent.',
       lead: "Depuis {founded}, L'Homme & l'Environnement imagine des programmes qui associent les communautés locales et les entreprises à la préservation de la biodiversité, à Madagascar et au-delà.",
       imageAlt: "Des femmes avec leurs paniers de fleurs d'ylang-ylang dans les plantations du Mont-Passot",
-      caption: "Cueillette d'ylang-ylang, Nosy Be — © Olivier Behra",
       history: 'Notre histoire',
       team: 'Notre équipe',
     },
@@ -923,7 +919,7 @@ const fr = {
       ],
       imageAlt: 'Cascade dans la forêt de Vohimana',
       quote: "C'est quand j'ai vu ce paysage que je me suis dit que c'était là qu'il fallait installer la base de Vohimana.",
-      quoteAuthor: 'Olivier Behra, fondateur — © Olivier Behra',
+      quoteAuthor: 'Olivier Behra, fondateur',
     },
     models: {
       titleStrong: 'Des modèles',
@@ -954,7 +950,6 @@ const fr = {
       become: 'Devenir partenaire',
       list: 'Voir nos partenaires',
       imageAlt: 'Un vari noir et blanc dans la canopée',
-      caption: 'Vari noir et blanc, forêt de Vohimana',
     },
     ways: {
       titleStrong: 'Trois façons',
@@ -1015,8 +1010,6 @@ const fr = {
       titleLight: 'parlons-en.',
       text: 'Mécénat financier ou de compétences, programme Net Positive Impact, partenariat de recherche : nous construisons chaque partenariat avec vous.',
       write: 'Nous écrire',
-      /** Objet du mail prérempli par le bouton « Nous écrire ». */
-      mailSubject: 'Proposition de partenariat',
     },
   },
   don: {
@@ -1029,7 +1022,6 @@ const fr = {
       titleLight: 'agit directement sur le terrain.',
       lead: "Il finance la protection des forêts de Madagascar et du Burkina Faso, et les activités qui permettent aux communautés locales d'en vivre.",
       imageAlt: "Forêts et mangroves d'Ambohidravy, vues du ciel",
-      caption: "Forêts et mangroves d'Ambohidravy",
     },
     recent: {
       label: 'Derniers dons',
@@ -1225,8 +1217,9 @@ const fr = {
     credits: {
       title: 'Crédits photos',
       intro: "Les photographies de ce site sont l'œuvre de :",
-      commons:
-        "Contributeurs de Wikimedia Commons, sous licences Creative Commons : l'auteur et la licence sont précisés en légende de chaque image concernée.",
+      commons: 'Contributeurs de Wikimedia Commons, sous licences Creative Commons :',
+      /** Lien vers la page de la photo sur Wikimedia Commons. */
+      source: 'Wikimedia Commons',
     },
     links: {
       title: 'Liens externes',
@@ -1341,11 +1334,6 @@ const fr = {
       all: 'Tous',
       /** {title} : titre de la photo. */
       open: 'Agrandir la photo : {title}',
-      /** Crédit absent des données (src/data/galerie.ts). */
-      creditMissing: '[crédit photo à fournir]',
-      /** Lien vers la photo d'origine (licence libre). */
-      source: 'source',
-      newTab: '(nouvel onglet)',
     },
     /** Lieux qui ne sont pas des sites de src/content/sites (voir GALLERY_PLACES). */
     places: {
@@ -1573,7 +1561,6 @@ const fr = {
       lead: 'Un don, une adhésion, quelques semaines sur le terrain ou un simple partage : chaque geste aide les communautés de Madagascar et du Burkina Faso à protéger la forêt dont elles vivent.',
       allWays: "Voir toutes les façons d'agir",
       imageAlt: 'Un guide présente la forêt à un groupe de visiteurs',
-      caption: 'Visite guidée en forêt, Madagascar',
     },
     ways: {
       titleStrong: 'Six façons',
@@ -1634,7 +1621,7 @@ const fr = {
       noteText:
         "Le détail de l'utilisation des fonds sera publié ici à partir de notre dernier rapport d'activité [à fournir].",
       imageAlt: 'Des cueilleurs de plantes aromatiques à Vohimana',
-      caption: 'Cueilleurs de plantes, Vohimana — © Olivier Behra',
+      caption: 'Cueilleurs de plantes, Vohimana',
     },
     faq: {
       titleStrong: 'Questions',
@@ -1673,6 +1660,36 @@ const fr = {
       text: 'Soutenez nos programmes par un don, ou venez les découvrir sur le terrain avec nos équipes.',
       field: 'Venir sur le terrain',
     },
+  },
+  /** Page 404 (src/pages/404.astro et en/404.astro). */
+  notFound: {
+    title: 'Page introuvable',
+    description: "Cette page n'existe pas ou a changé d'adresse.",
+    eyebrow: 'Erreur 404',
+    titleStrong: 'Cette page',
+    titleLight: 'est introuvable.',
+    text: "Le lien est peut-être ancien, ou l'adresse contient une faute de frappe. Repartez de l'accueil ou de l'une des pages ci-dessous.",
+    home: "Retour à l'accueil",
+    linksTitle: 'Pages utiles',
+    links: {
+      projets: { title: 'Nos projets', text: 'Conservation, reboisement, santé, plantes aromatiques : nos actions sur le terrain.' },
+      don: { title: 'Faire un don', text: 'Soutenir les communautés et la forêt à Madagascar et au Burkina Faso.' },
+      contact: { title: 'Contact', text: 'Une question, un lien cassé à signaler ? Écrivez-nous.' },
+    },
+  },
+
+  /** Page d'erreur serveur (src/pages/500.astro), servie par l'hébergeur pour les erreurs 5xx. */
+  serverError: {
+    title: 'Erreur du serveur',
+    description: 'Le site rencontre un problème temporaire.',
+    eyebrow: 'Erreur serveur',
+    titleStrong: 'Le site rencontre',
+    titleLight: 'un problème.',
+    text: "Ce n'est pas de votre fait : notre serveur ne répond pas correctement pour le moment. Réessayez dans quelques minutes.",
+    retry: 'Réessayer',
+    home: "Retour à l'accueil",
+    /** Suivi de l'adresse e-mail de l'ONG. */
+    contact: 'Si le problème continue, écrivez-nous à ',
   },
 };
 

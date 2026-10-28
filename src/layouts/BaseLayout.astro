@@ -58,8 +58,11 @@ const ogUrl = new URL(og.src, Astro.site);
     <link rel="canonical" href={canonical} />
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
     <link rel="alternate" hreflang="x-default" href={alternates[0]?.href} />
-    <meta name="theme-color" content="#97a785" />
+    <meta name="theme-color" content="#434840" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="preload" href="/fonts/Rubik-VariableFont_wght.woff2" as="font" type="font/woff2" crossorigin />
 
     <meta property="og:type" content="website" />
@@ -73,6 +76,7 @@ const ogUrl = new URL(og.src, Astro.site);
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={ogImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#contenu">{dict.meta.skipLink}</a>

@@ -52,8 +52,6 @@ const en: Dictionary = {
     shareEmail: 'Share by email',
     shareCopy: 'Copy link',
     shareCopied: 'Link copied',
-    pauseMotion: 'Pause the animation',
-    playMotion: 'Resume the animation',
     newsletterPending: 'Thank you. Sign-ups open very soon: your address has not been saved yet.',
   },
 
@@ -127,6 +125,34 @@ const en: Dictionary = {
 
   // TODO traduction : page « Particuliers » encore en français (copie de fr.ts).
   particuliers: structuredClone(fr.particuliers),
+
+  notFound: {
+    title: 'Page not found',
+    description: 'This page does not exist or has moved.',
+    eyebrow: 'Error 404',
+    titleStrong: 'This page',
+    titleLight: 'cannot be found.',
+    text: 'The link may be out of date, or the address may contain a typo. Start again from the home page or one of the pages below.',
+    home: 'Back to the home page',
+    linksTitle: 'Useful pages',
+    links: {
+      projets: { title: 'Our projects', text: 'Conservation, reforestation, health, aromatic plants: our work in the field.' },
+      don: { title: 'Donate', text: 'Support communities and forests in Madagascar and Burkina Faso.' },
+      contact: { title: 'Contact', text: 'A question, or a broken link to report? Write to us.' },
+    },
+  },
+
+  serverError: {
+    title: 'Server error',
+    description: 'The site is having a temporary problem.',
+    eyebrow: 'Server error',
+    titleStrong: 'The site is having',
+    titleLight: 'a problem.',
+    text: 'This is not your fault: our server is not responding properly right now. Please try again in a few minutes.',
+    retry: 'Try again',
+    home: 'Back to the home page',
+    contact: 'If the problem persists, write to us at ',
+  },
 };
 
 export default en;

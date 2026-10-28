@@ -224,7 +224,6 @@ const breadcrumb = [
       image={data.photo}
       imageAlt={data.photoAlt ?? ''}
       imagePosition={data.photoPosition}
-      caption={fill(page.photoCaption, { name: data.name })}
       donate={{ label: withName(page.donate), href: donatePath(lang) }}
       cta={heroCta}
     />
@@ -346,8 +345,6 @@ const breadcrumb = [
                 photoAlt={species.photoAlt}
                 photoPosition={species.photoPosition}
                 photoMissing={page.photoMissing}
-                credit={species.credit}
-                sourceLabel={page.species.source}
               />
             ))
           }
