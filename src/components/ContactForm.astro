@@ -1,10 +1,10 @@
 ---
 /**
- * Formulaire de la page Contact (carte « Votre message »). Envoi : fonction Vercel api/contact.ts.
+ * Formulaire de la page Contact (carte « Votre message »). Envoi : script PHP public/api/contact.php.
  * - Avec JS : validation au fil de la saisie (message sous le champ en quittant le champ, retiré dès
  *   que la saisie est valide), focus sur le premier champ en erreur, envoi en fetch, résultat dans
  *   la zone role="status". Si l'envoi échoue, lien mailto prérempli avec le message.
- * - Sans JS : validation du navigateur (required), envoi classique ; la fonction renvoie à la page,
+ * - Sans JS : validation du navigateur (required), envoi classique ; le script renvoie à la page,
  *   à l'ancre du message de confirmation ou d'erreur (affiché par :target).
  * Anti-spam : champ piège (CONTACT_TRAP) hors écran, ignoré des visiteurs et du clavier.
  */
@@ -243,7 +243,7 @@ const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) })
           form.reset();
           status.textContent = form.dataset.sent ?? '';
         } else if (result.errors && Object.keys(result.errors).length > 0) {
-          // Refusé par la fonction (rare : mêmes règles que le script).
+          // Refusé par le script (rare : mêmes règles que le script).
           status.textContent = '';
           const refused = controls.filter((control) => result.errors?.[control.name as ContactField]);
           refused.forEach((control) => showError(control, result.errors![control.name as ContactField]!));

@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# paramètres du formulaire de contact (hébergement OVH, jamais versionnés)
+contact-config.php

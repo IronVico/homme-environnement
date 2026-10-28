@@ -6,7 +6,7 @@ Site **statique** et **bilingue** (français par défaut à la racine, anglais s
 
 ## Lancer le projet
 
-Prérequis : Node.js 24 (Astro 7 demande 22.22 minimum). La version majeure est figée à `24.x` dans `package.json`, la même que dans les réglages du projet Vercel, pour que Vercel ne passe pas tout seul à une nouvelle version majeure de Node.
+Prérequis : Node.js 24 (Astro 7 demande 22.22 minimum). La version majeure est figée à `24.x` dans `package.json`, la même que dans le déploiement ([`.github/workflows/deploy-ovh.yml`](.github/workflows/deploy-ovh.yml)).
 
 ```bash
 npm install
@@ -25,9 +25,41 @@ Le site tourne sur <http://localhost:4321> (version anglaise : <http://localhost
 | `npm run preview` | Sert le build de `dist/` en local pour le tester            |
 | `npm run check`   | Vérification des types seule                                |
 
-Redirections 301 (anciennes URL, dont celles du site WordPress) : [`vercel.json`](vercel.json), à compléter à mesure que les pages cibles existent.
+Redirections 301 (anciennes URL, dont celles du site WordPress), HTTPS forcé, pages 404 et cache : [`public/.htaccess`](public/.htaccess) (Apache), à compléter à mesure que les pages cibles existent.
 
-Le dossier `dist/` est un site statique prêt à déposer sur Netlify, Vercel ou Cloudflare Pages (commande de build `npm run build`, dossier publié `dist`).
+Le dossier `dist/` est le site prêt à déposer : pages statiques, plus un script PHP pour le formulaire de contact. Il est publié chez OVH (voir « Déploiement »).
+
+## Déploiement (OVH)
+
+Le site est hébergé par l'ONG chez OVHcloud, offre d'hébergement Web **Perso** (Apache 2.4 + PHP, accès FTP). À chaque modification de `main`, la GitHub Action [`deploy-ovh.yml`](.github/workflows/deploy-ovh.yml) lance `npm run build` puis [`ovh/deploy.sh`](ovh/deploy.sh), qui dépose `dist/` par **FTPS** (FTP chiffré) avec `lftp` et supprime les fichiers qui ne sont plus dans le build. Elle peut aussi se lancer à la main (onglet Actions → Déploiement OVH → Run workflow).
+
+Réglages du dépôt GitHub (Settings → Secrets and variables → Actions) ; aucune valeur dans le dépôt :
+
+| Nom | Type | Rôle |
+| --- | ---- | ---- |
+| `OVH_FTP_HOST` | secret | Serveur FTP du cluster OVH (ex. `ftp.clusterXXX.hosting.ovh.net`, espace client → Hébergement → FTP-SSH) |
+| `OVH_FTP_USER` | secret | Identifiant FTP |
+| `OVH_FTP_PASSWORD` | secret | Mot de passe FTP |
+| `OVH_FTP_DIR` | variable | Dossier du site, relatif à la racine FTP (ex. `www`, ou le dossier du nouveau site, voir plus bas). Obligatoire |
+| `OVH_FTP_PROTOCOL` | variable | `ftps` (par défaut) ou `sftp` si OVH ne propose que SFTP |
+| `OVH_SSH_KNOWN_HOSTS` | secret | `sftp` seulement, facultatif : empreinte du serveur (ligne `known_hosts`) |
+| `OVH_DEPLOY` | variable | Interrupteur : `on` pour déposer. Sans lui, l'Action construit et vérifie le site sans rien envoyer |
+
+Ordre du dépôt : nouveaux fichiers de `_astro/` d'abord, puis pages et autres fichiers (suppression des obsolètes), enfin nettoyage de `_astro/` ; chaque fichier est envoyé sous un nom temporaire puis renommé, pour qu'aucun visiteur ne reçoive un fichier à moitié copié. Garde-fous : le script refuse un dossier qui contient un WordPress (`wp-config.php`) et ne supprime jamais `.ovhconfig` ni `.well-known/`.
+
+**Bascule depuis le WordPress actuel** (même hébergement) : ne pas déposer dans `www/`, qui le contient. Déposer dans un nouveau dossier (ex. `site-astro/`), le relier à un sous-domaine de recette dans l'espace client (Multisite, avec certificat SSL), vérifier, puis faire pointer `homme-environnement.org` et `www.` vers ce dossier dans Multisite. Le WordPress reste intact pour un retour arrière.
+
+Depuis son poste (lftp installé) : `npm run build` puis `OVH_FTP_HOST=… OVH_FTP_USER=… OVH_FTP_PASSWORD=… OVH_FTP_DIR=… ovh/deploy.sh`.
+
+PHP : le script de contact fonctionne de PHP 7.4 (version actuelle de l'hébergement, pour le WordPress) à 8.x. Passer l'hébergement en PHP 8.x (fichier `.ovhconfig`) une fois le WordPress retiré.
+
+## Mesure d'audience
+
+Aucun outil branché pour l'instant (Vercel Web Analytics ne fonctionne que sur Vercel). Emplacement réservé en fin de `<body>` dans [`BaseLayout.astro`](src/layouts/BaseLayout.astro). Solution **sans cookies** à choisir (Umami ou GoatCounter, par exemple) : ajouter sa balise `<script defer>` à cet emplacement et renseigner `ANALYTICS_TOOL` dans [`src/data/confidentialite.ts`](src/data/confidentialite.ts) (affiché sur la page Confidentialité).
+
+## Environnement de build
+
+`SITE_ENV=preview npm run build` construit un site de recette : bandeau des derniers dons rempli de dons fictifs, comme avec `npm run dev`. Tout autre build (dont celui du déploiement) est un build de production, sans dons fictifs.
 
 ## Organisation
 
@@ -135,20 +167,19 @@ Règles à suivre pour toute nouvelle page (WCAG 2.2 AA, modes clair et sombre, 
 
 ## Formulaire de contact
 
-Le site reste statique ; seule la route `POST /api/contact` tourne côté serveur : une fonction Vercel ([`api/contact.ts`](api/contact.ts)) qui envoie le message par e-mail en SMTP, depuis une boîte de la messagerie de l'ONG (pas de service tiers, aucun cookie). Champs, sujets et validation sont partagés entre la page et la fonction ([`src/lib/contact.ts`](src/lib/contact.ts)) ; anti-spam : un champ piège invisible.
+Le site reste statique ; seule la route `POST /api/contact.php` tourne côté serveur : un script PHP sans dépendance ([`public/api/contact.php`](public/api/contact.php)) qui envoie le message par e-mail en SMTP, depuis une boîte e-mail OVH de l'ONG (pas de service tiers, aucun cookie). Champs, sujets et validation sont définis dans [`src/lib/contact.ts`](src/lib/contact.ts), partagés avec le script par `api/contact-fields.json`, généré au build ; anti-spam : un champ piège invisible. Réponses (JSON, ou redirection vers la page sans JavaScript) identiques à celles de l'ancienne fonction Vercel.
 
-Variables d'environnement à renseigner dans le projet Vercel (Settings → Environment Variables), modèle dans [`.env.example`](.env.example) :
+Paramètres d'envoi : fichier `contact-config.php`, **jamais dans le dépôt** et déposé à la main (FTP) **hors du dossier publié**, à la racine de l'espace FTP (deux niveaux au-dessus de `api/contact.php` : `/home/<login>/contact-config.php` si le site est dans `/home/<login>/www/`). Modèle commenté : [`ovh/contact-config.example.php`](ovh/contact-config.example.php).
 
-| Variable       | Rôle |
-| -------------- | ---- |
-| `CONTACT_TO`   | Destinataire des messages |
-| `SMTP_HOST`    | Serveur SMTP de la messagerie de l'ONG |
-| `SMTP_PORT`    | `465` (SSL, par défaut) ou `587` (STARTTLS) |
-| `SMTP_USER`    | Identifiant de la boîte qui envoie |
-| `SMTP_PASS`    | Mot de passe (ou mot de passe d'application) de cette boîte |
-| `CONTACT_FROM` | Expéditeur affiché, facultatif (`SMTP_USER` par défaut) |
+| Clé | Rôle |
+| --- | ---- |
+| `to` | Destinataire des messages (une adresse ou une liste) |
+| `from` | Expéditeur affiché, facultatif (`user` par défaut) ; adresse du domaine |
+| `host` | `ssl0.ovh.net` (serveur SMTP des e-mails OVH) |
+| `port` / `encryption` | `465` / `ssl` (par défaut) ou `587` / `starttls` |
+| `user` / `pass` | Adresse complète et mot de passe de la boîte qui envoie |
 
-Tant qu'elles manquent (et avec `npm run dev`, qui ne sert pas `/api`), l'envoi échoue proprement : la page propose d'envoyer le message depuis la messagerie du visiteur (lien `mailto` prérempli). Pour tester la fonction en local : `vercel dev`.
+Tant qu'il manque (et avec `npm run dev`, qui n'exécute pas PHP), l'envoi échoue proprement : la page propose d'envoyer le message depuis la messagerie du visiteur (lien `mailto` prérempli). Les échecs sont écrits dans le journal d'erreurs PHP de l'hébergement (sans le contenu des messages).
 
 ## Contenus provisoires (maquette V1)
 

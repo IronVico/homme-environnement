@@ -1204,7 +1204,7 @@ const fr = {
     hosting: {
       title: 'Hébergement',
       intro: 'Le site est hébergé par :',
-      country: 'États-Unis',
+      country: 'France',
     },
     design: {
       title: 'Conception',
@@ -1673,6 +1673,16 @@ const fr = {
       text: 'Soutenez nos programmes par un don, ou venez les découvrir sur le terrain avec nos équipes.',
       field: 'Venir sur le terrain',
     },
+  },
+
+  notFound: {
+    title: 'Page introuvable',
+    description: "Cette page n'existe pas ou a changé d'adresse.",
+    titleStrong: 'Page introuvable.',
+    titleLight: "Le sentier s'arrête ici.",
+    lead: "Cette page n'existe pas, ou elle a changé d'adresse avec le nouveau site. Repartez de l'accueil, ou écrivez-nous si vous cherchez quelque chose de précis.",
+    home: "Retour à l'accueil",
+    contact: 'Nous contacter',
   },
 };
 

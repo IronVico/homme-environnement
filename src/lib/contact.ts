@@ -1,11 +1,11 @@
 /**
  * Formulaire de contact : champs, sujets et validation, partagés par la page (script du
- * navigateur, ContactForm.astro) et la fonction d'envoi (api/contact.ts). Aucune dépendance
- * à Astro : ce fichier est aussi compilé par Vercel pour la fonction.
+ * navigateur, ContactForm.astro) et le script d'envoi PHP (public/api/contact.php), qui reçoit
+ * ces règles au build dans api/contact-fields.json (src/pages/api/contact-fields.json.ts).
  */
 
-/** Adresse de la fonction Vercel qui envoie le message (api/contact.ts). */
-export const CONTACT_ENDPOINT = '/api/contact';
+/** Adresse du script qui envoie le message (public/api/contact.php, hébergement OVH). */
+export const CONTACT_ENDPOINT = '/api/contact.php';
 
 /** Sujets de la liste, dans l'ordre affiché ; libellés dans src/i18n (contact.form.subjects). */
 export const CONTACT_SUBJECTS = ['don', 'stage', 'entreprise', 'presse', 'autre'] as const;
@@ -25,7 +25,7 @@ export const CONTACT_MAX: Record<Exclude<ContactField, 'sujet' | 'consentement'>
   message: 5000,
 };
 
-/** Ancres de la page Contact où la fonction renvoie un envoi sans JavaScript (CSS :target). */
+/** Ancres de la page Contact où le script d'envoi renvoie un envoi sans JavaScript (CSS :target). */
 export const CONTACT_ANCHORS = { sent: 'message-envoye', error: 'message-erreur' } as const;
 
 export type ContactError = 'required' | 'email' | 'tooLong';
@@ -66,7 +66,7 @@ export function validateContact(values: ContactValues): Partial<Record<ContactFi
   return errors;
 }
 
-/** Valeurs d'un FormData (formulaire du navigateur ou requête reçue par la fonction). */
+/** Valeurs d'un FormData (formulaire du navigateur). */
 export function readContactValues(data: FormData): ContactValues {
   const text = (name: string) => {
     const value = data.get(name);

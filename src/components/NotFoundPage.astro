@@ -1,0 +1,88 @@
+---
+/**
+ * Page 404, commune aux deux langues (/404.html et /en/404.html). Textes dans src/i18n (clé
+ * `notFound`). Servie par Apache pour toute adresse inconnue (ErrorDocument, public/.htaccess) :
+ * liens et ressources en chemins absolus, la page s'affiche quelle que soit l'adresse demandée.
+ * Haut de page sur courbes de niveau, comme Contact ; jamais indexée.
+ */
+import { pagePath } from '../data/navigation';
+import { getLang, localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from './Button.astro';
+import ContourPattern from './ContourPattern.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+
+const lang = getLang(Astro.currentLocale);
+const page = t(lang).notFound;
+---
+
+<BaseLayout title={page.title} description={page.description} noindex>
+  <Header />
+
+  <main id="contenu" class="not-found">
+    <ContourPattern variant="hero" class="not-found__contours" />
+    <section class="not-found__hero container" aria-labelledby="not-found-h1">
+      <h1 id="not-found-h1" class="not-found__title" data-reveal>
+        <span class="not-found__strong">{page.titleStrong}</span><br />
+        <span class="not-found__light">{page.titleLight}</span>
+      </h1>
+      <p class="not-found__lead" data-reveal>{page.lead}</p>
+      <div class="not-found__actions" data-reveal>
+        <Button href={localeUrl(lang)} variant="primary">{page.home}</Button>
+        <Button href={pagePath(lang, 'contact')}>{page.contact}</Button>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .not-found {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+  }
+
+  .not-found :global(.not-found__contours) {
+    z-index: -1;
+  }
+
+  .not-found__hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-top: clamp(48px, 8vw, 120px);
+    padding-bottom: clamp(64px, 10vw, 160px);
+  }
+
+  .not-found__title {
+    max-width: 800px;
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .not-found__strong {
+    font-weight: 800;
+  }
+
+  .not-found__light {
+    font-weight: 300;
+  }
+
+  .not-found__lead {
+    max-width: 640px;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>
