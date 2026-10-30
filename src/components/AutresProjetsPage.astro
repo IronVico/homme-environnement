@@ -1,0 +1,721 @@
+---
+/**
+ * Page « Autres projets soutenus », commune aux deux langues.
+ * Textes dans src/i18n (clé autresProjets), données dans src/data/projets-soutenus.ts.
+ * Filtre par pays côté client, depuis la carte ou les pastilles ; sans JS, tous les
+ * projets s'affichent, les pastilles et les repères de la carte restent masqués.
+ */
+import Hexagon from '@lucide/astro/icons/hexagon';
+import Leaf from '@lucide/astro/icons/leaf';
+import MapPin from '@lucide/astro/icons/map-pin';
+import PawPrint from '@lucide/astro/icons/paw-print';
+import TreePine from '@lucide/astro/icons/tree-pine';
+import Users from '@lucide/astro/icons/users';
+import { Picture } from 'astro:assets';
+import { donatePath, pagePath } from '../data/navigation';
+import {
+  COMPANIES,
+  PROGRAMME,
+  SUPPORTED_COUNTRIES,
+  SUPPORTED_PROJECTS,
+  type SupportedCountry,
+  type SupportedIcon,
+} from '../data/projets-soutenus';
+import { getLang, localeUrl, t } from '../i18n';
+import { worldPoint } from '../lib/world-map';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Button from './Button.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import PageHero from './PageHero.astro';
+import PhotoBanner from './PhotoBanner.astro';
+import SectionHeading from './SectionHeading.astro';
+import StatsBand from './StatsBand.astro';
+import TodoPill from './TodoPill.astro';
+import WorldMap from './WorldMap.astro';
+
+import ctaPhoto from '../assets/photos/engager-entreprises.jpg';
+import burkinaPhoto from '../assets/photos/pays-burkina-elephants.jpg';
+import teamPhoto from '../assets/photos/projets-soutenus-equipe-cameroun.jpg';
+import heroPhoto from '../assets/photos/projets-soutenus-nicaragua.jpg';
+
+const lang = getLang(Astro.currentLocale);
+const dict = t(lang);
+const page = dict.autresProjets;
+const { countries } = page;
+
+// Les mentions « [à fournir] » restent en français sur la page anglaise.
+const todoLang = lang === 'en' ? 'fr' : undefined;
+
+const ICONS: Record<SupportedIcon, typeof MapPin> = {
+  faune: PawPrint,
+  foret: TreePine,
+  femmes: Users,
+  filiere: Leaf,
+  miel: Hexagon,
+};
+
+const stats = [
+  {
+    value: `${PROGRAMME.from}–${PROGRAMME.to}`,
+    text: page.stats.yearsText,
+    illustration: 'ticks' as const,
+    count: 10,
+    illustrationLabel: page.stats.yearsLabel,
+  },
+  {
+    value: PROGRAMME.projects,
+    text: page.stats.projectsText,
+    illustration: 'grid' as const,
+    count: PROGRAMME.projects,
+    illustrationLabel: page.stats.projectsLabel,
+  },
+  {
+    value: PROGRAMME.countries,
+    text: page.stats.countriesText,
+    illustration: 'segments' as const,
+    count: PROGRAMME.countries,
+    illustrationLabel: page.stats.countriesLabel,
+  },
+];
+
+const countLabel = (count: number) => (count > 1 ? page.list.countMany : page.list.countOne).replace('{count}', String(count));
+
+const placeOf = (ids: readonly SupportedCountry[]) => ids.map((id) => countries[id]).join(page.list.placeSeparator);
+
+const followed = [
+  { ...page.followed.items.burkina, image: burkinaPhoto },
+  { ...page.followed.items.tanzanie, image: undefined },
+  { ...page.followed.items.cameroun, image: teamPhoto },
+  { ...page.followed.items.perou, image: undefined },
+];
+
+const breadcrumb = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[2]!, href: pagePath(lang, 'projets') },
+];
+---
+
+<BaseLayout title={page.title} description={page.description} ogImage={heroPhoto} ogImageAlt={page.hero.imageAlt}>
+  <Header />
+  <Breadcrumb items={breadcrumb} current={page.title} />
+
+  <main id="contenu">
+    <PageHero
+      titleStrong={page.hero.titleStrong}
+      titleLight={page.hero.titleLight}
+      lead={page.hero.lead}
+      image={heroPhoto}
+      imageAlt={page.hero.imageAlt}
+      cta={{ label: page.hero.cta, href: '#carte-titre' }}
+    />
+
+    <StatsBand stats={stats} label={page.stats.label} />
+
+    <section class="section" aria-labelledby="entreprises-titre">
+      <div class="container companies">
+        <div class="companies__text">
+          <SectionHeading id="entreprises-titre" strong={page.companies.titleStrong} light={page.companies.titleLight} />
+          <p class="companies__body">{page.companies.intro}</p>
+          <ul class="companies__list" aria-label={page.companies.listLabel}>
+            {COMPANIES.map((name) => <li class="companies__item">{name}</li>)}
+          </ul>
+          <p class="companies__body">{page.companies.outro}</p>
+        </div>
+        <figure class="companies__figure" data-reveal>
+          <Picture
+            class="companies__photo"
+            src={teamPhoto}
+            alt={page.companies.imageAlt}
+            formats={['avif', 'webp']}
+            widths={[480, 720, 946]}
+            sizes="(max-width: 1080px) 100vw, 600px"
+          />
+          <figcaption class="companies__caption">{page.companies.caption}</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section--tinted" aria-labelledby="carte-titre">
+      <div
+        class="container stack"
+        data-supported
+        data-count-one={page.list.countOne}
+        data-count-many={page.list.countMany}
+      >
+        <SectionHeading id="carte-titre" strong={page.list.titleStrong} light={page.list.titleLight} lead={page.list.lead} />
+
+        <div class="explorer" data-explorer>
+          <div class="explorer__side">
+            <div class="map-card">
+              <WorldMap
+                label={page.list.mapLabel}
+                labels={SUPPORTED_COUNTRIES.map((country) => ({
+                  id: country.id,
+                  x: country.x,
+                  y: country.y,
+                  anchor: 'anchor' in country ? country.anchor : undefined,
+                  text: countries[country.id],
+                }))}
+              >
+                {
+                  SUPPORTED_COUNTRIES.map((country) => {
+                    const label = page.list.pinLabel.replace('{country}', countries[country.id]);
+                    const { left, top } = worldPoint(country.px, country.py);
+                    return (
+                      <button
+                        class="pin"
+                        type="button"
+                        style={`left: ${left}; top: ${top}`}
+                        aria-label={label}
+                        aria-pressed="false"
+                        data-tooltip={label}
+                        data-country={country.id}
+                        hidden
+                      >
+                        <span class="pin__dot" aria-hidden="true" />
+                      </button>
+                    );
+                  })
+                }
+              </WorldMap>
+            </div>
+
+            <div class="filters">
+              <div class="filters__group" role="group" aria-label={page.list.filterCountry} data-filters hidden>
+                <button class="filters__pill" type="button" aria-pressed="true" data-country="all">{page.list.allCountries}</button>
+                {
+                  SUPPORTED_COUNTRIES.map((country) => (
+                    <button class="filters__pill" type="button" aria-pressed="false" data-country={country.id}>
+                      {countries[country.id]}
+                    </button>
+                  ))
+                }
+              </div>
+              <p class="filters__count" aria-live="polite" data-count>{countLabel(SUPPORTED_PROJECTS.length)}</p>
+            </div>
+          </div>
+
+          <ul class="supported-grid" aria-label={page.list.listLabel}>
+            {
+              SUPPORTED_PROJECTS.map((project) => {
+                const Icon = ICONS[project.icon];
+                return (
+                  <li class="supported" data-countries={project.countries.join(' ')}>
+                    <span class="supported__icon" aria-hidden="true">
+                      <Icon size={22} />
+                    </span>
+                    <h3 class="supported__title">{page.projects[project.id]}</h3>
+                    <p class="supported__place">
+                      <MapPin size={14} aria-hidden="true" />
+                      {
+                        project.countries.length > 0 ? (
+                          placeOf(project.countries)
+                        ) : (
+                          <TodoPill><span lang={todoLang}>{page.list.placeTodo}</span></TodoPill>
+                        )
+                      }
+                    </p>
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="suivi-titre">
+      <div class="container stack">
+        <SectionHeading id="suivi-titre" strong={page.followed.titleStrong} light={page.followed.titleLight} lead={page.followed.lead} />
+        <div class="followed-grid">
+          {
+            followed.map(({ place, title, text, image }) => (
+              <article class="followed" data-reveal>
+                {
+                  image ? (
+                    <Picture
+                      class="followed__photo"
+                      src={image}
+                      alt=""
+                      formats={['avif', 'webp']}
+                      widths={[320, 520, 720]}
+                      sizes="(max-width: 700px) 100vw, (max-width: 1000px) 50vw, 310px"
+                    />
+                  ) : (
+                    <div class="followed__todo">
+                      <TodoPill><span lang={todoLang}>{page.followed.photoTodo}</span></TodoPill>
+                    </div>
+                  )
+                }
+                <div class="followed__body">
+                  <p class="supported__place">
+                    <MapPin size={14} aria-hidden="true" />
+                    {place}
+                  </p>
+                  <h3 class="followed__title">{title}</h3>
+                  <p class="followed__text">{text}</p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <PhotoBanner
+      id="don-titre"
+      titleStrong={page.cta.titleStrong}
+      titleLight={page.cta.titleLight}
+      text={page.cta.text}
+      image={ctaPhoto}
+      imagePosition="50% 45%"
+    >
+      <div class="cta__buttons">
+        <Button href={donatePath(lang)} variant="don">{dict.ui.donate}</Button>
+        <Button href={pagePath(lang, 'projets')} variant="on-dark">{page.cta.projects}</Button>
+      </div>
+    </PhotoBanner>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  /*
+   * Filtre par pays : un pays à la fois (« all » : pas de filtre). Repères de la carte et
+   * pastilles portent le même data-country. Un second clic sur le pays actif réaffiche tout.
+   */
+  const STICKY_TOP = 104; // même valeur que .explorer__side
+
+  document.querySelectorAll<HTMLElement>('[data-supported]').forEach((root) => {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('button[data-country]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('li[data-countries]')];
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const explorer = root.querySelector<HTMLElement>('[data-explorer]');
+    const twoColumns = window.matchMedia('(min-width: 1081px)');
+    const { countOne = '', countMany = '' } = root.dataset;
+
+    let current = 'all';
+
+    const render = () => {
+      buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.country === current)));
+      let shown = 0;
+      cards.forEach((card) => {
+        const visible = current === 'all' || card.dataset.countries!.split(' ').includes(current);
+        card.hidden = !visible;
+        if (visible) shown += 1;
+      });
+      if (count) count.textContent = (shown > 1 ? countMany : countOne).replace('{count}', String(shown));
+    };
+
+    buttons.forEach((button) => {
+      button.hidden = false;
+      button.addEventListener('click', () => {
+        current = button.dataset.country === current ? 'all' : button.dataset.country!;
+        render();
+        // Deux colonnes : la liste raccourcit, on ramène le haut de la section sous le header.
+        const top = explorer ? explorer.getBoundingClientRect().top - STICKY_TOP : 0;
+        if (twoColumns.matches && top < 0) window.scrollBy({ top });
+      });
+    });
+
+    // Noms de pays sur la carte : même effet qu'un clic sur le repère, et même survol pour les deux.
+    root.querySelectorAll<SVGTextElement>('text[data-country]').forEach((name) => {
+      const pin = root.querySelector<HTMLButtonElement>(`.pin[data-country="${name.dataset.country}"]`);
+      if (!pin) return;
+      name.addEventListener('click', () => pin.click());
+      [name, pin].forEach((target) => {
+        target.addEventListener('pointerenter', () => [name, pin].forEach((el) => el.classList.add('is-hover')));
+        target.addEventListener('pointerleave', () => [name, pin].forEach((el) => el.classList.remove('is-hover')));
+      });
+    });
+
+    root.querySelector<HTMLElement>('[data-filters]')?.removeAttribute('hidden');
+  });
+</script>
+
+<style>
+  .section--tinted {
+    background: var(--section);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .companies {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 40px 64px;
+  }
+
+  .companies__text {
+    flex: 1 1 480px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .companies__body {
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  .companies__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .companies__item {
+    padding: 8px 16px;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+  }
+
+  .companies__figure {
+    flex: 1 1 460px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .companies__figure :global(.companies__photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 96px 96px var(--radius-card) var(--radius-card);
+  }
+
+  .companies__caption {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .explorer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .explorer__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    min-width: 0;
+  }
+
+  .map-card {
+    padding: clamp(8px, 1.2vw, 16px);
+    border-radius: var(--radius-block);
+    background: var(--surface);
+  }
+
+  /* Zone de 24px centrée sur le pays ; la pastille grossit quand le pays est choisi. */
+  .pin {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .pin[hidden] {
+    display: none;
+  }
+
+  .pin__dot {
+    box-sizing: content-box;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--surface);
+    border-radius: var(--radius-pill);
+    background: var(--bouton-plein);
+    transition: transform var(--transition-ui);
+  }
+
+  .pin:hover .pin__dot,
+  .pin.is-hover .pin__dot {
+    transform: scale(1.25);
+  }
+
+  .pin[aria-pressed='true'] .pin__dot {
+    width: 14px;
+    height: 14px;
+    box-shadow: 0 0 0 3px var(--bouton-plein);
+  }
+
+  /* Sous 700px, les repères sont trop serrés : les pastilles servent de filtre. */
+  @media (max-width: 700px) {
+    .pin__dot {
+      width: 8px;
+      height: 8px;
+      border-width: 1px;
+    }
+
+    .pin[aria-pressed='true'] .pin__dot {
+      width: 10px;
+      height: 10px;
+      box-shadow: 0 0 0 2px var(--bouton-plein);
+    }
+
+    /* Ni au clavier ni pour les lecteurs d'écran : ces repères ne sont plus des commandes. */
+    .pin {
+      visibility: hidden;
+    }
+
+    .pin__dot {
+      visibility: visible;
+    }
+  }
+
+  .filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .filters__group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filters__group[hidden] {
+    display: none;
+  }
+
+  .filters__pill {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 2px solid var(--surface);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--texte);
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-ui),
+      border-color var(--transition-ui),
+      color var(--transition-ui);
+  }
+
+  .filters__pill:hover {
+    border-color: var(--texte);
+  }
+
+  .filters__pill[aria-pressed='true'] {
+    background: var(--bouton-plein);
+    border-color: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .filters__count {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .supported-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .supported {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .supported[hidden] {
+    display: none;
+  }
+
+  .supported__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--disque);
+  }
+
+  .supported__title {
+    font-size: var(--fs-body);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .supported__place {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .supported .supported__place {
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--bordure-carte);
+  }
+
+  .supported__place :global(svg) {
+    flex-shrink: 0;
+  }
+
+  .followed-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  .followed {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .followed :global(.followed__photo) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .followed__todo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    background: var(--section);
+    font-size: 14px;
+  }
+
+  .followed__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-6) var(--space-6);
+  }
+
+  .followed__title {
+    font-size: var(--fs-body-lg);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .followed__text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .cta__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 1000px) {
+    .supported-grid,
+    .followed-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .supported-grid,
+    .followed-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Deux colonnes : la carte et les filtres restent à l'écran pendant qu'on parcourt la liste. */
+  @media (min-width: 1081px) {
+    .explorer {
+      display: grid;
+      grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+      align-items: start;
+      gap: var(--space-8);
+    }
+
+    .supported-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
+    }
+
+    .supported {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 4px var(--space-5);
+      padding: var(--space-5);
+    }
+
+    .supported__icon {
+      grid-row: 1 / span 2;
+    }
+
+    .supported .supported__place {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+  }
+
+  /* Sur un écran bas, la colonne ne tiendrait pas : elle défile avec la page. */
+  @media (min-width: 1081px) and (min-height: 670px) {
+    .explorer__side {
+      position: sticky;
+      top: 104px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pin__dot,
+    .filters__pill {
+      transition: none;
+    }
+
+    .pin:hover .pin__dot,
+    .pin.is-hover .pin__dot {
+      transform: none;
+    }
+  }
+</style>
