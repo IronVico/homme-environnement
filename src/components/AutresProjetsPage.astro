@@ -321,10 +321,15 @@ const breadcrumb = [
       });
     });
 
-    // Noms de pays sur la carte : même effet qu'un clic sur le repère.
+    // Noms de pays sur la carte : même effet qu'un clic sur le repère, et même survol pour les deux.
     root.querySelectorAll<SVGTextElement>('text[data-country]').forEach((name) => {
-      const pin = buttons.find((button) => button.dataset.country === name.dataset.country);
-      name.addEventListener('click', () => pin?.click());
+      const pin = root.querySelector<HTMLButtonElement>(`.pin[data-country="${name.dataset.country}"]`);
+      if (!pin) return;
+      name.addEventListener('click', () => pin.click());
+      [name, pin].forEach((target) => {
+        target.addEventListener('pointerenter', () => [name, pin].forEach((el) => el.classList.add('is-hover')));
+        target.addEventListener('pointerleave', () => [name, pin].forEach((el) => el.classList.remove('is-hover')));
+      });
     });
 
     root.querySelector<HTMLElement>('[data-filters]')?.removeAttribute('hidden');
@@ -450,7 +455,8 @@ const breadcrumb = [
     transition: transform var(--transition-ui);
   }
 
-  .pin:hover .pin__dot {
+  .pin:hover .pin__dot,
+  .pin.is-hover .pin__dot {
     transform: scale(1.25);
   }
 
@@ -707,7 +713,8 @@ const breadcrumb = [
       transition: none;
     }
 
-    .pin:hover .pin__dot {
+    .pin:hover .pin__dot,
+    .pin.is-hover .pin__dot {
       transform: none;
     }
   }
