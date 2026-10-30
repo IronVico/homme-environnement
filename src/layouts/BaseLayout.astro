@@ -85,8 +85,10 @@ const ogUrl = new URL(og.src, Astro.site);
       <slot />
     </div>
     <script>
+      import { initImages } from '../scripts/images';
       import { initReveal } from '../scripts/reveal';
       import { initTooltips } from '../scripts/tooltip';
+      initImages();
       initReveal();
       initTooltips();
     </script>
