@@ -57,11 +57,9 @@ const { label, labels } = Astro.props;
     cursor: pointer;
   }
 
-  /* Posée par le parent au survol du nom ou de son repère. Le gras reste visible là où le
-     navigateur ne souligne pas le texte SVG. */
+  /* Posée par le parent au survol du nom ou de son repère. */
   .world-map__label.is-hover {
     font-weight: 800;
-    text-decoration: underline;
   }
 
   @media (max-width: 700px) {
