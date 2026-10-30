@@ -5,12 +5,14 @@
  * clair / sombre. Les terres sont en --trait : --section ne se détache pas de la carte en
  * sombre. Le parent pose les repères par-dessus (slot), en % de la carte.
  * Noms masqués sous 700px : illisibles à cette échelle, les pastilles de filtre les donnent.
+ * Avec JS, un nom se clique comme son repère (data-country, voir le parent) ; au clavier et
+ * pour les lecteurs d'écran, le repère reste la commande.
  */
 import { WORLD_COUNTRIES_PATH, WORLD_LAND_PATH, WORLD_VIEWBOX } from '../lib/world-map';
 
 interface Props {
   label: string;
-  labels: { x: number; y: number; anchor?: 'middle' | 'end'; text: string }[];
+  labels: { id: string; x: number; y: number; anchor?: 'middle' | 'end'; text: string }[];
 }
 
 const { label, labels } = Astro.props;
@@ -21,8 +23,8 @@ const { label, labels } = Astro.props;
     <path style="fill: var(--trait)" d={WORLD_LAND_PATH}></path>
     <path style="fill: var(--accent)" d={WORLD_COUNTRIES_PATH}></path>
     {
-      labels.map(({ x, y, anchor, text }) => (
-        <text class="world-map__label" x={x} y={y} text-anchor={anchor}>
+      labels.map(({ id, x, y, anchor, text }) => (
+        <text class="world-map__label" x={x} y={y} text-anchor={anchor} data-country={id}>
           {text}
         </text>
       ))
@@ -49,6 +51,14 @@ const { label, labels } = Astro.props;
     stroke: var(--surface);
     stroke-width: 4px;
     paint-order: stroke;
+  }
+
+  :global(.js) .world-map__label {
+    cursor: pointer;
+  }
+
+  :global(.js) .world-map__label:hover {
+    text-decoration: underline;
   }
 
   @media (max-width: 700px) {

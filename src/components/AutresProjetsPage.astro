@@ -152,6 +152,7 @@ const breadcrumb = [
               <WorldMap
                 label={page.list.mapLabel}
                 labels={SUPPORTED_COUNTRIES.map((country) => ({
+                  id: country.id,
                   x: country.x,
                   y: country.y,
                   anchor: 'anchor' in country ? country.anchor : undefined,
@@ -318,6 +319,12 @@ const breadcrumb = [
         const top = explorer ? explorer.getBoundingClientRect().top - STICKY_TOP : 0;
         if (twoColumns.matches && top < 0) window.scrollBy({ top });
       });
+    });
+
+    // Noms de pays sur la carte : même effet qu'un clic sur le repère.
+    root.querySelectorAll<SVGTextElement>('text[data-country]').forEach((name) => {
+      const pin = buttons.find((button) => button.dataset.country === name.dataset.country);
+      name.addEventListener('click', () => pin?.click());
     });
 
     root.querySelector<HTMLElement>('[data-filters]')?.removeAttribute('hidden');
