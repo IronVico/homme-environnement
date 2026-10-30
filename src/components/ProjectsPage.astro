@@ -7,7 +7,7 @@
  */
 import { getCollection } from 'astro:content';
 import { COUNTRIES, PROJECT_THEMES } from '../data/projets';
-import { donatePath, fieldPath, projectPath } from '../data/navigation';
+import { donatePath, fieldPath, pagePath, projectPath } from '../data/navigation';
 import { getLang, localeUrl, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from './Breadcrumb.astro';
@@ -125,6 +125,11 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
           }
         </ul>
         <p class="list-empty" data-empty hidden>{page.list.empty}</p>
+
+        <div class="list-more">
+          <p>{page.more.text}</p>
+          <Button href={pagePath(lang, 'autresProjets')} variant="secondary">{page.more.link}</Button>
+        </div>
       </div>
     </section>
 
@@ -291,6 +296,21 @@ const breadcrumb = [{ label: dict.ui.breadcrumbHome, href: localeUrl(lang) }];
 
   .list-empty[hidden] {
     display: none;
+  }
+
+  .list-more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5) var(--space-8);
+  }
+
+  .list-more p {
+    flex: 1 1 320px;
+    max-width: 620px;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
   }
 
   .cta__buttons {

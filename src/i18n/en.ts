@@ -85,7 +85,126 @@ const en: Dictionary = {
   site: structuredClone(fr.site),
 
   // TODO traduction : page « Nos projets » encore en français (copie de fr.ts).
-  projets: structuredClone(fr.projets),
+  projets: {
+    ...structuredClone(fr.projets),
+    // TODO traduction : à relire par l'ONG.
+    more: {
+      text: 'From 2010 to 2019, we also supported other projects around the world.',
+      link: 'Other supported projects',
+    },
+  },
+
+  // TODO traduction : page « Autres projets soutenus » traduite, à relire par l'ONG.
+  autresProjets: {
+    title: 'Other supported projects',
+    description:
+      'From 2010 to 2019, Man & the Environment developed biodiversity conservation projects around the world, with local communities and private companies.',
+    hero: {
+      titleStrong: 'Other supported projects,',
+      titleLight: 'all over the world.',
+      lead: "From 2010 to 2019, thanks to the commitment to Nature of Xavier Marie, founder of Maisons du Monde, Man & the Environment took up the challenge of showing that biodiversity conservation projects could be developed anywhere in the world, by linking local communities and private companies around natural ingredient supply chains.",
+      imageAlt: 'Bird in a palm tree laden with fruit, Nicaragua',
+      cta: 'See the projects',
+    },
+    stats: {
+      label: 'The programme in figures',
+      yearsText: 'ten years of working with companies.',
+      yearsLabel: '10 lines, one for each year of the programme',
+      projectsText: 'conservation projects developed.',
+      projectsLabel: '21 dots, one for each project',
+      countriesText: 'countries, on three continents.',
+      countriesLabel: 'Ring of 17 segments, one for each country',
+    },
+    companies: {
+      titleStrong: 'Companies',
+      titleLight: 'at our side',
+      intro: 'These projects were always developed with private companies as financial partners.',
+      listLabel: 'Partner companies',
+      outro: 'The programme was then handed over to local stakeholders.',
+      imageAlt: 'The team in hiking clothes, backpacks on, posing on a forest path',
+      caption: 'President, Strategy Manager and Director of Man & the Environment with the ERuDeF teams in Cameroon in 2012.',
+    },
+    list: {
+      titleStrong: 'On three continents,',
+      titleLight: 'one approach',
+      lead: 'Protecting a species or a forest by creating a natural ingredient supply chain with local communities.',
+      mapLabel: 'World map: countries where projects were carried out, from Colombia to Indonesia',
+      pinLabel: 'See the projects: {country}',
+      filterCountry: 'Filter by country',
+      allCountries: 'All countries',
+      countOne: '{count} project',
+      countMany: '{count} projects',
+      listLabel: 'Projects carried out',
+      placeSeparator: ' and ',
+      placeTodo: '[pays à confirmer]',
+    },
+    countries: {
+      co: 'Colombia',
+      ma: 'Morocco',
+      sn: 'Senegal',
+      ci: "Côte d'Ivoire",
+      bf: 'Burkina Faso',
+      gh: 'Ghana',
+      cm: 'Cameroon',
+      cd: 'D.R. Congo',
+      mg: 'Madagascar',
+      in: 'India',
+      my: 'Malaysia',
+      id: 'Indonesia',
+    },
+    projects: {
+      tamarin: 'Saving the cotton-top tamarin with the Maya nut',
+      saloum: "Encouraging women's entrepreneurship in the Saloum Delta",
+      argan: 'Safeguarding the Saharan bee with women argan oil producers',
+      balanites: 'The balanites supply chain to preserve the Sahelian massif of Korko',
+      karite: "Shea and honey to safeguard Africa's large wildlife",
+      'kwabre-tanoe': 'The Kwabre-Tanoé transboundary reserve to save 3 African primates from extinction',
+      'nord-sud': 'An exemplary North-South partnership',
+      'produits-foret': 'Adding value to forest products to improve the incomes of indigenous peoples',
+      'cross-river': 'Palm oil to save the Cross River gorilla',
+      dja: 'Plant butters to preserve the Dja reserve',
+      oku: 'White honey and beeswax: two alternatives to save the Mount Oku forest',
+      bonobo: 'Reconciling bonobo conservation and the economic development of local people',
+      lemur: 'Supporting local development to save the greater bamboo lemur',
+      loris: 'Fighting the extinction of lorises by creating sustainable incomes',
+      tigre: 'Saving the Malayan tiger by restoring the Sungai Yu corridor',
+      rotin: 'Supporting the sustainable use of rattan on the edge of Lore Lindu National Park',
+    },
+    followed: {
+      titleStrong: 'What we follow',
+      titleLight: 'today',
+      lead: 'Man & the Environment has focused on long-term commitments, considered necessary to ensure that local communities can truly take ownership of sustainable environmental management programmes. Besides Madagascar, we mainly continue to follow:',
+      photoTodo: '[photo à fournir]',
+      items: {
+        burkina: {
+          place: 'Burkina Faso',
+          title: 'Elephant corridors',
+          text: 'Support for women and young people in the Nazinga-Kaboré Tambi corridor.',
+        },
+        tanzanie: {
+          place: 'Tanzania',
+          title: 'Elephant corridors',
+          text: 'Support for women and young people in the Gongo corridor.',
+        },
+        cameroun: {
+          place: 'Cameroon',
+          title: 'Chimpanzee corridor',
+          text: 'Support for women and young people in the Deng Deng – Dja corridor.',
+        },
+        perou: {
+          place: 'Peru',
+          title: 'Casitas forests',
+          text: 'Adding value to Palo Santo to conserve the forests.',
+        },
+      },
+    },
+    cta: {
+      titleStrong: 'Supporting our projects',
+      titleLight: 'means acting with local communities.',
+      text: 'Your donation directly funds action in the field.',
+      projects: 'All our projects',
+    },
+  },
 
   // TODO traduction : fiches projet encore en français (copie de fr.ts).
   projet: structuredClone(fr.projet),

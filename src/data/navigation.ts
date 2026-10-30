@@ -30,6 +30,7 @@ export const PAGES = {
   madagascar: 'sites/madagascar',
   burkina: 'sites/burkina-faso',
   projets: 'projets',
+  autresProjets: 'projets/autres-projets-soutenus',
   stages: 's-engager/stages-volontariat',
   entreprises: 's-engager/entreprises',
   equipe: 'ong/equipe',
