@@ -7,8 +7,8 @@
  * Sans ce script, le CSS retire l'écran de lui-même (animation intro-secours).
  */
 
-const GRACE_MS = 200; // à garder égal au délai du dessin dans Intro.astro
-const DRAWN_MS = 870; // isotype dessiné et rempli
+const GRACE_MS = 400; // à garder égal au délai du dessin dans Intro.astro
+const DRAWN_MS = 1070; // isotype dessiné et rempli
 const MAX_MS = 3500;
 
 /** Résolue quand la page apparaît : tout de suite, ou quand le rideau commence à se lever. */
@@ -35,7 +35,10 @@ export function initIntro() {
   }
 
   revealed = (async () => {
-    const elapsed = () => performance.now(); // depuis le début de la navigation
+    // Compté depuis l'arrivée de la page : la lenteur du serveur ne dit rien de la photo, déjà en cache au retour.
+    const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    const arrival = navigation?.responseStart ?? 0;
+    const elapsed = () => performance.now() - arrival;
     const ready = await Promise.race([heroLoaded().then(() => true), wait(GRACE_MS - elapsed()).then(() => false)]);
     if (ready && elapsed() <= GRACE_MS) {
       intro.remove();
