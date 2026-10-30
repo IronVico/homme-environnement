@@ -1,0 +1,83 @@
+---
+/**
+ * Écran d'ouverture : l'isotype apparaît, tourne d'un quart de geste, puis l'écran
+ * s'efface. Joué une fois par session, à la première page vue (.no-intro, posé par le
+ * script du <head> de BaseLayout). Tout est en CSS : l'écran part de lui-même, même si
+ * le script de la page ne charge pas, et ne capte jamais les clics. Il ne s'affiche ni
+ * sans JS, ni avec prefers-reduced-motion, ni à l'impression.
+ *
+ * La durée (1050 ms avant que l'écran s'efface) est reprise par INTRO_MS dans
+ * src/scripts/reveal.ts : les apparitions de la page démarrent à ce moment.
+ */
+---
+
+<div class="intro" aria-hidden="true">
+  <svg class="intro__isotype" viewBox="34 20 98 126">
+    <path
+      fill="currentColor"
+      d="M75.76,80.91c2.78,4.16-3.13,7.34-8.87,12.96-14.37,14.08-26.6,36.68-14.11,42.15,10.73,4.7,16.83-4.62,20.66-11.41,6.38-11.3,8.03-28.93,12.58-29.07,4.55-.14,4.61,14.81,10.29,26.42,4.63,9.46,12.05,16.15,19.14,10.71,7.09-5.45,5.89-13.11,2.22-20.09-6.15-11.68-23.04-20.87-22.78-30.37.27-9.5,18.17-12.88,24.05-18.05,5.88-5.17,5.99-9.53,4.39-12.88s-5.39-6.84-14.54-.78c-4.18,2.77-14,14.67-18.41,12.44-4.41-2.24.86-10.68-.21-18.22-1.07-7.54-6.69-9.5-10.83-8.52-4.15.98-10.03,5.31-7.62,12.15s8.43,13.63,5.22,16.62c-4.85,4.53-10.15-5.73-24.23-6.24-10.04-.36-14.61,14.58,3.24,18.68,13.59,3.12,17.31-.26,19.83,3.52Z"
+    ></path>
+  </svg>
+</div>
+
+<style>
+  .intro {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js:not(.no-intro)) .intro {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--fond);
+      pointer-events: none;
+      animation: intro-out 500ms cubic-bezier(0.65, 0, 0.35, 1) 950ms forwards;
+    }
+  }
+
+  @media print {
+    :global(.js:not(.no-intro)) .intro {
+      display: none;
+    }
+  }
+
+  .intro__isotype {
+    width: 72px;
+    color: var(--accent);
+    animation:
+      intro-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+      intro-turn 500ms cubic-bezier(0.34, 1.4, 0.64, 1) 400ms forwards,
+      intro-zoom 500ms cubic-bezier(0.65, 0, 0.35, 1) 950ms forwards;
+  }
+
+  @keyframes intro-pop {
+    from {
+      opacity: 0;
+      scale: 0.6;
+    }
+  }
+
+  @keyframes intro-turn {
+    to {
+      rotate: 90deg;
+    }
+  }
+
+  @keyframes intro-zoom {
+    to {
+      opacity: 0;
+      scale: 1.35;
+    }
+  }
+
+  @keyframes intro-out {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+</style>

@@ -4,6 +4,7 @@ import { getImage } from 'astro:assets';
 import defaultOgImage from '../assets/photos/hero-artisane-vohimana.jpg';
 import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
 import Analytics from '@vercel/analytics/astro';
+import Intro from '../components/Intro.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -47,6 +48,13 @@ const ogUrl = new URL(og.src, Astro.site);
         const theme = localStorage.getItem('lhe-theme');
         if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
       } catch {}
+      // Écran d'ouverture (Intro.astro) : une fois par session.
+      try {
+        if (sessionStorage.getItem('lhe-intro')) document.documentElement.classList.add('no-intro');
+        else sessionStorage.setItem('lhe-intro', '1');
+      } catch {
+        document.documentElement.classList.add('no-intro');
+      }
       // Filet de sécurité : si le script d'apparition ne s'exécute pas, tout s'affiche.
       setTimeout(() => {
         if (!document.documentElement.dataset.revealReady) document.documentElement.classList.add('reveal-off');
@@ -80,6 +88,7 @@ const ogUrl = new URL(og.src, Astro.site);
     <slot name="head" />
   </head>
   <body>
+    <Intro />
     <a class="skip-link" href="#contenu">{dict.meta.skipLink}</a>
     <div class="site">
       <slot />
