@@ -10,7 +10,7 @@
  */
 
 const STAGGER_MS = 90;
-const INTRO_MS = 1050;
+const INTRO_MS = 800;
 
 export function initReveal() {
   const root = document.documentElement;
