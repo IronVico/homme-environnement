@@ -48,10 +48,9 @@ const ogUrl = new URL(og.src, Astro.site);
         const theme = localStorage.getItem('lhe-theme');
         if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
       } catch {}
-      // Écran d'ouverture (Intro.astro) : une fois par session.
+      // Écran d'ouverture (Intro.astro) : une fois par session, clé posée par src/scripts/intro.ts.
       try {
         if (sessionStorage.getItem('lhe-intro')) document.documentElement.classList.add('no-intro');
-        else sessionStorage.setItem('lhe-intro', '1');
       } catch {
         document.documentElement.classList.add('no-intro');
       }
@@ -95,8 +94,10 @@ const ogUrl = new URL(og.src, Astro.site);
     </div>
     <script>
       import { initImages } from '../scripts/images';
+      import { initIntro } from '../scripts/intro';
       import { initReveal } from '../scripts/reveal';
       import { initTooltips } from '../scripts/tooltip';
+      initIntro();
       initImages();
       initReveal();
       initTooltips();

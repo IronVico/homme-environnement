@@ -1,14 +1,11 @@
 ---
 /**
- * Écran d'ouverture : l'isotype se dessine au trait et se remplit, puis un rideau se
- * lève sur la page, suivi d'une bande sauge. Joué une fois par session, à la première
- * page vue (.no-intro, posé par le script du <head> de BaseLayout). Tout est en CSS :
- * l'écran part de lui-même, même si le script de la page ne charge pas, et ne capte
- * jamais les clics. Il ne s'affiche ni sans JS, ni avec prefers-reduced-motion, ni à
- * l'impression.
- *
- * Les apparitions de la page démarrent pendant que le rideau se lève : INTRO_MS dans
- * src/scripts/reveal.ts, à garder juste après --intro-lever.
+ * Écran d'ouverture, seulement quand la page a besoin de charger (src/scripts/intro.ts) :
+ * l'isotype se dessine au trait et se remplit, le rideau attend la photo principale puis
+ * se lève, suivi d'une bande sauge (.intro--lever). Si la photo est prête tout de suite,
+ * le script retire l'écran avant que rien ne se dessine. Sans ce script, l'écran part de
+ * lui-même (intro-secours). Il ne capte jamais les clics, et ne s'affiche ni sans JS, ni
+ * avec prefers-reduced-motion, ni à l'impression, ni deux fois dans une session (.no-intro).
  */
 ---
 
@@ -26,8 +23,6 @@
 
 <style>
   .intro {
-    --intro-lever: 720ms;
-    --intro-courbe: cubic-bezier(0.76, 0, 0.24, 1);
     display: none;
   }
 
@@ -39,7 +34,11 @@
       display: block;
       overflow: hidden;
       pointer-events: none;
-      animation: intro-fin 100ms linear 1300ms forwards;
+      animation: intro-secours 100ms linear 5000ms forwards;
+    }
+
+    :global(.js:not(.no-intro)) .intro.intro--lever {
+      animation: none;
     }
   }
 
@@ -56,12 +55,19 @@
     inset: 0 0 auto;
     height: 125%;
     border-radius: 0 0 50% 50% / 0 0 14vh 14vh;
-    animation: intro-lever 560ms var(--intro-courbe) var(--intro-lever) forwards;
+  }
+
+  .intro--lever .intro__bande,
+  .intro--lever .intro__rideau {
+    animation: intro-lever 560ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
   }
 
   .intro__bande {
     background: var(--accent);
-    animation-delay: calc(var(--intro-lever) + 90ms);
+  }
+
+  .intro--lever .intro__bande {
+    animation-delay: 90ms;
   }
 
   .intro__rideau {
@@ -77,7 +83,10 @@
     margin-top: calc(50vh - 56px);
     overflow: visible;
     color: var(--accent);
-    animation: intro-sortie 320ms ease-in var(--intro-lever) forwards;
+  }
+
+  .intro--lever .intro__isotype {
+    animation: intro-sortie 320ms ease-in forwards;
   }
 
   .intro__isotype path {
@@ -89,8 +98,8 @@
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
     animation:
-      intro-trait 560ms ease-in-out forwards,
-      intro-remplir 260ms ease-out 400ms forwards;
+      intro-trait 560ms ease-in-out 200ms forwards,
+      intro-remplir 260ms ease-out 600ms forwards;
   }
 
   @keyframes intro-trait {
@@ -118,7 +127,7 @@
     }
   }
 
-  @keyframes intro-fin {
+  @keyframes intro-secours {
     to {
       opacity: 0;
       visibility: hidden;
