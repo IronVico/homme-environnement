@@ -22,6 +22,7 @@ import {
   type SupportedIcon,
 } from '../data/projets-soutenus';
 import { getLang, localeUrl, t } from '../i18n';
+import { worldPoint } from '../lib/world-map';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from './Breadcrumb.astro';
 import Button from './Button.astro';
@@ -145,77 +146,82 @@ const breadcrumb = [
       >
         <SectionHeading id="carte-titre" strong={page.list.titleStrong} light={page.list.titleLight} lead={page.list.lead} />
 
-        <div class="map-card">
-          <WorldMap
-            label={page.list.mapLabel}
-            labels={SUPPORTED_COUNTRIES.map((country) => ({
-              x: country.x,
-              y: country.y,
-              anchor: 'anchor' in country ? country.anchor : undefined,
-              text: countries[country.id],
-            }))}
-          >
+        <div class="explorer" data-explorer>
+          <div class="explorer__side">
+            <div class="map-card">
+              <WorldMap
+                label={page.list.mapLabel}
+                labels={SUPPORTED_COUNTRIES.map((country) => ({
+                  x: country.x,
+                  y: country.y,
+                  anchor: 'anchor' in country ? country.anchor : undefined,
+                  text: countries[country.id],
+                }))}
+              >
+                {
+                  SUPPORTED_COUNTRIES.map((country) => {
+                    const label = page.list.pinLabel.replace('{country}', countries[country.id]);
+                    const { left, top } = worldPoint(country.px, country.py);
+                    return (
+                      <button
+                        class="pin"
+                        type="button"
+                        style={`left: ${left}; top: ${top}`}
+                        aria-label={label}
+                        aria-pressed="false"
+                        data-tooltip={label}
+                        data-country={country.id}
+                        hidden
+                      >
+                        <span class="pin__dot" aria-hidden="true" />
+                      </button>
+                    );
+                  })
+                }
+              </WorldMap>
+            </div>
+
+            <div class="filters">
+              <div class="filters__group" role="group" aria-label={page.list.filterCountry} data-filters hidden>
+                <button class="filters__pill" type="button" aria-pressed="true" data-country="all">{page.list.allCountries}</button>
+                {
+                  SUPPORTED_COUNTRIES.map((country) => (
+                    <button class="filters__pill" type="button" aria-pressed="false" data-country={country.id}>
+                      {countries[country.id]}
+                    </button>
+                  ))
+                }
+              </div>
+              <p class="filters__count" aria-live="polite" data-count>{countLabel(SUPPORTED_PROJECTS.length)}</p>
+            </div>
+          </div>
+
+          <ul class="supported-grid" aria-label={page.list.listLabel}>
             {
-              SUPPORTED_COUNTRIES.map((country) => {
-                const label = page.list.pinLabel.replace('{country}', countries[country.id]);
+              SUPPORTED_PROJECTS.map((project) => {
+                const Icon = ICONS[project.icon];
                 return (
-                  <button
-                    class="pin"
-                    type="button"
-                    style={`left: ${country.left}%; top: ${country.top}%`}
-                    aria-label={label}
-                    aria-pressed="false"
-                    data-tooltip={label}
-                    data-country={country.id}
-                    hidden
-                  >
-                    <span class="pin__dot" aria-hidden="true" />
-                  </button>
+                  <li class="supported" data-countries={project.countries.join(' ')}>
+                    <span class="supported__icon" aria-hidden="true">
+                      <Icon size={22} />
+                    </span>
+                    <h3 class="supported__title">{page.projects[project.id]}</h3>
+                    <p class="supported__place">
+                      <MapPin size={14} aria-hidden="true" />
+                      {
+                        project.countries.length > 0 ? (
+                          placeOf(project.countries)
+                        ) : (
+                          <TodoPill><span lang={todoLang}>{page.list.placeTodo}</span></TodoPill>
+                        )
+                      }
+                    </p>
+                  </li>
                 );
               })
             }
-          </WorldMap>
+          </ul>
         </div>
-
-        <div class="filters">
-          <div class="filters__group" role="group" aria-label={page.list.filterCountry} data-filters hidden>
-            <button class="filters__pill" type="button" aria-pressed="true" data-country="all">{page.list.allCountries}</button>
-            {
-              SUPPORTED_COUNTRIES.map((country) => (
-                <button class="filters__pill" type="button" aria-pressed="false" data-country={country.id}>
-                  {countries[country.id]}
-                </button>
-              ))
-            }
-          </div>
-          <p class="filters__count" aria-live="polite" data-count>{countLabel(SUPPORTED_PROJECTS.length)}</p>
-        </div>
-
-        <ul class="supported-grid" aria-label={page.list.listLabel}>
-          {
-            SUPPORTED_PROJECTS.map((project) => {
-              const Icon = ICONS[project.icon];
-              return (
-                <li class="supported" data-countries={project.countries.join(' ')}>
-                  <span class="supported__icon" aria-hidden="true">
-                    <Icon size={22} />
-                  </span>
-                  <h3 class="supported__title">{page.projects[project.id]}</h3>
-                  <p class="supported__place">
-                    <MapPin size={14} aria-hidden="true" />
-                    {
-                      project.countries.length > 0 ? (
-                        placeOf(project.countries)
-                      ) : (
-                        <TodoPill><span lang={todoLang}>{page.list.placeTodo}</span></TodoPill>
-                      )
-                    }
-                  </p>
-                </li>
-              );
-            })
-          }
-        </ul>
       </div>
     </section>
 
@@ -280,10 +286,14 @@ const breadcrumb = [
    * Filtre par pays : un pays à la fois (« all » : pas de filtre). Repères de la carte et
    * pastilles portent le même data-country. Un second clic sur le pays actif réaffiche tout.
    */
+  const STICKY_TOP = 104; // même valeur que .explorer__side
+
   document.querySelectorAll<HTMLElement>('[data-supported]').forEach((root) => {
     const buttons = [...root.querySelectorAll<HTMLButtonElement>('button[data-country]')];
     const cards = [...root.querySelectorAll<HTMLElement>('li[data-countries]')];
     const count = root.querySelector<HTMLElement>('[data-count]');
+    const explorer = root.querySelector<HTMLElement>('[data-explorer]');
+    const twoColumns = window.matchMedia('(min-width: 1081px)');
     const { countOne = '', countMany = '' } = root.dataset;
 
     let current = 'all';
@@ -304,6 +314,9 @@ const breadcrumb = [
       button.addEventListener('click', () => {
         current = button.dataset.country === current ? 'all' : button.dataset.country!;
         render();
+        // Deux colonnes : la liste raccourcit, on ramène le haut de la section sous le header.
+        const top = explorer ? explorer.getBoundingClientRect().top - STICKY_TOP : 0;
+        if (twoColumns.matches && top < 0) window.scrollBy({ top });
       });
     });
 
@@ -382,6 +395,19 @@ const breadcrumb = [
     line-height: 1.45;
   }
 
+  .explorer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .explorer__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    min-width: 0;
+  }
+
   .map-card {
     padding: clamp(12px, 3vw, 36px);
     border-radius: var(--radius-block);
@@ -409,8 +435,8 @@ const breadcrumb = [
 
   .pin__dot {
     box-sizing: content-box;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border: 2px solid var(--surface);
     border-radius: var(--radius-pill);
     background: var(--bouton-plein);
@@ -422,8 +448,8 @@ const breadcrumb = [
   }
 
   .pin[aria-pressed='true'] .pin__dot {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     box-shadow: 0 0 0 3px var(--bouton-plein);
   }
 
@@ -625,6 +651,46 @@ const breadcrumb = [
     .supported-grid,
     .followed-grid {
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Deux colonnes : la carte et les filtres restent à l'écran pendant qu'on parcourt la liste. */
+  @media (min-width: 1081px) {
+    .explorer {
+      display: grid;
+      grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+      align-items: start;
+      gap: var(--space-8);
+    }
+
+    .supported-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
+    }
+
+    .supported {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 4px var(--space-5);
+      padding: var(--space-5);
+    }
+
+    .supported__icon {
+      grid-row: 1 / span 2;
+    }
+
+    .supported .supported__place {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+  }
+
+  /* Sur un écran bas, la colonne ne tiendrait pas : elle défile avec la page. */
+  @media (min-width: 1081px) and (min-height: 760px) {
+    .explorer__side {
+      position: sticky;
+      top: 104px;
     }
   }
 

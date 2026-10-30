@@ -30,22 +30,21 @@ export const COMPANIES = [
 
 /**
  * Pays de la carte, dans l'ordre des filtres.
- * left, top : repère du pays, en % de la carte.
- * x, y, anchor : nom du pays dans le repère du SVG (src/lib/world-map.ts).
+ * px, py : repère du pays (Côte d'Ivoire, Burkina Faso et Ghana écartés pour garder 24px entre deux cibles à 1440px) ; x, y, anchor : nom du pays. Dans le repère du SVG (src/lib/world-map.ts).
  */
 export const SUPPORTED_COUNTRIES = [
-  { id: 'co', left: 13.33, top: 50, x: 168, y: 296 },
-  { id: 'ma', left: 38.15, top: 19.57, x: 462, y: 115 },
-  { id: 'sn', left: 35.19, top: 38.59, x: 407, y: 226, anchor: 'end' },
-  { id: 'ci', left: 38.33, top: 46.2, x: 442, y: 297, anchor: 'end' },
-  { id: 'bf', left: 40, top: 40.76, x: 486, y: 239 },
-  { id: 'gh', left: 40.37, top: 46.74, x: 480, y: 310, anchor: 'middle' },
-  { id: 'cm', left: 45.19, top: 48.37, x: 547, y: 288 },
-  { id: 'cd', left: 49.26, top: 57.61, x: 595, y: 354 },
-  { id: 'mg', left: 58.15, top: 75.54, x: 702, y: 461 },
-  { id: 'in', left: 69.63, top: 32.61, x: 836, y: 194 },
-  { id: 'my', left: 78.52, top: 50, x: 920, y: 294, anchor: 'end' },
-  { id: 'id', left: 85.19, top: 56.52, x: 1021, y: 349 },
+  { id: 'co', px: 158, py: 300, x: 178, y: 296 },
+  { id: 'ma', px: 452, py: 117, x: 472, y: 115 },
+  { id: 'sn', px: 417, py: 232, x: 397, y: 226, anchor: 'end' },
+  { id: 'ci', px: 444, py: 277, x: 428, y: 297, anchor: 'end' },
+  { id: 'bf', px: 474, py: 238, x: 494, y: 239 },
+  { id: 'gh', px: 484, py: 282, x: 484, y: 312, anchor: 'middle' },
+  { id: 'cm', px: 535, py: 290, x: 557, y: 288 },
+  { id: 'cd', px: 583, py: 346, x: 605, y: 354 },
+  { id: 'mg', px: 688, py: 453, x: 712, y: 461 },
+  { id: 'in', px: 824, py: 196, x: 846, y: 194 },
+  { id: 'my', px: 930, py: 300, x: 910, y: 294, anchor: 'end' },
+  { id: 'id', px: 1009, py: 339, x: 1031, y: 349 },
 ] as const;
 
 export type SupportedCountry = (typeof SUPPORTED_COUNTRIES)[number]['id'];

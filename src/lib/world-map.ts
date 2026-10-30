@@ -1,12 +1,21 @@
 /**
  * Carte du monde de la page « Autres projets soutenus » (projection équirectangulaire,
- * repère de 1184 × 600) : tracés repris de la maquette. Les repères et les noms des pays
+ * repère de 1184 × 600, cadré à l'affichage) : tracés repris de la maquette. Les repères et les noms des pays
  * sont dans src/data/projets-soutenus.ts, exprimés dans ce même repère.
  */
 
-export const WORLD_WIDTH = 1184;
-export const WORLD_HEIGHT = 600;
-export const WORLD_VIEWBOX = `0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`;
+
+/** Cadrage affiché : moins d'océan et de pôles, pour agrandir les pays dans la colonne. */
+const CROP = { x: 120, y: 60, width: 1030, height: 440 };
+export const WORLD_VIEWBOX = `${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`;
+
+/** Position d'un point du repère, en % de la carte cadrée. */
+export function worldPoint(x: number, y: number): { left: string; top: string } {
+  return {
+    left: `${(((x - CROP.x) / CROP.width) * 100).toFixed(2)}%`,
+    top: `${(((y - CROP.y) / CROP.height) * 100).toFixed(2)}%`,
+  };
+}
 
 /** Toutes les terres. */
 export const WORLD_LAND_PATH =
