@@ -509,6 +509,8 @@ const fr = {
       titleLight: "aujourd'hui",
       lead: "L'Homme & l'Environnement s'est concentré sur des engagements à long terme, jugés nécessaires pour assurer de vraies capacités de prise en main par les communautés locales des programmes de gestion durable de l'environnement. Outre Madagascar, nous continuons de suivre principalement :",
       photoTodo: '[photo à fournir]',
+      /** La photo porte le logo et la devise de HISA : le texte alternatif les reprend. */
+      tanzanieAlt: 'Logo de HISA, « Protection de la faune sauvage », au-dessus de trois éléphants dans la savane',
       items: {
         burkina: {
           place: 'Burkina Faso',
@@ -518,7 +520,7 @@ const fr = {
         tanzanie: {
           place: 'Tanzanie',
           title: 'Corridors des éléphants',
-          text: 'Soutien aux femmes et aux jeunes du corridor de Gongo.',
+          text: 'Première forêt partagée hommes-éléphants, créée par les ONG française et tanzanienne HISA et SANA. Notre volet : aider à valoriser, pour les femmes et les jeunes du corridor de Gongo, des ressources naturelles locales qui ne soient pas en compétition avec les éléphants.',
         },
         cameroun: {
           place: 'Cameroun',

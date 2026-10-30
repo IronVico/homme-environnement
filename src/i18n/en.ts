@@ -175,6 +175,7 @@ const en: Dictionary = {
       titleLight: 'today',
       lead: 'Man & the Environment has focused on long-term commitments, considered necessary to ensure that local communities can truly take ownership of sustainable environmental management programmes. Besides Madagascar, we mainly continue to follow:',
       photoTodo: '[photo à fournir]',
+      tanzanieAlt: 'HISA logo, “Protection de la faune sauvage” (wildlife protection), above three elephants in the savannah',
       items: {
         burkina: {
           place: 'Burkina Faso',
@@ -184,7 +185,7 @@ const en: Dictionary = {
         tanzanie: {
           place: 'Tanzania',
           title: 'Elephant corridors',
-          text: 'Support for women and young people in the Gongo corridor.',
+          text: 'The first forest shared by people and elephants, created by the French and Tanzanian NGOs HISA and SANA. Our part: helping women and young people in the Gongo corridor to add value to local natural resources that do not compete with elephants.',
         },
         cameroun: {
           place: 'Cameroon',

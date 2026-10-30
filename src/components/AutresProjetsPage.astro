@@ -37,6 +37,7 @@ import WorldMap from './WorldMap.astro';
 
 import ctaPhoto from '../assets/photos/engager-entreprises.jpg';
 import burkinaPhoto from '../assets/photos/pays-burkina-elephants.jpg';
+import tanzaniePhoto from '../assets/photos/projets-soutenus-hisa.jpg';
 import teamPhoto from '../assets/photos/projets-soutenus-equipe-cameroun.jpg';
 import heroPhoto from '../assets/photos/projets-soutenus-nicaragua.jpg';
 
@@ -85,10 +86,10 @@ const countLabel = (count: number) => (count > 1 ? page.list.countMany : page.li
 const placeOf = (ids: readonly SupportedCountry[]) => ids.map((id) => countries[id]).join(page.list.placeSeparator);
 
 const followed = [
-  { ...page.followed.items.burkina, image: burkinaPhoto },
-  { ...page.followed.items.tanzanie, image: undefined },
-  { ...page.followed.items.cameroun, image: teamPhoto },
-  { ...page.followed.items.perou, image: undefined },
+  { ...page.followed.items.burkina, image: burkinaPhoto, imageAlt: '' },
+  { ...page.followed.items.tanzanie, image: tanzaniePhoto, imageAlt: page.followed.tanzanieAlt },
+  { ...page.followed.items.cameroun, image: teamPhoto, imageAlt: '' },
+  { ...page.followed.items.perou, image: undefined, imageAlt: '' },
 ];
 
 const breadcrumb = [
@@ -231,14 +232,14 @@ const breadcrumb = [
         <SectionHeading id="suivi-titre" strong={page.followed.titleStrong} light={page.followed.titleLight} lead={page.followed.lead} />
         <div class="followed-grid">
           {
-            followed.map(({ place, title, text, image }) => (
+            followed.map(({ place, title, text, image, imageAlt }) => (
               <article class="followed" data-reveal>
                 {
                   image ? (
                     <Picture
                       class="followed__photo"
                       src={image}
-                      alt=""
+                      alt={imageAlt}
                       formats={['avif', 'webp']}
                       widths={[320, 520, 720]}
                       sizes="(max-width: 700px) 100vw, (max-width: 1000px) 50vw, 310px"
