@@ -1,10 +1,10 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
+import Intro from '../components/Intro.astro';
 import defaultOgImage from '../assets/photos/hero-artisane-vohimana.jpg';
 import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
 import Analytics from '@vercel/analytics/astro';
-import Intro from '../components/Intro.astro';
 import '../styles/global.css';
 
 interface Props {
