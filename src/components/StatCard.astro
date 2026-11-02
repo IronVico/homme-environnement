@@ -21,15 +21,19 @@ interface Props {
    * ring : 30 traits (années). bars : barres croissantes. dots : pastilles (1 = 1 000 ha).
    * sites : 5 pastilles en cercle (un par site). share : anneau rempli à value %. families : deux silhouettes.
    * water : goutte au-dessus de vagues (accès à l'eau).
+   * ticks, grid, segments : un élément par unité (`count`), en traits autour d'un point,
+   * en grille de pastilles ou en anneau de segments.
    */
-  illustration?: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families' | 'water';
+  illustration?: 'ring' | 'bars' | 'dots' | 'sites' | 'share' | 'families' | 'water' | 'ticks' | 'grid' | 'segments';
   /** Nom de l'illustration pour les lecteurs d'écran (l'icône de la variante est décorative). */
   illustrationLabel?: string;
   /** share : part de l'anneau remplie, entre 0 et 1 (par défaut value / 100). */
   ratio?: number;
+  /** ticks, grid, segments : nombre d'éléments dessinés. */
+  count?: number;
 }
 
-const { value, prefix, unit, suffix, text, illustration, illustrationLabel, ratio } = Astro.props;
+const { value, prefix, unit, suffix, text, illustration, illustrationLabel, ratio, count = 0 } = Astro.props;
 
 const NBSP = '\u00a0';
 const numberLocale = getLang(Astro.currentLocale) === 'en' ? 'en-GB' : 'fr-FR';
@@ -70,6 +74,32 @@ const sitePoints = [
   { cx: 33, cy: 76, fill: 'var(--texte)' },
   { cx: 22, cy: 42, fill: 'var(--don)' },
 ];
+
+// Point à un rayon et un angle (en tours, sens horaire depuis midi) du centre de l'illustration.
+const polar = (r: number, turn: number) => ({
+  x: (50 + r * Math.sin(turn * 2 * Math.PI)).toFixed(1),
+  y: (50 - r * Math.cos(turn * 2 * Math.PI)).toFixed(1),
+});
+
+const ticks = Array.from({ length: count }, (_, i) => {
+  const [from, to] = [polar(34, i / count), polar(44, i / count)];
+  return { x1: from.x, y1: from.y, x2: to.x, y2: to.y };
+});
+
+// Grille de 7 colonnes, centrée en hauteur ; la première pastille en pêche, une sur trois en basalte.
+const GRID_COLUMNS = 7;
+const gridRows = Math.ceil(count / GRID_COLUMNS);
+const gridDots = Array.from({ length: count }, (_, i) => ({
+  cx: 14 + (i % GRID_COLUMNS) * 12,
+  cy: 50 + (Math.floor(i / GRID_COLUMNS) - (gridRows - 1) / 2) * 18,
+  fill: i === 0 ? 'var(--don)' : i % 3 === 0 ? 'var(--texte)' : 'var(--accent)',
+}));
+
+// Anneau de segments : chaque segment occupe 72 % de sa part, le reste est l'espace entre deux.
+const segments = Array.from({ length: count }, (_, i) => {
+  const [from, to] = [polar(38, i / count), polar(38, (i + 0.72) / count)];
+  return `M${from.x} ${from.y}A38 38 0 0 1 ${to.x} ${to.y}`;
+});
 
 const dots = [
   { cx: 24, cy: 36 },
@@ -160,6 +190,42 @@ const dots = [
           <path class="stat-card__step stat-card__dot" style="--i: 2; fill: var(--texte)" d="M10 82c2-14 10-22 20-22s18 8 20 22Z" />
           <path class="stat-card__step stat-card__dot" style="--i: 3; fill: var(--texte)" d="M50 82c2-14 10-22 20-22s18 8 20 22Z" />
           <circle class="stat-card__step stat-card__dot" style="--i: 4; fill: var(--don)" cx="50" cy="54" r="7" />
+        </>
+      )
+    }
+    {
+      illustration === 'ticks' && (
+        <>
+          <circle cx="50" cy="50" r="26" style="fill: var(--accent)" fill-opacity="0.3" />
+          {ticks.map((t, i) => (
+            <line
+              class="stat-card__step"
+              style={`--i: ${i}; stroke: var(--texte)`}
+              x1={t.x1}
+              y1={t.y1}
+              x2={t.x2}
+              y2={t.y2}
+              stroke-width="5"
+              stroke-linecap="round"
+            />
+          ))}
+          <circle cx="50" cy="50" r="7" style="fill: var(--don)" />
+        </>
+      )
+    }
+    {
+      illustration === 'grid' &&
+        gridDots.map((d, i) => (
+          <circle class="stat-card__step stat-card__dot" style={`--i: ${i}; fill: ${d.fill}`} cx={d.cx} cy={d.cy} r="5" />
+        ))
+    }
+    {
+      illustration === 'segments' && (
+        <>
+          {segments.map((d, i) => (
+            <path class="stat-card__step stat-card__dot" style={`--i: ${i}; stroke: var(--texte)`} d={d} fill="none" stroke-width="12" />
+          ))}
+          <circle cx="50" cy="50" r="7" style="fill: var(--don)" />
         </>
       )
     }

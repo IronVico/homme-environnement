@@ -109,6 +109,12 @@ Rappels :
 - Logo de la version anglaise : variante « Man & the Environment » (LOGO-ENG-2 de la charte), jamais la version « Human ».
 - **V1** : l'interface anglaise (menus, boutons, libellés d'accessibilité) est traduite ; le contenu de la home anglaise est encore une copie du français, à traduire (`home` dans `en.ts`).
 
+## Partage (Open Graph)
+
+- Chaque page a son image de partage 1200×630, générée au build (`src/lib/og.ts`, servie par `src/pages/og/[...page].png.ts`) : logo et titre du hero à gauche, courbes de niveau à droite. Satori + resvg, police Rubik de `@fontsource/rubik` : aucun service externe, rien à exécuter sur le serveur.
+- Les titres viennent de l'i18n (`hero.titleStrong` / `titleLight` des pages de `PAGES`) et des collections (nom et accroche des fiches). Une nouvelle page de `PAGES` a donc son image d'office ; une page absente de la liste (404, 500) reçoit celle de l'accueil.
+- Accueil seulement : vidéo de partage (`public/video/partage-accueil-fr.mp4` et `-en.mp4`, 8 s en boucle), lue par Discord, Telegram, parfois iMessage ; ailleurs, l'image fixe s'affiche. Elle n'est pas générée au build : si le titre de l'accueil change, la refaire (page HTML de la composition animée enregistrée image par image avec puppeteer-core, 30 i/s, puis `ffmpeg -framerate 30 -i f%04d.png -c:v libx264 -preset veryslow -crf 23 -pix_fmt yuv420p -movflags +faststart`).
+
 ## Animations et accessibilité
 
 Règles à suivre pour toute nouvelle page (WCAG 2.2 AA, modes clair et sombre, vérifications avant PR) : [`CLAUDE.md`](CLAUDE.md).

@@ -62,7 +62,7 @@ const breadcrumb = [
 const contentLang = lang === 'en' ? 'fr' : undefined;
 ---
 
-<BaseLayout title={page.title} description={page.description} ogImage={heroGuide} ogImageAlt={page.hero.imageAlt}>
+<BaseLayout title={page.title} description={page.description}>
   <Header current="engager" />
   <Breadcrumb items={breadcrumb} current={page.title} />
 
