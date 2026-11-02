@@ -25,7 +25,6 @@ import PhotoBanner from './PhotoBanner.astro';
 import SectionHeading from './SectionHeading.astro';
 
 import ctaPhoto from '../assets/photos/pilier-economie-fete-ambohidravy.jpg';
-import ogPhoto from '../assets/photos/ong/cascade-vohimana.jpg';
 
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
@@ -73,7 +72,7 @@ const breadcrumb = [
 ];
 ---
 
-<BaseLayout title={page.title} description={page.description} ogImage={ogPhoto} ogImageAlt={GALLERY_PHOTOS[0]?.alt}>
+<BaseLayout title={page.title} description={page.description}>
   <Header current="ressources" />
   <Breadcrumb items={breadcrumb} current={page.title} />
 

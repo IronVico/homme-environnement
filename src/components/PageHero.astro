@@ -296,6 +296,16 @@ const photoSizes = `(max-width: 1100px) 100vw, ${coverWidth}px`;
     border-radius: 160px 160px 20px 20px;
   }
 
+  /* Côte à côte, sur un écran bas : la photo tient dans le premier écran : elle rétrécit en gardant son format 4:5, calée à droite. */
+  @media (min-width: 1081px) {
+    .page-hero--photo :global(.page-hero__photo) {
+      width: auto;
+      max-width: 100%;
+      height: min(575px, max(360px, calc(100svh - var(--header-h) - var(--crumb-h) - var(--hero-pt) - var(--hero-pb))));
+      margin-left: auto;
+    }
+  }
+
   /* Empilé : la photo passe sous le texte et prend toute la largeur. */
   @media (max-width: 1080px) {
     .page-hero {

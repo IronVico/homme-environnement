@@ -410,6 +410,11 @@ const fr = {
       madagascar: 'Madagascar',
       'burkina-faso': 'Burkina Faso',
     },
+    /** Lien vers la page « Autres projets soutenus », sous la liste. */
+    more: {
+      text: "De 2010 à 2019, nous avons aussi soutenu d'autres projets, partout dans le monde.",
+      link: 'Autres projets soutenus',
+    },
     cta: {
       titleStrong: 'Venez voir nos projets',
       titleLight: 'sur le terrain.',
@@ -418,6 +423,125 @@ const fr = {
     },
   },
   // Fiche projet (gabarit commun, maquette FicheProjet). Le contenu propre à chaque projet est dans src/content/projets.
+  /** Page « Autres projets soutenus ». Données et chiffres dans src/data/projets-soutenus.ts. */
+  autresProjets: {
+    title: 'Autres projets soutenus',
+    description:
+      "De 2010 à 2019, L'Homme & l'Environnement a développé partout dans le monde des projets de conservation de la biodiversité, avec les communautés locales et des entreprises privées.",
+    hero: {
+      titleStrong: 'Autres projets soutenus,',
+      titleLight: 'partout dans le monde.',
+      lead: "De 2010 à 2019, grâce à l'engagement pour la Nature de Xavier Marie, fondateur de Maisons du Monde, L'Homme & l'Environnement a relevé le challenge de montrer que partout dans le monde il était possible de développer des projets de conservation de la biodiversité, en créant le lien entre les communautés locales et des entreprises privées autour de filières d'ingrédients naturels.",
+      imageAlt: 'Oiseau dans un palmier chargé de fruits, Nicaragua',
+      cta: 'Voir les projets',
+    },
+    stats: {
+      label: 'Le programme en chiffres',
+      yearsText: 'dix ans de programme avec les entreprises.',
+      yearsLabel: '10 traits, un par année du programme',
+      projectsText: 'projets de conservation développés.',
+      projectsLabel: '21 points, un par projet',
+      countriesText: 'pays, sur trois continents.',
+      countriesLabel: 'Anneau de 17 segments, un par pays',
+    },
+    companies: {
+      titleStrong: 'Des entreprises',
+      titleLight: 'à nos côtés',
+      intro: 'Ces projets ont été développés avec, systématiquement, des entreprises privées comme partenaires financiers.',
+      listLabel: 'Entreprises partenaires',
+      outro: 'Le programme a ensuite été transmis aux acteurs locaux.',
+      imageAlt: "L'équipe en tenue de randonnée, sacs au dos, pose sur un chemin en forêt",
+      caption: "Président, Responsable stratégique et Directrice de L'Homme & l'Environnement avec les équipes d'ERuDeF au Cameroun en 2012.",
+    },
+    list: {
+      titleStrong: 'Sur trois continents,',
+      titleLight: 'une même approche',
+      lead: "Protéger une espèce ou une forêt en créant, avec les communautés locales, une filière d'ingrédients naturels.",
+      mapLabel: "Carte du monde : pays où des projets ont été menés, de la Colombie à l'Indonésie",
+      /** {country} : nom du pays. */
+      pinLabel: 'Voir les projets : {country}',
+      filterCountry: 'Filtrer par pays',
+      allCountries: 'Tous les pays',
+      /** {count} : nombre de projets affichés. */
+      countOne: '{count} projet',
+      countMany: '{count} projets',
+      listLabel: 'Projets menés',
+      /** Entre deux pays d'un même projet. */
+      placeSeparator: ' et ',
+      placeTodo: '[pays à confirmer]',
+    },
+    /** Noms des pays, par identifiant (src/data/projets-soutenus.ts). */
+    countries: {
+      co: 'Colombie',
+      ma: 'Maroc',
+      sn: 'Sénégal',
+      ci: "Côte d'Ivoire",
+      bf: 'Burkina Faso',
+      gh: 'Ghana',
+      cm: 'Cameroun',
+      cd: 'R.D. Congo',
+      mg: 'Madagascar',
+      in: 'Inde',
+      my: 'Malaisie',
+      id: 'Indonésie',
+    },
+    /** Titres des projets, par identifiant (src/data/projets-soutenus.ts). */
+    projects: {
+      tamarin: 'Sauver le tamarin titi grâce au noyer maya',
+      saloum: "Encourager l'entrepreneuriat féminin dans le delta du Saloum",
+      argan: "La sauvegarde de l'abeille du Sahara par les productrices d'huile d'argan",
+      balanites: 'La filière balanites pour préserver le massif sahélien de Korko',
+      karite: 'Le karité et le miel pour la sauvegarde de la grande faune africaine',
+      'kwabre-tanoe': "La réserve transfrontalière de Kwabre-Tanoé pour sauver de l'extinction 3 primates africains",
+      'nord-sud': 'Un partenariat Nord-Sud exemplaire',
+      'produits-foret': 'Valoriser les produits de la forêt pour améliorer les revenus des populations autochtones',
+      'cross-river': "De l'huile de palme pour sauver le gorille de Cross River",
+      dja: 'Des beurres végétaux pour la préservation de la réserve du Dja',
+      oku: "Miel blanc et cire d'abeille : deux alternatives pour sauver la forêt du mont Oku",
+      bonobo: 'Concilier préservation du bonobo et développement économique des populations locales',
+      lemur: 'Appuyer le développement local pour sauver le grand lémur bambou',
+      loris: "Lutter contre l'extinction des loris par la création durable de revenus",
+      tigre: 'Sauver le tigre de Malaisie grâce à la restauration du corridor de Sungai Yu',
+      rotin: "Soutenir l'exploitation durable de la ressource en rotin en périphérie du parc national de Lore Lindu",
+    },
+    followed: {
+      titleStrong: 'Ce que nous suivons',
+      titleLight: "aujourd'hui",
+      lead: "L'Homme & l'Environnement s'est concentré sur des engagements à long terme, jugés nécessaires pour assurer de vraies capacités de prise en main par les communautés locales des programmes de gestion durable de l'environnement. Outre Madagascar, nous continuons de suivre principalement :",
+      photoTodo: '[photo à fournir]',
+      /** La photo porte le logo et la devise de HISA : le texte alternatif les reprend. */
+      tanzanieAlt: 'Logo de HISA, « Protection de la faune sauvage », au-dessus de trois éléphants dans la savane',
+      items: {
+        burkina: {
+          place: 'Burkina Faso',
+          title: 'Corridors des éléphants',
+          text: 'Soutien aux femmes et aux jeunes du corridor de Nazinga-Kaboré Tambi.',
+        },
+        tanzanie: {
+          place: 'Tanzanie',
+          title: 'Corridors des éléphants',
+          text: 'Première forêt partagée hommes-éléphants, créée par les ONG française et tanzanienne HISA et SANA. Notre volet : aider à valoriser, pour les femmes et les jeunes du corridor de Gongo, des ressources naturelles locales qui ne soient pas en compétition avec les éléphants.',
+        },
+        cameroun: {
+          place: 'Cameroun',
+          title: 'Corridor des chimpanzés',
+          text: 'Soutien aux femmes et aux jeunes du corridor de Deng Deng – Dja.',
+        },
+        perou: {
+          place: 'Pérou',
+          title: 'Forêts de Casitas',
+          text: 'Valorisation du Palo Santo pour la conservation des forêts.',
+        },
+      },
+    },
+    cta: {
+      titleStrong: 'Soutenir nos projets,',
+      titleLight: "c'est agir avec les communautés locales.",
+      text: 'Votre don finance directement les actions sur le terrain.',
+      projects: 'Tous nos projets',
+    },
+  },
+
   projet: {
     /** Valeur ou texte pas encore fourni par l'ONG (affiché tel quel sur la page). */
     missing: '[à fournir]',

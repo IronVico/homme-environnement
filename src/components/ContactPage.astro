@@ -29,8 +29,6 @@ import InfoNote from './InfoNote.astro';
 import SectionHeading from './SectionHeading.astro';
 import TodoPill from './TodoPill.astro';
 
-import ogPhoto from '../assets/photos/hero-artisane-vohimana.jpg';
-
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const page = dict.contact;
@@ -46,7 +44,7 @@ const moreCards = [
 ];
 ---
 
-<BaseLayout title={page.title} description={page.description} ogImage={ogPhoto} noindex>
+<BaseLayout title={page.title} description={page.description} noindex>
   <Header current="contact" />
   <Breadcrumb items={breadcrumb} current={page.title} />
 
