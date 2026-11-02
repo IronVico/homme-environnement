@@ -26,7 +26,6 @@ import SectionHeading from './SectionHeading.astro';
 import TodoPill from './TodoPill.astro';
 
 import ctaPhoto from '../assets/photos/pays-madagascar.jpg';
-import ogPhoto from '../assets/photos/hero-artisane-vohimana.jpg';
 
 const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
@@ -63,7 +62,7 @@ const breadcrumb = [
 ];
 ---
 
-<BaseLayout title={page.title} description={page.description} ogImage={ogPhoto} noindex>
+<BaseLayout title={page.title} description={page.description} noindex>
   <Header current="ressources" />
   <Breadcrumb items={breadcrumb} current={page.title} />
 

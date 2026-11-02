@@ -1,17 +1,12 @@
 ---
-import type { ImageMetadata } from 'astro';
-import { getImage } from 'astro:assets';
-import defaultOgImage from '../assets/photos/hero-artisane-vohimana.jpg';
 import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
+import { ogImageFor } from '../lib/og';
 import Analytics from '@vercel/analytics/astro';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
-  /** Image de partage (Open Graph), recadrée en 1200×630. */
-  ogImage?: ImageMetadata;
-  ogImageAlt?: string;
   /** Page encore incomplète (contenu « [à fournir] ») : pas d'indexation par les moteurs. */
   noindex?: boolean;
 }
@@ -20,7 +15,7 @@ const lang = getLang(Astro.currentLocale);
 const dict = t(lang);
 const SITE_NAME = dict.meta.siteName;
 
-const { title, description, ogImage = defaultOgImage, ogImageAlt = dict.home.hero.imageAlt, noindex = false } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 
 const fullTitle = title === SITE_NAME ? title : `${title} | ${SITE_NAME}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -30,8 +25,14 @@ const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
   code,
   href: new URL(localeUrl(code, path), Astro.site),
 }));
-const og = await getImage({ src: ogImage, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+// Image de partage générée au build pour chaque page (src/lib/og.ts), celle de l'accueil en repli.
+const og = await ogImageFor(lang, Astro.url.pathname);
 const ogUrl = new URL(og.src, Astro.site);
+// Accueil : vidéo de partage (courbes de niveau animées, 8 s en boucle), lue par Discord, Telegram,
+// parfois iMessage ; partout ailleurs, l'image fixe reste affichée.
+// Test sur l'URL et non sur `path`, qui vaut aussi « » sur la 404.
+const isHome = /^\/(en\/?)?$/.test(Astro.url.pathname);
+const ogVideo = isHome ? new URL(`/video/partage-accueil-${lang}.mp4`, Astro.site) : undefined;
 ---
 
 <!doctype html>
@@ -73,10 +74,23 @@ const ogUrl = new URL(og.src, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:image:alt" content={og.alt} />
+    {
+      ogVideo && (
+        <>
+          <meta property="og:video" content={ogVideo} />
+          <meta property="og:video:type" content="video/mp4" />
+          <meta property="og:video:width" content="1200" />
+          <meta property="og:video:height" content="630" />
+        </>
+      )
+    }
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogUrl} />
+    <meta name="twitter:image:alt" content={og.alt} />
     <slot name="head" />
   </head>
   <body>

@@ -37,7 +37,7 @@ const links = [
 const enNotFound = localeUrl('en', '404');
 ---
 
-<BaseLayout title={page.title} description={page.description} ogImage={photo} noindex>
+<BaseLayout title={page.title} description={page.description} noindex>
   {
     lang === 'fr' ? (
       <script is:inline slot="head" define:vars={{ enNotFound }}>
