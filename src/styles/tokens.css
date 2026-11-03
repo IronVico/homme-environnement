@@ -118,6 +118,7 @@
   --motif-opacite: 1; /* courbes de niveau : ×0,6 en sombre */
   --aquarelle-1: 0.16; /* lavis sauge sous l'île de la carte, deux couches */
   --aquarelle-2: 0.14;
+  --aquarelle-bord: #667857; /* bord plus foncé du lavis, identique dans les deux modes */
   --carte-capitale: var(--blanc); /* point de la capitale, sur l'île sauge */
   --ombre-teinte: var(--basalte); /* teinte des ombres hors ombre carte (mélangée en color-mix) */
   --ombre-papier: rgba(67, 72, 64, 0.14); /* ombre nette du tampon */
