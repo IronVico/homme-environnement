@@ -1826,25 +1826,27 @@ const fr = {
     open: 'Une question ?',
     title: 'Une question ?',
     close: 'Fermer',
-    /** Avant le prénom de la membre de l'équipe, pour les lecteurs d'écran. */
+    /** Avant chaque message de la membre de l'équipe (son prénom à la suite), pour les lecteurs d'écran. */
     hostSays: 'écrit :',
-    you: 'Vous',
     youSay: 'Vous avez écrit :',
     greeting: 'Bonjour ! Posez-nous votre question, on vous répond par e-mail sous quelques jours.',
-    required: 'Tous les champs sont obligatoires.',
+    askEmail: 'Merci ! À quelle adresse e-mail pouvons-nous vous répondre ?',
+    /** Suivi du lien vers la politique de confidentialité. */
+    askConsent: "Dernière étape : votre adresse sert uniquement à vous répondre, rien d'autre. ",
+    privacyLink: 'Lire la politique de confidentialité',
+    /** Valeur du consentement envoyée avec le message (même règle que la page Contact). */
+    consentButton: "J'accepte, envoyer",
     message: 'Votre question',
+    messagePlaceholder: 'Écrivez votre question…',
     email: 'Votre adresse e-mail',
     emailPlaceholder: 'nom@exemple.fr',
-    emailHelp: 'Uniquement pour vous répondre.',
-    consent: "J'accepte que mes données personnelles soient utilisées uniquement pour répondre à ma demande.",
-    privacyLink: 'Lire la politique de confidentialité',
+    send: 'Envoyer',
+    another: 'Poser une autre question',
     trap: 'Ne remplissez pas ce champ',
-    submit: 'Envoyer',
     errors: {
       message: 'Écrivez votre question.',
       email: 'Indiquez votre adresse e-mail.',
       emailInvalid: 'Cette adresse e-mail semble incomplète. Exemple : nom@exemple.fr',
-      consentement: 'Cochez cette case pour que nous puissions vous répondre.',
       /** {max} : nombre de caractères autorisés. */
       tooLong: 'Ce texte est trop long : {max} caractères au maximum.',
     },
@@ -1853,6 +1855,7 @@ const fr = {
     /** Envoi impossible : lien mailto prérempli à la suite. */
     failed: "Le message n'a pas pu partir. Vous pouvez l'envoyer depuis votre messagerie : ",
     failedLink: 'ouvrir un e-mail prérempli',
+    retry: "Réessayer l'envoi",
     /** Objet de l'e-mail prérempli. */
     mailSubject: 'Question rapide',
   },

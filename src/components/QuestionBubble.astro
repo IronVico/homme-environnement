@@ -6,6 +6,9 @@
  * - Avec JS : le lien devient un bouton qui ouvre un <dialog> modal (focus piégé par le navigateur,
  *   Échap ferme, focus rendu à la bulle). Le panneau est cloné depuis un <template> à la première
  *   ouverture. Panneau ancré au-dessus de la bulle sur ordinateur, plein écran sous 700px.
+ * Échange en trois temps, une seule zone de saisie en bas : la question, l'adresse e-mail, puis
+ * l'accord (bouton « J'accepte, envoyer »). Les réponses de la membre de l'équipe sont annoncées
+ * par la zone role="status". Une deuxième question réutilise l'adresse et l'accord.
  * Envoi : le même que la page Contact (CONTACT_ENDPOINT, règles de src/lib/contact.ts, champ piège),
  * sujet QUESTION_SUBJECT, sans nom. Membre de l'équipe qui signe : src/data/question.ts.
  */
@@ -22,6 +25,7 @@ import Portrait from './Portrait.astro';
 const lang = getLang(Astro.currentLocale);
 const q = t(lang).question;
 const host = QUESTION_HOST;
+const hostSays = `${host.firstName} ${q.hostSays} `;
 const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
 ---
 
@@ -67,100 +71,116 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
       </div>
 
       <div class="question__body" data-question-body>
-        <div class="question__thread">
+        <div class="question__thread" data-question-thread>
           <p class="question__msg question__msg--host">
-            <span class="visually-hidden">{host.firstName} {q.hostSays} </span>{q.greeting}
+            <span class="visually-hidden">{hostSays}</span>{q.greeting}
           </p>
-          <div class="question__status" role="status" data-question-status></div>
+        </div>
+      </div>
+
+      <!-- Réponses de la membre de l'équipe, annoncées aux lecteurs d'écran (le fil n'est pas une zone live). -->
+      <p class="visually-hidden" role="status" data-question-status></p>
+
+      <form
+        class="question__composer"
+        action={CONTACT_ENDPOINT}
+        method="post"
+        aria-labelledby="question-titre"
+        data-question-form
+        data-sending={q.sending}
+        data-retry={q.retry}
+        data-mail-subject={q.mailSubject}
+        data-email={CONTACT_EMAIL}
+      >
+        <input type="hidden" name="lang" value={lang} />
+        <input type="hidden" name="sujet" value={QUESTION_SUBJECT} />
+        <input type="hidden" name="message" data-value="message" />
+        <input type="hidden" name="email" data-value="email" />
+        <!-- Activé par le bouton « J'accepte, envoyer » : même champ que la case de la page Contact. -->
+        <input type="hidden" name="consentement" value="on" disabled data-value="consentement" />
+
+        <!-- Champ piège (comme la page Contact) : hors écran, sauté au clavier ; rempli, le message est ignoré. -->
+        <div class="question__trap" aria-hidden="true">
+          <label for="question-piege">{q.trap}</label>
+          <input id="question-piege" name={CONTACT_TRAP} type="text" tabindex="-1" autocomplete="off" />
         </div>
 
-        <form
-          class="question__form"
-          action={CONTACT_ENDPOINT}
-          method="post"
-          aria-labelledby="question-titre"
-          data-question-form
-          data-sending={q.sending}
-          data-received={q.received}
-          data-failed={q.failed}
-          data-failed-link={q.failedLink}
-          data-mail-subject={q.mailSubject}
-          data-you-say={q.youSay}
-          data-host-says={`${host.firstName} ${q.hostSays} `}
-          data-email={CONTACT_EMAIL}
-        >
-          <input type="hidden" name="lang" value={lang} />
-          <input type="hidden" name="sujet" value={QUESTION_SUBJECT} />
-          <p class="question__required">{q.required}</p>
+        <p class="question__error" id="question-erreur" aria-live="polite" data-question-error></p>
 
-          <div class="question__field">
-            <label class="question__label" for="question-message">{q.message} <span aria-hidden="true">*</span></label>
-            <textarea
-              class="question__input question__textarea"
-              id="question-message"
-              name="message"
-              rows="4"
-              maxlength={CONTACT_MAX.message}
-              required
-              aria-describedby="question-message-erreur"
-              data-field
-              data-error-required={q.errors.message}
-              data-error-too-long={tooLong(CONTACT_MAX.message)}></textarea>
-            <p class="question__error" id="question-message-erreur" aria-live="polite"></p>
-          </div>
-
-          <div class="question__field">
-            <label class="question__label" for="question-email">{q.email} <span aria-hidden="true">*</span></label>
-            <input
-              class="question__input"
-              id="question-email"
-              name="email"
-              type="email"
-              autocomplete="email"
-              inputmode="email"
-              maxlength={CONTACT_MAX.email}
-              placeholder={q.emailPlaceholder}
-              required
-              aria-describedby="question-email-aide question-email-erreur"
-              data-field
-              data-error-required={q.errors.email}
-              data-error-email={q.errors.emailInvalid}
-              data-error-too-long={tooLong(CONTACT_MAX.email)}
-            />
-            <p class="question__help" id="question-email-aide">{q.emailHelp}</p>
-            <p class="question__error" id="question-email-erreur" aria-live="polite"></p>
-          </div>
-
-          <!-- Champ piège (comme la page Contact) : hors écran, sauté au clavier ; rempli, le message est ignoré. -->
-          <div class="question__trap" aria-hidden="true">
-            <label for="question-piege">{q.trap}</label>
-            <input id="question-piege" name={CONTACT_TRAP} type="text" tabindex="-1" autocomplete="off" />
-          </div>
-
-          <div class="question__field">
-            <div class="question__consent">
-              <input
-                class="question__checkbox"
-                id="question-consentement"
-                name="consentement"
-                type="checkbox"
-                required
-                aria-describedby="question-consentement-erreur"
-                data-field
-                data-error-required={q.errors.consentement}
-              />
-              <label for="question-consentement">{q.consent} <span aria-hidden="true">*</span></label>
-            </div>
-            <p class="question__privacy"><a href={pagePath(lang, 'confidentialite')}>{q.privacyLink}</a></p>
-            <p class="question__error" id="question-consentement-erreur" aria-live="polite"></p>
-          </div>
-
-          <button class="question__submit btn-motion" type="submit">
-            {q.submit}
+        <div class="question__bar" data-step="message">
+          <label class="visually-hidden" for="question-message">{q.message}</label>
+          <textarea
+            class="question__input"
+            id="question-message"
+            rows="1"
+            maxlength={CONTACT_MAX.message}
+            placeholder={q.messagePlaceholder}
+            aria-describedby="question-erreur"
+            data-field="message"
+            data-error-required={q.errors.message}
+            data-error-too-long={tooLong(CONTACT_MAX.message)}></textarea>
+          <button class="question__send" type="submit" aria-label={q.send} data-tooltip={q.send} data-tooltip-align="end">
             <Send size={20} aria-hidden="true" />
           </button>
-        </form>
-      </div>
+        </div>
+
+        <div class="question__bar" data-step="email" hidden>
+          <label class="visually-hidden" for="question-email">{q.email}</label>
+          <input
+            class="question__input"
+            id="question-email"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            maxlength={CONTACT_MAX.email}
+            placeholder={q.emailPlaceholder}
+            aria-describedby="question-erreur"
+            data-field="email"
+            data-error-required={q.errors.email}
+            data-error-email={q.errors.emailInvalid}
+            data-error-too-long={tooLong(CONTACT_MAX.email)}
+          />
+          <button class="question__send" type="submit" aria-label={q.send} data-tooltip={q.send} data-tooltip-align="end">
+            <Send size={20} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div class="question__actions" data-step="consent" hidden>
+          <button class="question__primary btn-motion" type="submit" data-question-consent>{q.consentButton}</button>
+        </div>
+
+        <div class="question__actions" data-step="done" hidden>
+          <button class="question__secondary" type="button" data-question-another>{q.another}</button>
+        </div>
+      </form>
+
+      <!-- Messages ajoutés au fil au cours de l'échange. -->
+      <template data-msg="email">
+        <p class="question__msg question__msg--host"><span class="visually-hidden">{hostSays}</span>{q.askEmail}</p>
+      </template>
+      <template data-msg="consent">
+        <p class="question__msg question__msg--host">
+          <span class="visually-hidden">{hostSays}</span>{q.askConsent}<a href={pagePath(lang, 'confidentialite')}
+            >{q.privacyLink}</a
+          >.
+        </p>
+      </template>
+      <template data-msg="sending">
+        <p class="question__msg question__msg--host question__msg--pending">{q.sending}</p>
+      </template>
+      <template data-msg="received">
+        <p class="question__msg question__msg--host"><span class="visually-hidden">{hostSays}</span>{q.received}</p>
+      </template>
+      <template data-msg="failed">
+        <p class="question__msg question__msg--host">
+          <span class="visually-hidden">{hostSays}</span>{q.failed}<a data-mailto>{q.failedLink}</a>.
+        </p>
+      </template>
+      <template data-msg="you">
+        <p class="question__msg question__msg--you">
+          <span class="visually-hidden">{q.youSay} </span><span data-text></span>
+        </p>
+      </template>
     </dialog>
   </template>
 </div>
@@ -168,6 +188,7 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
 <script>
   import { readContactValues, validateContactField, type ContactError, type ContactField } from '../lib/contact';
 
+  type Step = 'message' | 'email' | 'consent' | 'done';
   type Control = HTMLInputElement | HTMLTextAreaElement;
 
   const ERROR_ATTRIBUTE: Record<ContactError, string> = {
@@ -192,32 +213,149 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
     link.replaceWith(bubble);
 
     let dialog: HTMLDialogElement | null = null;
-
-    const message = (className: string, srLabel: string, text: string) => {
-      const paragraph = document.createElement('p');
-      paragraph.className = `question__msg ${className}`;
-      const label = document.createElement('span');
-      label.className = 'visually-hidden';
-      label.textContent = srLabel;
-      paragraph.append(label, text);
-      // Classes scopées d'Astro : reprises du premier message.
-      const scope = dialog?.querySelector('.question__msg')?.getAttributeNames().find((n) => n.startsWith('data-astro-cid'));
-      if (scope) {
-        paragraph.setAttribute(scope, '');
-        label.setAttribute(scope, '');
-      }
-      return paragraph;
-    };
+    let focusStep: () => void = () => {};
 
     const setup = (panel: HTMLDialogElement) => {
       const form = panel.querySelector<HTMLFormElement>('[data-question-form]')!;
+      const body = panel.querySelector<HTMLElement>('[data-question-body]')!;
+      const thread = panel.querySelector<HTMLElement>('[data-question-thread]')!;
       const status = panel.querySelector<HTMLElement>('[data-question-status]')!;
-      const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-      const textarea = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')!;
-      const controls = [...form.querySelectorAll<Control>('[data-field]')];
+      const error = panel.querySelector<HTMLElement>('[data-question-error]')!;
+      const consentButton = form.querySelector<HTMLButtonElement>('[data-question-consent]')!;
+      const steps = [...form.querySelectorAll<HTMLElement>('[data-step]')];
+      const field = (name: string) => form.querySelector<Control>(`[data-field="${name}"]`)!;
+      const value = (name: string) => form.querySelector<HTMLInputElement>(`[data-value="${name}"]`)!;
+      const textarea = field('message') as HTMLTextAreaElement;
+      let step: Step = 'message';
       let sending = false;
       form.noValidate = true;
 
+      const scrollToEnd = () => body.scrollTo({ top: body.scrollHeight });
+
+      /** Ajoute un message au fil ; ceux de la membre de l'équipe sont aussi annoncés. */
+      const say = (name: string, text?: string) => {
+        const source = panel.querySelector<HTMLTemplateElement>(`template[data-msg="${name}"]`)!;
+        const message = source.content.firstElementChild!.cloneNode(true) as HTMLElement;
+        if (text !== undefined) message.querySelector('[data-text]')!.textContent = text;
+        thread.append(message);
+        if (name !== 'you') status.textContent = message.textContent?.trim() ?? '';
+        scrollToEnd();
+        return message;
+      };
+
+      const show = (next: Step) => {
+        step = next;
+        steps.forEach((element) => (element.hidden = element.dataset.step !== next));
+        focusStep();
+      };
+
+      focusStep = () => {
+        const current = steps.find((element) => element.dataset.step === step);
+        current?.querySelector<HTMLElement>('textarea, input, button')?.focus();
+      };
+
+      const showError = (control: Control, problem: ContactError | null) => {
+        const text = problem ? (control.dataset[ERROR_ATTRIBUTE[problem]] ?? control.dataset.errorRequired ?? '') : '';
+        if (error.textContent !== text) error.textContent = text;
+        if (problem) control.setAttribute('aria-invalid', 'true');
+        else control.removeAttribute('aria-invalid');
+      };
+
+      /** Mêmes règles que la page Contact, sur la valeur saisie. */
+      const check = (control: Control) => {
+        const data = new FormData(form);
+        data.set(control.dataset.field!, control.value);
+        const problem = validateContactField(control.dataset.field as ContactField, readContactValues(data));
+        showError(control, problem);
+        return problem;
+      };
+
+      [field('message'), field('email')].forEach((control) => {
+        control.addEventListener('input', () => {
+          if (control.hasAttribute('aria-invalid')) check(control);
+        });
+      });
+
+      // Zone de saisie qui grandit avec le texte ; Entrée envoie, Maj + Entrée passe à la ligne.
+      textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      });
+      textarea.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+          event.preventDefault();
+          form.requestSubmit();
+        }
+      });
+
+      const send = async () => {
+        sending = true;
+        consentButton.setAttribute('aria-disabled', 'true');
+        const pending = say('sending');
+        let sent = false;
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+          const result = (await response.json().catch(() => ({}))) as { ok?: boolean };
+          sent = response.ok && result.ok === true;
+        } catch {
+          sent = false;
+        } finally {
+          sending = false;
+          consentButton.removeAttribute('aria-disabled');
+          pending.remove();
+        }
+        if (sent) {
+          say('received');
+          value('message').value = '';
+          show('done');
+        } else {
+          // Échec : lien mailto prérempli avec la question, et nouvel essai possible.
+          const failed = say('failed');
+          const mailto = failed.querySelector<HTMLAnchorElement>('[data-mailto]')!;
+          mailto.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(form.dataset.mailSubject ?? '')}&body=${encodeURIComponent(value('message').value)}`;
+          consentButton.textContent = form.dataset.retry ?? '';
+          show('consent');
+        }
+      };
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (sending) return;
+
+        if (step === 'message' || step === 'email') {
+          const control = field(step);
+          if (check(control)) {
+            control.focus();
+            return;
+          }
+          const text = control.value.trim();
+          value(step).value = text;
+          control.value = '';
+          if (control === textarea) textarea.style.height = '';
+          say('you', text);
+          if (step === 'message' && !value('email').value) {
+            say('email');
+            show('email');
+          } else if (value('consentement').disabled) {
+            say('consent');
+            show('consent');
+          } else {
+            void send();
+          }
+          return;
+        }
+
+        if (step === 'consent') {
+          value('consentement').disabled = false;
+          void send();
+        }
+      });
+
+      panel.querySelector('[data-question-another]')!.addEventListener('click', () => show('message'));
       panel.querySelector('[data-question-close]')!.addEventListener('click', () => panel.close());
       // Clic hors du panneau (sur le fond) : fermeture.
       panel.addEventListener('click', (event) => {
@@ -232,95 +370,6 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
         bubble.setAttribute('aria-expanded', 'false');
         bubble.focus();
       });
-
-      const showError = (control: Control, error: ContactError | null) => {
-        const text = error ? (control.dataset[ERROR_ATTRIBUTE[error]] ?? control.dataset.errorRequired ?? '') : '';
-        const output = document.getElementById(`${control.id}-erreur`);
-        if (output && output.textContent !== text) output.textContent = text;
-        if (error) control.setAttribute('aria-invalid', 'true');
-        else control.removeAttribute('aria-invalid');
-      };
-
-      const check = (control: Control) => {
-        const error = validateContactField(control.name as ContactField, readContactValues(new FormData(form)));
-        showError(control, error);
-        return error;
-      };
-
-      controls.forEach((control) => {
-        // Affiché en quittant le champ ; retiré dès que la saisie redevient valide.
-        control.addEventListener('blur', () => {
-          if (control.type === 'checkbox' && !control.hasAttribute('aria-invalid')) return;
-          check(control);
-        });
-        const recheck = () => {
-          if (control.hasAttribute('aria-invalid')) check(control);
-        };
-        control.addEventListener('input', recheck);
-        control.addEventListener('change', recheck);
-      });
-
-      const scrollToStatus = () => status.scrollIntoView({ block: 'nearest' });
-
-      // Échec d'envoi : lien mailto prérempli avec la question.
-      const showFailure = () => {
-        const mailto = document.createElement('a');
-        mailto.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(form.dataset.mailSubject ?? '')}&body=${encodeURIComponent(textarea.value.trim())}`;
-        mailto.textContent = form.dataset.failedLink ?? '';
-        const notice = document.createElement('p');
-        notice.append(form.dataset.failed ?? '', mailto, '.');
-        status.replaceChildren(notice);
-        scrollToStatus();
-      };
-
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (sending) return;
-
-        const invalid = controls.filter((control) => check(control) !== null);
-        if (invalid.length > 0) {
-          invalid[0]!.focus();
-          return;
-        }
-
-        // Réponse automatique précédente : reste dans le fil, au-dessus de la zone de statut.
-        status.querySelectorAll('.question__msg').forEach((reply) => status.before(reply));
-        const question = textarea.value.trim();
-        sending = true;
-        submit.setAttribute('aria-disabled', 'true');
-        status.textContent = form.dataset.sending ?? '';
-        try {
-          const response = await fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: { Accept: 'application/json' },
-          });
-          const result = (await response.json().catch(() => ({}))) as {
-            ok?: boolean;
-            errors?: Partial<Record<ContactField, ContactError>>;
-          };
-          if (response.ok && result.ok) {
-            status.before(message('question__msg--you', `${form.dataset.youSay ?? ''} `, question));
-            status.replaceChildren(message('question__msg--host', form.dataset.hostSays ?? '', form.dataset.received ?? ''));
-            textarea.value = '';
-            scrollToStatus();
-          } else if (result.errors && Object.keys(result.errors).length > 0) {
-            // Refusé par l'envoi (rare : mêmes règles que le script).
-            status.textContent = '';
-            const refused = controls.filter((control) => result.errors?.[control.name as ContactField]);
-            refused.forEach((control) => showError(control, result.errors![control.name as ContactField]!));
-            if (refused.length > 0) refused[0]!.focus();
-            else showFailure();
-          } else {
-            showFailure();
-          }
-        } catch {
-          showFailure();
-        } finally {
-          sending = false;
-          submit.removeAttribute('aria-disabled');
-        }
-      });
     };
 
     bubble.addEventListener('click', () => {
@@ -333,7 +382,7 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
       dialog.showModal();
       document.documentElement.classList.add('question-open');
       bubble.setAttribute('aria-expanded', 'true');
-      dialog.querySelector<HTMLTextAreaElement>('textarea')!.focus();
+      focusStep();
     });
   }
 </script>
@@ -399,12 +448,23 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
     .question__panel[open] {
       animation: question-in 200ms ease-out;
     }
+
+    .question__msg {
+      animation: question-msg-in 160ms ease-out;
+    }
   }
 
   @keyframes question-in {
     from {
       opacity: 0;
       translate: 0 12px;
+    }
+  }
+
+  @keyframes question-msg-in {
+    from {
+      opacity: 0;
+      translate: 0 6px;
     }
   }
 
@@ -477,20 +537,22 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
     background: var(--section);
   }
 
+  /* Fil de la conversation : seul à défiler, les derniers messages juste au-dessus de la saisie. */
   .question__body {
+    display: flex;
     flex: 1;
+    flex-direction: column;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: var(--space-5);
-    padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
   }
 
   .question__thread {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    margin-bottom: var(--space-6);
+    margin-top: auto;
   }
 
   .question__msg {
@@ -510,6 +572,11 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
     color: var(--texte);
   }
 
+  .question__msg--host a {
+    color: var(--texte);
+    font-weight: 500;
+  }
+
   .question__msg--you {
     align-self: flex-end;
     border-bottom-right-radius: 6px;
@@ -517,82 +584,20 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
     color: var(--texte-sur-bouton);
   }
 
-  .question__status {
-    display: flex;
-    flex-direction: column;
-    font-size: var(--fs-body-sm);
-    line-height: 1.5;
+  .question__msg--pending {
+    font-style: italic;
   }
 
-  .question__status:empty {
-    display: none;
-  }
-
-  .question__form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  .question__required,
-  .question__help {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--texte-doux);
-  }
-
-  .question__field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-  }
-
-  .question__label {
-    font-size: var(--fs-body-sm);
-    font-weight: 600;
-  }
-
-  /* Contour à 3:1 minimum (WCAG 1.4.11), comme les champs de la page Contact. */
-  .question__input {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 48px;
-    margin: 0;
-    padding: 12px 16px;
-    border: 1.5px solid var(--texte-doux);
-    border-radius: 14px;
-    background: var(--surface);
-    color: var(--texte);
-    font: inherit;
-    font-size: 16px;
-    line-height: 1.4;
-    transition: border-color var(--transition-ui);
-  }
-
-  .question__input::placeholder {
-    color: var(--texte-doux);
-    opacity: 1;
-  }
-
-  .question__input:hover,
-  .question__input:focus,
-  .question__input[aria-invalid='true'] {
-    border-color: var(--texte);
-  }
-
-  .question__input[aria-invalid='true'] {
-    border-width: 2px;
-  }
-
-  .question__textarea {
-    min-height: 112px;
-    line-height: 1.5;
-    resize: vertical;
+  /* Zone de saisie, en bas du panneau. */
+  .question__composer {
+    flex-shrink: 0;
+    padding: var(--space-3) var(--space-5);
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--trait);
   }
 
   .question__error {
+    margin-bottom: var(--space-2);
     font-size: 14px;
     font-weight: 600;
     line-height: 1.4;
@@ -602,31 +607,123 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
     display: none;
   }
 
-  .question__consent {
+  /* Contour à 3:1 minimum (WCAG 1.4.11), comme les champs de la page Contact ; le focus du champ
+     est porté par la barre entière (contour autour de la barre, pas du champ seul). */
+  .question__bar {
     display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-    font-size: 14px;
-    line-height: 1.5;
+    align-items: flex-end;
+    gap: var(--space-2);
+    padding: 4px 4px 4px 16px;
+    border: 1.5px solid var(--texte-doux);
+    border-radius: 26px;
+    background: var(--surface);
+    transition: border-color var(--transition-ui);
   }
 
-  .question__checkbox {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+  .question__bar:hover,
+  .question__bar:focus-within,
+  .question__bar:has([aria-invalid='true']) {
+    border-color: var(--texte);
+  }
+
+  .question__bar:has(.question__input:focus-visible) {
+    outline: 2px solid var(--texte);
+    outline-offset: 2px;
+  }
+
+  .question__bar:has([aria-invalid='true']) {
+    border-width: 2px;
+  }
+
+  .question__bar[hidden],
+  .question__actions[hidden] {
+    display: none;
+  }
+
+  .question__input {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    max-height: 132px;
     margin: 0;
-    accent-color: var(--bouton-plein);
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    color: var(--texte);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: none;
+  }
+
+  .question__input:focus-visible {
+    outline: none;
+  }
+
+  .question__input::placeholder {
+    color: var(--texte-doux);
+    opacity: 1;
+  }
+
+  .question__send {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+    cursor: pointer;
+    transition: background-color var(--transition-ui);
+  }
+
+  .question__send:hover {
+    background: var(--texte-fort);
+  }
+
+  .question__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .question__primary,
+  .question__secondary {
+    min-height: 44px;
+    padding: 12px 22px;
+    border-radius: var(--radius-pill);
+    font: inherit;
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    line-height: 1.25;
     cursor: pointer;
   }
 
-  .question__consent label {
-    cursor: pointer;
+  .question__primary {
+    border: 0;
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
   }
 
-  .question__privacy {
-    padding-left: 36px;
-    font-size: 14px;
-    font-weight: 500;
+  .question__primary:hover {
+    background: var(--texte-fort);
+  }
+
+  .question__primary[aria-disabled='true'] {
+    cursor: progress;
+  }
+
+  .question__secondary {
+    border: 1.5px solid var(--texte);
+    background: transparent;
+    color: var(--texte);
+    transition: background-color var(--transition-ui);
+  }
+
+  .question__secondary:hover {
+    background: var(--section);
   }
 
   .question__trap {
@@ -637,34 +734,11 @@ const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
     overflow: hidden;
   }
 
-  .question__submit {
-    display: inline-flex;
-    align-self: flex-start;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 24px;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: var(--bouton-plein);
-    color: var(--texte-sur-bouton);
-    font: inherit;
-    font-size: var(--fs-button);
-    font-weight: 600;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .question__submit:hover {
-    background: var(--texte-fort);
-  }
-
-  .question__submit[aria-disabled='true'] {
-    cursor: progress;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .question__input,
-    .question__close {
+    .question__bar,
+    .question__close,
+    .question__send,
+    .question__secondary {
       transition: none;
     }
   }
