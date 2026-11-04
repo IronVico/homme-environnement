@@ -14,9 +14,10 @@ export const PRIVACY_UPDATED: string | null = null;
 export const NEWSLETTER_TOOL: string | null = null;
 
 /**
- * Outil de mesure d'audience sans cookie, chargé dans BaseLayout (<Analytics />).
+ * Outil de mesure d'audience, chargé après accord dans le bandeau cookies (CookieConsent ;
+ * identifiant dans src/data/mesure-audience.ts).
  */
-export const ANALYTICS_TOOL: string | null = 'Vercel Web Analytics';
+export const ANALYTICS_TOOL: string | null = 'Google Analytics 4, service de Google Ireland Limited';
 
 /** Durées de conservation (texte affiché tel quel). TODO ONG : à fournir. */
 export const RETENTION = {

@@ -1,4 +1,5 @@
 ---
+import { GA_ID } from '../data/mesure-audience';
 import { donatePath, getFooterNav, getLegalNav, SOCIAL_URLS } from '../data/navigation';
 import { getLang, localeUrl, pathWithoutLocale, t } from '../i18n';
 import Button from './Button.astro';
@@ -73,6 +74,15 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
               <a href={link.href}>{link.label}</a>
             </li>
           ))
+        }
+        {
+          GA_ID && (
+            <li>
+              <button type="button" class="footer__cookies" data-consent-open aria-controls="bandeau-cookies">
+                {ui.manageCookies}
+              </button>
+            </li>
+          )
         }
         <li>
           <a href={otherLangUrl} lang={otherLang} hreflang={otherLang}>{ui.otherLanguage}</a>
@@ -233,6 +243,21 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-5);
+  }
+
+  /* « Gérer les cookies » rouvre le bandeau (CookieConsent) : bouton présenté comme les liens voisins. */
+  .footer__cookies {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--texte);
+    font-size: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .footer__cookies:hover {
+    color: var(--texte-fort);
   }
 
   /* Mobile (maquette v124) : le tampon passe dans le flux, tout en bas du footer, sous la

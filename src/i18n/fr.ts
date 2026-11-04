@@ -27,6 +27,7 @@ const fr = {
     themeLight: 'Clair',
     themeDark: 'Sombre',
     otherLanguage: 'English version',
+    manageCookies: 'Gérer les cookies',
     sitemap: 'Plan du site',
     social: 'Réseaux sociaux',
     socialLinkedin: "L'Homme & l'Environnement sur LinkedIn",
@@ -1356,7 +1357,7 @@ const fr = {
   confidentialite: {
     title: 'Confidentialité',
     description:
-      "Politique de confidentialité de L'Homme & l'Environnement : données collectées, mesure d'audience sans cookies, durées de conservation et vos droits.",
+      "Politique de confidentialité de L'Homme & l'Environnement : données collectées, mesure d'audience, durées de conservation et vos droits.",
     hero: {
       titleStrong: 'Vos données,',
       titleLight: 'en toute transparence.',
@@ -1394,12 +1395,19 @@ const fr = {
       },
     },
     audience: {
-      title: "Mesure d'audience sans cookies",
-      text: "Pour savoir quelles pages sont utiles, nous mesurons la fréquentation du site avec un outil qui ne dépose aucun cookie et ne vous suit pas d'un site à l'autre. Nous ne consultons que des statistiques globales : pages vues, sites de provenance, type d'appareil. Outil retenu : ",
+      title: "Mesure d'audience",
+      // Phrase coupée autour du nom de l'outil (ANALYTICS_TOOL).
+      text: 'Pour savoir quelles pages sont utiles, nous mesurons la fréquentation du site avec ',
+      textAfter:
+        ", uniquement si vous l'acceptez dans le bandeau cookies. Nous ne consultons que des statistiques globales : pages vues, sites de provenance, type d'appareil. Les signaux Google et la personnalisation publicitaire sont désactivés : ces données ne servent pas à la publicité.",
+      cookies:
+        "Après votre accord, deux cookies sont déposés : _ga, qui distingue les visiteurs par un identifiant aléatoire, et _ga_<identifiant>, qui garde l'état de la visite. Ils expirent au bout de 13 mois.",
+      transfer:
+        "Google peut traiter ces données aux États-Unis. Ce transfert est encadré par le Data Privacy Framework, le cadre de protection des données entre l'Union européenne et les États-Unis, auquel Google adhère.",
       note: {
-        title: 'Pas de bandeau cookies sur ce site',
-        text: "Comme aucun cookie de mesure ou de publicité n'est déposé, aucun consentement n'est nécessaire. ",
-        toConfirm: "[à confirmer selon l'outil retenu]",
+        title: "Vous pouvez changer d'avis",
+        text: "Sans votre accord, Google Analytics n'est pas chargé et aucun cookie de mesure n'est déposé. Pour donner ou retirer votre accord, utilisez «\u00a0Gérer les cookies\u00a0» en bas de chaque page : en cas de retrait, les cookies _ga sont effacés.",
+        manage: 'Gérer les cookies',
       },
     },
     retention: {
@@ -1412,7 +1420,7 @@ const fr = {
       newsletterValue: "Jusqu'à votre désinscription",
       donations: 'Informations liées aux dons',
       audience: "Statistiques d'audience",
-      audienceValue: 'Globales et anonymes',
+      audienceValue: '13 mois pour les cookies, 14 mois pour les statistiques dans Google Analytics',
     },
     rights: {
       title: 'Vos droits',
@@ -1786,6 +1794,19 @@ const fr = {
     },
   },
   /** Page 404 (src/pages/404.astro et en/404.astro). */
+  /** Bandeau cookies de la mesure d'audience (CookieConsent). */
+  consent: {
+    title: "Mesure d'audience",
+    // Espaces insécables dans les guillemets : « Gérer les cookies » ne se coupe pas.
+    text: "Avec votre accord, nous utilisons Google Analytics pour mesurer la fréquentation du site, sans cookie publicitaire. Vous pouvez changer d'avis à tout moment avec «\u00a0Gérer les cookies\u00a0», en bas de page. ",
+    privacyLink: 'Politique de confidentialité',
+    refuse: 'Refuser',
+    accept: 'Accepter',
+    close: 'Fermer et refuser',
+    currentGranted: 'Votre choix actuel : accepté.',
+    currentDenied: 'Votre choix actuel : refusé.',
+  },
+
   notFound: {
     title: 'Page introuvable',
     description: "Cette page n'existe pas ou a changé d'adresse.",

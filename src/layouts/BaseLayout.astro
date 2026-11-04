@@ -2,6 +2,8 @@
 import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
 import { ogImageFor } from '../lib/og';
 import Analytics from '@vercel/analytics/astro';
+import CookieConsent from '../components/CookieConsent.astro';
+import { GA_ID } from '../data/mesure-audience';
 import '../styles/global.css';
 
 interface Props {
@@ -99,6 +101,8 @@ const ogVideo = isHome ? new URL(`/video/partage-accueil-${lang}.mp4`, mediaOrig
   </head>
   <body>
     <a class="skip-link" href="#contenu">{dict.meta.skipLink}</a>
+    {/* Bandeau cookies de Google Analytics 4 : ni bandeau ni script tant que l'identifiant est vide. */}
+    {GA_ID && <CookieConsent />}
     <div class="site">
       <slot />
     </div>

@@ -31,6 +31,7 @@ const en: Dictionary = {
     themeLight: 'Light',
     themeDark: 'Dark',
     otherLanguage: 'Version française',
+    manageCookies: 'Manage cookies',
     sitemap: 'Site map',
     social: 'Social media',
     socialLinkedin: 'Man & the Environment on LinkedIn',
@@ -245,6 +246,17 @@ const en: Dictionary = {
 
   // TODO traduction : page « Particuliers » encore en français (copie de fr.ts).
   particuliers: structuredClone(fr.particuliers),
+
+  consent: {
+    title: 'Audience measurement',
+    text: 'With your consent, we use Google Analytics to measure traffic on the site, with no advertising cookies. You can change your mind at any time with “Manage cookies” at the bottom of the page. ',
+    privacyLink: 'Privacy policy',
+    refuse: 'Refuse',
+    accept: 'Accept',
+    close: 'Close and refuse',
+    currentGranted: 'Your current choice: accepted.',
+    currentDenied: 'Your current choice: refused.',
+  },
 
   notFound: {
     title: 'Page not found',
