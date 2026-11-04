@@ -5,14 +5,14 @@
  * utilisée comme masque, à la couleur du texte doux.
  * En mobile (≤ 900px), la liste défile en boucle ; avec prefers-reduced-motion, elle reste en grille.
  * Pas de bouton Pause : choix de Victor à la recette V1, écart assumé à WCAG 2.2.2 (voir la PR).
- * Chaque logo mène à la fiche du partenaire sur notre page Partenaires (ancre = identifiant),
- * jamais vers son site : le visiteur reste sur le site, sur le chemin du don.
+ * Chaque logo ouvre le site du partenaire dans un nouvel onglet (choix de Victor) ; sans site
+ * connu, il mène à sa fiche sur notre page Partenaires (ancre = identifiant).
  */
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import { Image } from 'astro:assets';
 import { pagePath } from '../data/navigation';
 import { getPartner } from '../data/partenaires';
-import { getLang } from '../i18n';
+import { getLang, t } from '../i18n';
 
 interface Props {
   title: string;
@@ -21,7 +21,9 @@ interface Props {
 }
 
 const { title, link } = Astro.props;
-const partnersPage = pagePath(getLang(Astro.currentLocale), 'partenaires');
+const lang = getLang(Astro.currentLocale);
+const partnersPage = pagePath(lang, 'partenaires');
+const newTab = t(lang).partenaires.list.newTab;
 
 // Sélection affichée sur l'accueil (identifiants de src/data/partenaires.ts, partenaires avec logo).
 const FEATURED = [
@@ -37,7 +39,7 @@ const FEATURED = [
 
 const partners = FEATURED.map(getPartner).flatMap((partner) =>
   partner.logo && partner.logoMono
-    ? [{ id: partner.id, name: partner.name, logo: partner.logo, mono: partner.logoMono }]
+    ? [{ id: partner.id, name: partner.name, url: partner.url, logo: partner.logo, mono: partner.logoMono }]
     : [],
 );
 
@@ -60,12 +62,14 @@ const tooltipAlign = (i: number) => (i % COLUMNS === 0 ? 'start' : i % COLUMNS =
             <li class:list={['partners__logo', { 'partners__logo--dup': p.dup }]} aria-hidden={p.dup ? 'true' : undefined}>
               <a
                 class="partners__link"
-                href={`${partnersPage}#${p.id}`}
+                href={p.url ?? `${partnersPage}#${p.id}`}
+                target={p.url ? '_blank' : undefined}
+                rel={p.url ? 'noopener' : undefined}
                 data-tooltip={p.name}
                 data-tooltip-align={tooltipAlign(i)}
                 tabindex={p.dup ? -1 : undefined}
               >
-                {!p.dup && <span class="visually-hidden">{p.name}</span>}
+                {!p.dup && <span class="visually-hidden">{p.url ? `${p.name} ${newTab}` : p.name}</span>}
                 <Image class="partners__img" src={p.logo} alt="" height={56} densities={[1, 2]} />
                 <span
                   class="partners__mark"
