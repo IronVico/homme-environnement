@@ -260,35 +260,25 @@ const { ui } = t(lang);
 
   /*
    * Mobile : texte et boutons remplissent à eux seuls le premier écran, la photo
-   * n'apparaissait qu'au défilement. Elle passe au-dessus du texte, en format paysage
-   * bas, pour être vue dès l'arrivée. Ordre visuel seulement : dans le HTML, le h1 reste
-   * en premier pour les lecteurs d'écran (la photo n'est pas focalisable).
+   * n'apparaissait qu'au défilement. Elle passe au-dessus du texte, dans sa forme du
+   * desktop (portrait, rayons en %, ondulation, isotype), mais réduite : 62 % de la
+   * largeur au plus et 32 % de la hauteur d'écran, pour être vue dès l'arrivée.
+   * Ordre visuel seulement : dans le HTML, le h1 reste en premier pour les lecteurs
+   * d'écran (la photo n'est pas focalisable).
    */
   @media (max-width: 700px) {
     .hero {
       gap: var(--space-6);
-      padding-top: var(--space-3);
+      /* Place pour l'isotype, qui dépasse au-dessus de la photo. */
+      padding-top: var(--space-8);
     }
 
+    /* Le bloc prend la largeur de la photo : l'isotype, en % du bloc, garde ses proportions. */
     .hero__media {
       order: -1;
-      flex-basis: 100%;
-    }
-
-    /* En paysage, les rayons en % du desktop donneraient un ovale : rayons fixes, forme
-       organique sans ondulation (l'animation repasserait en %). */
-    .hero__media :global(.hero__photo) {
-      aspect-ratio: 16 / 10;
-      max-height: 28svh;
-      object-position: 62% 45%;
-      border-radius: 96px 140px 84px 124px / 72px 64px 88px 76px;
-      animation: none;
-    }
-
-    .hero__isotype {
-      width: 34%;
-      right: -4%;
-      top: -10%;
+      flex: 0 0 auto;
+      width: min(62%, calc(32svh / 1.08));
+      margin-inline: auto;
     }
 
     .hero__text {
