@@ -9,6 +9,6 @@ summary: "[Texte à fournir : forêt voisine d'Ambalakalanoro, gérée par les c
 species:
   - { name: "[À compléter]", type: animal }
 # Position du repère sur la carte du pays, en % de sa largeur (x) et de sa hauteur (y).
-mapPosition: { x: 53.17, y: 31.13 }
+mapPosition: { x: 57.91, y: 34.4 }
 order: 6
 ---
