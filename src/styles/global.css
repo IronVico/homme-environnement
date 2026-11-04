@@ -51,6 +51,28 @@ picture > source {
   display: none;
 }
 
+/*
+ * Photo en cours de chargement : fond d'attente sous l'image, retiré une fois chargée
+ * (src/scripts/images.ts). Toutes les photos sont opaques ; les logos, transparents,
+ * passent par <Image>, sans <picture>.
+ */
+picture > img:not(.is-loaded) {
+  background-color: var(--section);
+}
+
+/* Voile du fondu d'apparition, retiré à la fin de l'animation. Jamais posé avec prefers-reduced-motion. */
+.image-fade {
+  position: absolute;
+  pointer-events: none;
+  animation: image-fade 220ms ease-out forwards;
+}
+
+@keyframes image-fade {
+  to {
+    opacity: 0;
+  }
+}
+
 h1,
 h2,
 h3,
