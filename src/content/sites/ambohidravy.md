@@ -65,6 +65,6 @@ cta:
   text: "Chaque semaine compte. Votre don équipe les patrouilleurs et renforce les communautés qui protègent leur forêt sacrée."
 
 # Position du repère sur la carte du pays, en % de sa largeur (x) et de sa hauteur (y).
-mapPosition: { x: 72.0, y: 16.23 }
+mapPosition: { x: 73.49, y: 17.9 }
 order: 5
 ---
