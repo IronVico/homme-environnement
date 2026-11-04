@@ -5,15 +5,23 @@
  * utilisée comme masque, à la couleur du texte doux.
  * En mobile (≤ 900px), la liste défile en boucle ; avec prefers-reduced-motion, elle reste en grille.
  * Pas de bouton Pause : choix de Victor à la recette V1, écart assumé à WCAG 2.2.2 (voir la PR).
+ * Chaque logo mène à la fiche du partenaire sur notre page Partenaires (ancre = identifiant),
+ * jamais vers son site : le visiteur reste sur le site, sur le chemin du don.
  */
+import ArrowRight from '@lucide/astro/icons/arrow-right';
 import { Image } from 'astro:assets';
+import { pagePath } from '../data/navigation';
 import { getPartner } from '../data/partenaires';
+import { getLang } from '../i18n';
 
 interface Props {
   title: string;
+  /** Libellé du lien vers la page Partenaires, sous la grille. */
+  link: string;
 }
 
-const { title } = Astro.props;
+const { title, link } = Astro.props;
+const partnersPage = pagePath(getLang(Astro.currentLocale), 'partenaires');
 
 // Sélection affichée sur l'accueil (identifiants de src/data/partenaires.ts, partenaires avec logo).
 const FEATURED = [
@@ -28,11 +36,18 @@ const FEATURED = [
 ];
 
 const partners = FEATURED.map(getPartner).flatMap((partner) =>
-  partner.logo && partner.logoMono ? [{ name: partner.name, logo: partner.logo, mono: partner.logoMono }] : [],
+  partner.logo && partner.logoMono
+    ? [{ id: partner.id, name: partner.name, logo: partner.logo, mono: partner.logoMono }]
+    : [],
 );
 
-// La seconde série sert uniquement à boucler le défilement : masquée aux lecteurs d'écran.
+// La seconde série sert uniquement à boucler le défilement : masquée aux lecteurs d'écran et
+// hors de l'ordre de tabulation (ses liens restent cliquables à la souris et au doigt).
 const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((p) => ({ ...p, dup: true }))];
+
+// Grille de 4 colonnes : l'infobulle des colonnes de bord s'aligne sur le bord du logo pour ne pas sortir de l'écran.
+const COLUMNS = 4;
+const tooltipAlign = (i: number) => (i % COLUMNS === 0 ? 'start' : i % COLUMNS === COLUMNS - 1 ? 'end' : undefined);
 ---
 
 <section class="partners" aria-labelledby="partenaires-titre">
@@ -41,20 +56,32 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     <div class="partners__marquee" data-reveal>
       <ul class="partners__track">
         {
-          track.map((p) => (
+          track.map((p, i) => (
             <li class:list={['partners__logo', { 'partners__logo--dup': p.dup }]} aria-hidden={p.dup ? 'true' : undefined}>
-              {!p.dup && <span class="visually-hidden">{p.name}</span>}
-              <Image class="partners__img" src={p.logo} alt="" height={56} densities={[1, 2]} />
-              <span
-                class="partners__mark"
-                aria-hidden="true"
-                style={`--logo: url(${p.mono.src}); aspect-ratio: ${p.mono.width} / ${p.mono.height}`}
-              ></span>
+              <a
+                class="partners__link"
+                href={`${partnersPage}#${p.id}`}
+                data-tooltip={p.name}
+                data-tooltip-align={tooltipAlign(i)}
+                tabindex={p.dup ? -1 : undefined}
+              >
+                {!p.dup && <span class="visually-hidden">{p.name}</span>}
+                <Image class="partners__img" src={p.logo} alt="" height={56} densities={[1, 2]} />
+                <span
+                  class="partners__mark"
+                  aria-hidden="true"
+                  style={`--logo: url(${p.mono.src}); aspect-ratio: ${p.mono.width} / ${p.mono.height}`}
+                ></span>
+              </a>
             </li>
           ))
         }
       </ul>
     </div>
+    <a class="partners__all" href={partnersPage}>
+      <span class="partners__all-label">{link}</span>
+      <ArrowRight class="partners__all-arrow" size={18} />
+    </a>
   </div>
 </section>
 
@@ -71,9 +98,7 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     text-align: center;
   }
 
-  .partners__marquee {
-    overflow: hidden;
-  }
+  /* Pas d'overflow: hidden ici : il couperait les infobulles des logos (voir le défilement mobile). */
 
   .partners__track {
     display: grid;
@@ -89,15 +114,54 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
   }
 
-  .partners__logo :global(.partners__img) {
+  /*
+   * Logo cliquable : toute la case est la zone de clic. Au repos, logo un peu atténué
+   * (couleurs adoucies en clair, masque texte doux en sombre) ; au survol et au focus,
+   * pleine intensité et léger soulèvement, comme les cartes cliquables.
+   */
+  .partners__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 12px;
+    border-radius: var(--radius-card-sm);
+    transition: transform var(--transition-ui);
+  }
+
+  .partners__link:hover,
+  .partners__link:focus-visible {
+    transform: translateY(var(--lift-button-hover));
+  }
+
+  /* Infobulle : les noms longs (ministère, Muséum) passent sur deux lignes plutôt que de déborder. */
+  .partners__link[data-tooltip]::after {
+    width: max-content;
+    max-width: min(240px, 80vw);
+    white-space: normal;
+    text-align: center;
+  }
+
+  .partners__link :global(.partners__img) {
     display: block;
     width: auto;
     max-width: 100%;
     height: 52px;
     object-fit: contain;
+    filter: saturate(0.55);
+    opacity: 0.85;
+    transition:
+      filter var(--transition-ui),
+      opacity var(--transition-ui);
+  }
+
+  .partners__link:hover :global(.partners__img),
+  .partners__link:focus-visible :global(.partners__img) {
+    filter: none;
+    opacity: 1;
   }
 
   /* Mode sombre : logo monochrome, le PNG sert de masque, la couleur vient du thème. */
@@ -108,10 +172,16 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     background-color: var(--texte-doux);
     -webkit-mask: var(--logo) center / contain no-repeat;
     mask: var(--logo) center / contain no-repeat;
+    transition: background-color var(--transition-ui);
+  }
+
+  .partners__link:hover .partners__mark,
+  .partners__link:focus-visible .partners__mark {
+    background-color: var(--texte);
   }
 
   @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .partners__logo :global(.partners__img) {
+    :global(:root:not([data-theme='light'])) .partners__link :global(.partners__img) {
       display: none;
     }
 
@@ -120,7 +190,7 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
     }
   }
 
-  :global(:root[data-theme='dark']) .partners__logo :global(.partners__img) {
+  :global(:root[data-theme='dark']) .partners__link :global(.partners__img) {
     display: none;
   }
 
@@ -144,6 +214,11 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
   /* Mobile : défilement en boucle, sans bouton Pause (choix de recette). Avec mouvement
      réduit, la grille reste en place : tous les logos visibles, sans défilement. */
   @media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+    /* clip (et non hidden) : coupe la bande à l'horizontale, laisse passer l'infobulle au-dessus. */
+    .partners__marquee {
+      overflow-x: clip;
+    }
+
     .partners__track {
       display: flex;
       width: max-content;
@@ -158,6 +233,90 @@ const track = [...partners.map((p) => ({ ...p, dup: false })), ...partners.map((
 
     .partners__logo--dup {
       display: flex;
+    }
+
+    /* Un logo survolé ne s'échappe pas sous la souris. */
+    .partners__track:has(.partners__link:hover) {
+      animation-play-state: paused;
+    }
+
+    /* Au clavier, la bande se fige en grille (comme avec mouvement réduit) : le logo qui a le
+       focus est toujours à l'écran, pas dans la partie coupée de la bande. */
+    .partners__marquee:has(.partners__link:focus-visible) {
+      overflow-x: visible;
+    }
+
+    .partners__track:has(.partners__link:focus-visible) {
+      display: grid;
+      width: auto;
+      gap: 16px;
+      animation: none;
+    }
+
+    .partners__track:has(.partners__link:focus-visible) .partners__logo {
+      width: auto;
+    }
+
+    .partners__track:has(.partners__link:focus-visible) .partners__logo--dup {
+      display: none;
+    }
+  }
+
+  /* Lien texte : filet sauge au repos, trait tracé au survol, flèche qui glisse (comme la page Partenaires). */
+  .partners__all {
+    --trait: var(--texte);
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--texte);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .partners__all:hover {
+    color: var(--texte);
+  }
+
+  .partners__all-label {
+    padding-bottom: 3px;
+    background:
+      linear-gradient(var(--trait), var(--trait)) 0 100% / 0% 2px no-repeat,
+      linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 2px no-repeat;
+    transition: background-size 300ms ease-out;
+  }
+
+  .partners__all:hover .partners__all-label,
+  .partners__all:focus-visible .partners__all-label {
+    background-size:
+      100% 2px,
+      100% 2px;
+  }
+
+  .partners__all :global(.partners__all-arrow) {
+    flex-shrink: 0;
+    transition: transform var(--transition-ui);
+  }
+
+  .partners__all:hover :global(.partners__all-arrow),
+  .partners__all:focus-visible :global(.partners__all-arrow) {
+    transform: translateX(var(--nudge-arrow-hover));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partners__link,
+    .partners__all-label,
+    .partners__all :global(.partners__all-arrow) {
+      transition: none;
+    }
+
+    .partners__link:hover,
+    .partners__link:focus-visible,
+    .partners__all:hover :global(.partners__all-arrow),
+    .partners__all:focus-visible :global(.partners__all-arrow) {
+      transform: none;
     }
   }
 </style>
