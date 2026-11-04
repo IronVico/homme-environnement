@@ -118,7 +118,9 @@ const otherLangUrl = localeUrl(otherLang, pathWithoutLocale(Astro.url.pathname))
     flex-direction: column;
     gap: 40px;
     padding-top: 56px;
-    padding-bottom: var(--space-7);
+    /* Place de la bulle « Une question ? » (QuestionBubble : 56px à 16px du bas, plus un écart) :
+       en bas de page, elle ne recouvre ni les liens de la barre du bas ni le tampon. */
+    padding-bottom: calc(56px + 16px + var(--space-3));
   }
 
   .footer__top {

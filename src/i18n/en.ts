@@ -273,6 +273,37 @@ const en: Dictionary = {
     home: 'Back to the home page',
     contact: 'If the problem persists, write to us at ',
   },
+
+  question: {
+    open: 'Got a question?',
+    title: 'Got a question?',
+    close: 'Close',
+    hostSays: 'writes:',
+    you: 'You',
+    youSay: 'You wrote:',
+    greeting: 'Hello! Ask us your question and we will reply by email within a few days.',
+    required: 'All fields are required.',
+    message: 'Your question',
+    email: 'Your email address',
+    emailPlaceholder: 'name@example.com',
+    emailHelp: 'Only used to reply to you.',
+    consent: 'I agree that my personal data will be used only to reply to my request.',
+    privacyLink: 'Read the privacy policy',
+    trap: 'Do not fill in this field',
+    submit: 'Send',
+    errors: {
+      message: 'Write your question.',
+      email: 'Enter your email address.',
+      emailInvalid: 'This email address looks incomplete. Example: name@example.com',
+      consentement: 'Tick this box so that we can reply to you.',
+      tooLong: 'This text is too long: {max} characters maximum.',
+    },
+    sending: 'Sending…',
+    received: 'Message received! We will reply by email within a few days.',
+    failed: 'The message could not be sent. You can send it from your email app: ',
+    failedLink: 'open a pre-filled email',
+    mailSubject: 'Quick question',
+  },
 };
 
 export default en;

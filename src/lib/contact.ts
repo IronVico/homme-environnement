@@ -7,9 +7,18 @@
 /** Adresse de la fonction Vercel qui envoie le message (api/contact.ts). */
 export const CONTACT_ENDPOINT = '/api/contact';
 
-/** Sujets de la liste, dans l'ordre affiché ; libellés dans src/i18n (contact.form.subjects). */
-export const CONTACT_SUBJECTS = ['don', 'stage', 'entreprise', 'presse', 'autre'] as const;
+/** Sujets acceptés, dans l'ordre de la liste ; libellés dans src/i18n (contact.form.subjects). */
+export const CONTACT_SUBJECTS = ['don', 'stage', 'entreprise', 'presse', 'autre', 'question'] as const;
 export type ContactSubject = (typeof CONTACT_SUBJECTS)[number];
+
+/**
+ * Sujet des messages de la bulle « Une question ? » (QuestionBubble.astro) : absent de la liste
+ * de la page Contact, et seul sujet pour lequel le nom est facultatif (la bulle ne le demande pas).
+ */
+export const QUESTION_SUBJECT = 'question' satisfies ContactSubject;
+
+/** Sujets proposés dans la liste de la page Contact. */
+export const CONTACT_FORM_SUBJECTS = CONTACT_SUBJECTS.filter((subject) => subject !== QUESTION_SUBJECT);
 
 /**
  * Lien vers le formulaire avec un sujet présélectionné : /contact/?sujet=entreprise#formulaire
@@ -56,6 +65,7 @@ export function isContactSubject(value: string): value is ContactSubject {
 export function validateContactField(field: ContactField, values: ContactValues): ContactError | null {
   if (field === 'consentement') return values.consentement ? null : 'required';
   const value = values[field].trim();
+  if (!value && field === 'nom' && values.sujet.trim() === QUESTION_SUBJECT) return null;
   if (!value) return 'required';
   if (field === 'sujet') return isContactSubject(value) ? null : 'required';
   if (value.length > CONTACT_MAX[field]) return 'tooLong';

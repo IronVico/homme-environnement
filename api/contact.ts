@@ -92,6 +92,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const form = fr.contact.form;
   const subject = isContactSubject(values.sujet) ? form.subjects[values.sujet] : values.sujet;
+  // Nom facultatif pour les questions de la bulle (QUESTION_SUBJECT) : l'adresse le remplace.
   const name = oneLine(values.nom);
   const email = values.email.trim();
 
@@ -105,10 +106,10 @@ export async function POST(request: Request): Promise<Response> {
     await transporter.sendMail({
       from: { name: fr.meta.siteName, address: config.from },
       to: config.to,
-      replyTo: { name, address: email },
-      subject: oneLine(`[Site] ${subject} : ${name}`),
+      replyTo: name ? { name, address: email } : email,
+      subject: oneLine(`[Site] ${subject} : ${name || email}`),
       text: [
-        `${form.name} : ${name}`,
+        `${form.name} : ${name || '(non indiqué)'}`,
         `${form.email} : ${email}`,
         `${form.subject} : ${subject}`,
         `Page : ${lang === 'en' ? 'anglaise' : 'française'}`,

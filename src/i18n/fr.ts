@@ -1605,6 +1605,8 @@ const fr = {
         entreprise: 'Partenariat entreprise',
         presse: 'Presse',
         autre: 'Autre',
+        /** Messages de la bulle « Une question ? », absent de la liste de la page. */
+        question: 'Question rapide',
       },
       message: 'Message',
       messageHelp: 'Précisez si besoin le site ou le projet concerné.',
@@ -1814,6 +1816,45 @@ const fr = {
     home: "Retour à l'accueil",
     /** Suivi de l'adresse e-mail de l'ONG. */
     contact: 'Si le problème continue, écrivez-nous à ',
+  },
+
+  /**
+   * Bulle « Une question ? » sur toutes les pages (QuestionBubble.astro) : message rapide, réponse
+   * par e-mail. Envoi par le formulaire de contact (src/lib/contact.ts, sujet « Question rapide »).
+   */
+  question: {
+    open: 'Une question ?',
+    title: 'Une question ?',
+    close: 'Fermer',
+    /** Avant le prénom de la membre de l'équipe, pour les lecteurs d'écran. */
+    hostSays: 'écrit :',
+    you: 'Vous',
+    youSay: 'Vous avez écrit :',
+    greeting: 'Bonjour ! Posez-nous votre question, on vous répond par e-mail sous quelques jours.',
+    required: 'Tous les champs sont obligatoires.',
+    message: 'Votre question',
+    email: 'Votre adresse e-mail',
+    emailPlaceholder: 'nom@exemple.fr',
+    emailHelp: 'Uniquement pour vous répondre.',
+    consent: "J'accepte que mes données personnelles soient utilisées uniquement pour répondre à ma demande.",
+    privacyLink: 'Lire la politique de confidentialité',
+    trap: 'Ne remplissez pas ce champ',
+    submit: 'Envoyer',
+    errors: {
+      message: 'Écrivez votre question.',
+      email: 'Indiquez votre adresse e-mail.',
+      emailInvalid: 'Cette adresse e-mail semble incomplète. Exemple : nom@exemple.fr',
+      consentement: 'Cochez cette case pour que nous puissions vous répondre.',
+      /** {max} : nombre de caractères autorisés. */
+      tooLong: 'Ce texte est trop long : {max} caractères au maximum.',
+    },
+    sending: 'Envoi en cours…',
+    received: 'Message bien reçu ! On vous répond par e-mail sous quelques jours.',
+    /** Envoi impossible : lien mailto prérempli à la suite. */
+    failed: "Le message n'a pas pu partir. Vous pouvez l'envoyer depuis votre messagerie : ",
+    failedLink: 'ouvrir un e-mail prérempli',
+    /** Objet de l'e-mail prérempli. */
+    mailSubject: 'Question rapide',
   },
 };
 
