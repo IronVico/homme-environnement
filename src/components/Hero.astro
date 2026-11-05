@@ -257,42 +257,4 @@ const { ui } = t(lang);
       white-space: normal;
     }
   }
-
-  /*
-   * Mobile : texte et boutons remplissent à eux seuls le premier écran, la photo
-   * n'apparaissait qu'au défilement. Elle passe au-dessus du texte, en format paysage
-   * bas, pour être vue dès l'arrivée. Ordre visuel seulement : dans le HTML, le h1 reste
-   * en premier pour les lecteurs d'écran (la photo n'est pas focalisable).
-   */
-  @media (max-width: 700px) {
-    .hero {
-      gap: var(--space-6);
-      padding-top: var(--space-3);
-    }
-
-    .hero__media {
-      order: -1;
-      flex-basis: 100%;
-    }
-
-    /* En paysage, les rayons en % du desktop donneraient un ovale : rayons fixes, forme
-       organique sans ondulation (l'animation repasserait en %). */
-    .hero__media :global(.hero__photo) {
-      aspect-ratio: 16 / 10;
-      max-height: 28svh;
-      object-position: 62% 45%;
-      border-radius: 96px 140px 84px 124px / 72px 64px 88px 76px;
-      animation: none;
-    }
-
-    .hero__isotype {
-      width: 34%;
-      right: -4%;
-      top: -10%;
-    }
-
-    .hero__text {
-      gap: var(--space-5);
-    }
-  }
 </style>
