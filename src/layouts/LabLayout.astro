@@ -3,7 +3,7 @@
  * Gabarit des pages du lab (/lab/…), vitrine interne du design system tel qu'il est codé.
  * Barre du haut (logo, lien vers le site, bascule clair / sombre du header), navigation à
  * gauche groupée en Fondations et Composants (src/lib/lab-nav.ts), contenu à droite.
- * Sous 1000px, la navigation se replie derrière un bouton « Sommaire » (Échap la ferme).
+ * Sous 760px, la navigation se replie derrière un bouton « Sommaire » (Échap la ferme).
  * Pages en français seulement, noindex : hors sitemap (astro.config.mjs) ; sans image de
  * partage propre (absentes de src/lib/og.ts) ; aucun lien depuis le reste du site.
  * Textes en dur : le lab n'est pas traduit.
@@ -118,7 +118,7 @@ const next = page ? LAB_PAGES[index + 1] : LAB_PAGES[0];
 </BaseLayout>
 
 <script>
-  // Sommaire replié sous 1000px : bouton à aria-expanded, Échap ferme et rend le focus au bouton.
+  // Sommaire replié sous 760px : bouton à aria-expanded, Échap ferme et rend le focus au bouton.
   const button = document.querySelector<HTMLButtonElement>('[data-lab-menu]');
   const nav = document.querySelector<HTMLElement>('[data-lab-nav]');
   if (button && nav) {
@@ -210,7 +210,7 @@ const next = page ? LAB_PAGES[index + 1] : LAB_PAGES[0];
 
   .lab-shell {
     display: grid;
-    grid-template-columns: 248px minmax(0, 1fr);
+    grid-template-columns: clamp(200px, 20vw, 248px) minmax(0, 1fr);
   }
 
   .lab-side {
@@ -347,7 +347,7 @@ const next = page ? LAB_PAGES[index + 1] : LAB_PAGES[0];
     font-weight: 500;
   }
 
-  @media (max-width: 999px) {
+  @media (max-width: 759px) {
     .lab-shell {
       grid-template-columns: minmax(0, 1fr);
     }
