@@ -2,7 +2,6 @@
 import Intro from '../components/Intro.astro';
 import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
 import { ogImageFor } from '../lib/og';
-import Analytics from '@vercel/analytics/astro';
 import '../styles/global.css';
 
 interface Props {
@@ -28,7 +27,8 @@ const alternates = (Object.keys(languages) as Lang[]).map((code) => ({
 }));
 // Image de partage générée au build pour chaque page (src/lib/og.ts), celle de l'accueil en repli.
 // Fichiers de partage servis par le site réellement en ligne : sur Vercel, son domaine de production
-// (le domaine final sert encore l'ancien site, ses URL y répondraient 404) ; ailleurs, `site`.
+// (le domaine final sert encore l'ancien site, ses URL y répondraient 404) ; ailleurs, dont le build
+// de l'Action OVH, `site` (le domaine final, servi par OVH après la bascule).
 const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
 const mediaOrigin = vercelHost ? `https://${vercelHost}` : Astro.site;
 const og = await ogImageFor(lang, Astro.url.pathname);
@@ -120,6 +120,13 @@ const ogVideo = isHome ? new URL(`/video/partage-accueil-${lang}.mp4`, mediaOrig
       initReveal();
       initTooltips();
     </script>
-    <Analytics />
+    {
+      /*
+        Mesure d'audience : emplacement réservé, aucun outil chargé pour l'instant (Vercel Web
+        Analytics ne fonctionne que sur Vercel). Solution sans cookies à choisir avec Victor et l'ONG,
+        par exemple Umami ou GoatCounter : ajouter ici leur balise <script> (attribut `defer`), puis
+        renseigner ANALYTICS_TOOL dans src/data/confidentialite.ts (page Confidentialité). Voir README.
+      */
+    }
   </body>
 </html>

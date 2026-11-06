@@ -1,0 +1,76 @@
+# Configuration Apache du site sur l'hébergement OVH (offre Perso, Apache 2.4).
+# Copié tel quel dans dist/ par Astro (dossier public/) ; remplace les redirections de vercel.json.
+# Chaque bloc dépend d'un module : il est ignoré si le module manque, sans casser le site.
+
+Options -Indexes
+DirectoryIndex index.html
+AddDefaultCharset utf-8
+
+# Pages d'erreur du site (src/pages/404.astro, src/pages/en/404.astro et src/pages/500.astro).
+# Sous /en/, la 404 anglaise est servie directement (sans passer par la bascule en JavaScript).
+# Les réponses d'erreur de api/contact.php (JSON) ne sont pas remplacées : seules les erreurs
+# produites par Apache lui-même passent par ces pages.
+ErrorDocument 404 /404.html
+<If "%{REQUEST_URI} =~ m#^/en(/|$)#">
+  ErrorDocument 404 /en/404/index.html
+</If>
+ErrorDocument 403 /404.html
+ErrorDocument 500 /500.html
+ErrorDocument 502 /500.html
+ErrorDocument 503 /500.html
+ErrorDocument 504 /500.html
+
+# Règles du formulaire de contact, lues par api/contact.php sur le disque : pas d'accès par le Web.
+<Files "contact-fields.json">
+  Require all denied
+</Files>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Domaine sans www : adresse canonique en www (site d'astro.config.mjs), directement en HTTPS.
+  # Les autres noms (sous-domaine de test, adresse OVH du cluster) ne sont pas redirigés.
+  RewriteCond %{HTTP_HOST} ^homme-environnement\.org$ [NC]
+  RewriteRule ^ https://www.homme-environnement.org%{REQUEST_URI} [R=301,L]
+
+  # HTTPS forcé. Chez OVH, %{HTTPS} n'est pas fiable derrière les répartiteurs : on teste le port
+  # (règle recommandée par OVH). Chaque nom servi, sous-domaine de test compris, doit donc avoir
+  # son certificat SSL (Let's Encrypt, gratuit dans l'espace client OVH) avant le déploiement.
+  RewriteCond %{SERVER_PORT} ^80$
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # Anciennes URL (301), vers l'adresse finale avec la barre oblique (pas de seconde redirection).
+  # À compléter avec les URL de l'ancien site WordPress à mesure que les pages cibles existent.
+  RewriteRule ^(en/)?actions/madagascar/?$ /$1sites/madagascar/ [R=301,L]
+  RewriteRule ^madagascar/?$ /sites/madagascar/ [R=301,L]
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType image/avif .avif
+  AddType image/webp .webp
+  AddType image/svg+xml .svg
+  AddType application/manifest+json .webmanifest
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript text/javascript application/json image/svg+xml
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Pages HTML : revalidées à chaque visite, pour qu'une mise à jour soit vue tout de suite.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  # Fichiers du build (nom avec empreinte, change à chaque modification) : un an, sans revalidation.
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+  # Police auto-hébergée : un an (renommer le fichier si on la remplace).
+  <If "%{REQUEST_URI} =~ m#^/fonts/#">
+    Header set Cache-Control "public, max-age=31536000"
+  </If>
+</IfModule>

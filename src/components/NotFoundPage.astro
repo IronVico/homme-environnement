@@ -3,10 +3,10 @@
  * Page 404, commune aux deux langues (/404 et /en/404). Textes dans src/i18n (clé `notFound`).
  * Carte sur photo assombrie (titre, phrase, retour à l'accueil), puis trois pages utiles.
  *
- * Langue : Vercel sert une seule page 404 pour tout le site, la française (dist/404.html).
- * Sur une adresse en /en/…, le script de tête renvoie aussitôt vers la 404 anglaise
- * (/en/404/?depuis=…), qui remet l'adresse demandée dans la barre d'adresse : page, header et
- * footer sont alors entièrement en anglais. Sans JavaScript, la page reste en français.
+ * Langue : chez OVH, Apache sert directement la 404 anglaise sous /en/ (public/.htaccess).
+ * Filet de sécurité si un hébergeur ne sert que dist/404.html : sur une adresse en /en/…, le
+ * script de tête renvoie aussitôt vers la 404 anglaise (/en/404/?depuis=…), qui remet l'adresse
+ * demandée dans la barre d'adresse. Sans JavaScript, la page reste alors en français.
  */
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Heart from '@lucide/astro/icons/heart';

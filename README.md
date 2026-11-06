@@ -6,7 +6,7 @@ A **static**, **bilingual** site (French by default at the root, English under `
 
 ## Getting started
 
-Requirements: Node.js 24 (Astro 7 needs 22.22 at least). The major version is pinned to `24.x` in `package.json`, the same as in the Vercel project settings, so that Vercel does not move to a new Node major version on its own.
+Requirements: Node.js 24 (Astro 7 needs 22.22 at least). The major version is pinned to `24.x` in `package.json`, the same as in the deployment ([`.github/workflows/deploy-ovh.yml`](.github/workflows/deploy-ovh.yml)).
 
 ```bash
 npm install
@@ -25,9 +25,41 @@ The site runs at <http://localhost:4321> (English version: <http://localhost:432
 | `npm run preview` | Serves the `dist/` build locally for testing                 |
 | `npm run check`   | Type check only                                              |
 
-301 redirects (old URLs, including those of the WordPress site): [`vercel.json`](vercel.json), to be extended as the target pages are built.
+301 redirects (old URLs, including those of the WordPress site), forced HTTPS, error pages and caching: [`public/.htaccess`](public/.htaccess) (Apache), to be extended as the target pages are built.
 
-The `dist/` folder is a static site ready to deploy on Netlify, Vercel or Cloudflare Pages (build command `npm run build`, publish directory `dist`).
+The `dist/` folder is the site ready to upload: static pages, plus one PHP script for the contact form. It is published on OVH (see "Deployment").
+
+## Deployment (OVH)
+
+The site is hosted by the NGO at OVHcloud, **Perso** web hosting plan (Apache 2.4 + PHP, FTP access). On every change to `main`, the GitHub Action [`deploy-ovh.yml`](.github/workflows/deploy-ovh.yml) runs `npm run build` (with `SITE_ENV=production`), then [`ovh/deploy.sh`](ovh/deploy.sh), which uploads `dist/` over **FTPS** (encrypted FTP) with `lftp` and deletes the files that are no longer in the build. It can also be run by hand (Actions tab → Déploiement OVH → Run workflow).
+
+GitHub repository settings (Settings → Secrets and variables → Actions); no values in the repository:
+
+| Name | Type | Purpose |
+| ---- | ---- | ------- |
+| `OVH_FTP_HOST` | secret | FTP server of the OVH cluster (e.g. `ftp.clusterXXX.hosting.ovh.net`, control panel → Hosting → FTP-SSH) |
+| `OVH_FTP_USER` | secret | FTP login |
+| `OVH_FTP_PASSWORD` | secret | FTP password |
+| `OVH_FTP_DIR` | variable | Site folder, relative to the FTP root (e.g. `www`, or the new site's folder, see below). Required |
+| `OVH_FTP_PROTOCOL` | variable | `ftps` (default) or `sftp` if OVH only offers SFTP |
+| `OVH_SSH_KNOWN_HOSTS` | secret | `sftp` only, optional: server fingerprint (`known_hosts` line) |
+| `OVH_DEPLOY` | variable | Switch: `on` to upload. Without it, the Action builds and checks the site without sending anything |
+
+Upload order: new `_astro/` files first, then pages and other files (deleting obsolete ones), finally `_astro/` cleanup; each file is sent under a temporary name then renamed, so no visitor ever gets a half-copied file. Safeguards: the script refuses a folder containing a WordPress (`wp-config.php`) and never deletes `.ovhconfig` or `.well-known/`.
+
+**Switching from the current WordPress** (same hosting): do not upload into `www/`, which holds it. Upload into a new folder (e.g. `site-astro/`), attach it to a staging subdomain in the control panel (Multisite, with an SSL certificate), check, then point `homme-environnement.org` and `www.` to that folder in Multisite. The WordPress stays untouched for a rollback.
+
+From your own machine (with lftp installed): `npm run build`, then `OVH_FTP_HOST=… OVH_FTP_USER=… OVH_FTP_PASSWORD=… OVH_FTP_DIR=… ovh/deploy.sh`.
+
+PHP: the contact script runs on PHP 7.4 (the hosting's current version, for the WordPress) to 8.x. Move the hosting to PHP 8.x (`.ovhconfig` file) once the WordPress is removed.
+
+## Build environment
+
+`SITE_ENV` at build time: `production` (set by the deployment Action) leaves out the `/lab/` showcase and the fake donations; `preview` (`SITE_ENV=preview npm run build`) builds a staging site with the fake latest donations, like `npm run dev`. While the site is still on Vercel, `VERCEL_ENV=production` also leaves out the lab.
+
+## Audience measurement
+
+No tool connected for now (Vercel Web Analytics only works on Vercel). Reserved slot at the end of `<body>` in [`BaseLayout.astro`](src/layouts/BaseLayout.astro). A **cookie-free** tool is to be chosen (Umami or GoatCounter, for instance): add its `<script defer>` tag there and fill in `ANALYTICS_TOOL` in [`src/data/confidentialite.ts`](src/data/confidentialite.ts) (shown on the Privacy page).
 
 ## Project structure
 
@@ -91,7 +123,7 @@ src/
 
 The rules come from the NGO's design system (the "Design System" artifact): colours, typography, cards, buttons, accessibility, animations. Every value goes through the variables in [`src/styles/tokens.css`](src/styles/tokens.css); do not add hard-coded colours in a component.
 
-Internal showcase: `/lab/` shows the design system as coded, in light and dark mode: one page per foundation (colours by role, typography, spacing, radii, shadows, motion) and per component, with a left-hand navigation. Tokens are read from `tokens.css` at build time ([`src/lib/lab-tokens.ts`](src/lib/lab-tokens.ts)), components are the real ones with site data. Pages listed in [`src/lib/lab-nav.ts`](src/lib/lab-nav.ts), content in `src/components/lab/`, shell in [`src/layouts/LabLayout.astro`](src/layouts/LabLayout.astro). French only, `noindex`, not linked from the site, and **not built in production** (`VERCEL_ENV=production`): run `npm run dev` and open `/lab/`, or use a Vercel preview deployment.
+Internal showcase: `/lab/` shows the design system as coded, in light and dark mode: one page per foundation (colours by role, typography, spacing, radii, shadows, motion) and per component, with a left-hand navigation. Tokens are read from `tokens.css` at build time ([`src/lib/lab-tokens.ts`](src/lib/lab-tokens.ts)), components are the real ones with site data. Pages listed in [`src/lib/lab-nav.ts`](src/lib/lab-nav.ts), content in `src/components/lab/`, shell in [`src/layouts/LabLayout.astro`](src/layouts/LabLayout.astro). French only, `noindex`, not linked from the site, and **not built in production** (`SITE_ENV=production`, see "Build environment"): run `npm run dev` and open `/lab/`, or build a staging site.
 
 Reminders:
 
@@ -143,20 +175,19 @@ Rules to follow for every new page (WCAG 2.2 AA, light and dark modes, checks be
 
 ## Contact form
 
-The site stays static; only the `POST /api/contact` route runs on the server: a Vercel function ([`api/contact.ts`](api/contact.ts)) that sends the message by email over SMTP, from a mailbox of the NGO's email service (no third-party service, no cookies). Fields, subjects and validation are shared between the page and the function ([`src/lib/contact.ts`](src/lib/contact.ts)); anti-spam: an invisible honeypot field.
+The site stays static; only the `POST /api/contact.php` route runs on the server: a dependency-free PHP script ([`public/api/contact.php`](public/api/contact.php)) that sends the message by email over SMTP, from an OVH mailbox of the NGO (no third-party service, no cookies). Fields, subjects and validation are defined in [`src/lib/contact.ts`](src/lib/contact.ts) and shared with the script through `api/contact-fields.json`, generated at build time; anti-spam: an invisible honeypot field. Responses (JSON, or a redirect back to the page without JavaScript) are the same as the former Vercel function's.
 
-Environment variables to set in the Vercel project (Settings → Environment Variables), template in [`.env.example`](.env.example):
+Sending settings: a `contact-config.php` file, **never in the repository**, uploaded by hand (FTP) **outside the published folder**, at the FTP root (two levels above `api/contact.php`: `/home/<login>/contact-config.php` if the site is in `/home/<login>/www/`). Commented template: [`ovh/contact-config.example.php`](ovh/contact-config.example.php).
 
-| Variable       | Purpose |
-| -------------- | ------- |
-| `CONTACT_TO`   | Recipient of the messages |
-| `SMTP_HOST`    | SMTP server of the NGO's email service |
-| `SMTP_PORT`    | `465` (SSL, default) or `587` (STARTTLS) |
-| `SMTP_USER`    | Login of the sending mailbox |
-| `SMTP_PASS`    | Password (or app password) of that mailbox |
-| `CONTACT_FROM` | Displayed sender, optional (`SMTP_USER` by default) |
+| Key | Purpose |
+| --- | ------- |
+| `to` | Recipient of the messages (one address or a list) |
+| `from` | Displayed sender, optional (`user` by default); an address on the domain |
+| `host` | `ssl0.ovh.net` (OVH email SMTP server) |
+| `port` / `encryption` | `465` / `ssl` (default) or `587` / `starttls` |
+| `user` / `pass` | Full address and password of the sending mailbox |
 
-While they are missing (and with `npm run dev`, which does not serve `/api`), sending fails gracefully: the page offers to send the message from the visitor's own email app (prefilled `mailto` link). To test the function locally: `vercel dev`.
+While it is missing (and with `npm run dev`, which does not run PHP), sending fails gracefully: the page offers to send the message from the visitor's own email app (prefilled `mailto` link). Failures are written to the hosting's PHP error log (without the message content).
 
 ## Placeholder content (V1 mockup)
 

@@ -2,9 +2,10 @@
  * Pages du lab (/lab/…), dans l'ordre de la navigation de gauche. Chaque page a son contenu
  * dans src/components/lab/ (voir src/pages/lab/[page].astro).
  */
-// Lab absent du build de production (déploiement de production Vercel) : local et previews seulement.
-const VERCEL_ENV = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VERCEL_ENV;
-export const LAB_ENABLED = VERCEL_ENV !== 'production';
+// Lab absent du build de production : celui de l'Action OVH (SITE_ENV=production) et, tant que le
+// site est encore sur Vercel, son déploiement de production. Local et recette seulement.
+const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+export const LAB_ENABLED = env.SITE_ENV !== 'production' && env.VERCEL_ENV !== 'production';
 
 export interface LabPage {
   slug: string;

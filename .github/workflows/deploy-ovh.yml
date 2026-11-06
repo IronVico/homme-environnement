@@ -1,0 +1,52 @@
+# Construit le site à chaque modification de main et le dépose sur l'hébergement OVH de l'ONG
+# (FTPS, script ovh/deploy.sh). Identifiants dans les secrets du dépôt, voir README, « Déploiement ».
+# Interrupteur : la variable de dépôt OVH_DEPLOY doit valoir « on » ; sinon le site est construit
+# et vérifié, mais rien n'est déposé.
+name: Déploiement OVH
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Un seul déploiement à la fois, dans l'ordre des modifications.
+concurrency:
+  group: deploy-ovh
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          SITE_ENV: production
+
+      - name: Installer lftp
+        if: vars.OVH_DEPLOY == 'on'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Dépôt sur OVH
+        if: vars.OVH_DEPLOY == 'on'
+        run: ovh/deploy.sh
+        env:
+          OVH_FTP_HOST: ${{ secrets.OVH_FTP_HOST }}
+          OVH_FTP_USER: ${{ secrets.OVH_FTP_USER }}
+          OVH_FTP_PASSWORD: ${{ secrets.OVH_FTP_PASSWORD }}
+          OVH_FTP_DIR: ${{ vars.OVH_FTP_DIR }}
+          OVH_FTP_PROTOCOL: ${{ vars.OVH_FTP_PROTOCOL || 'ftps' }}
+          OVH_SSH_KNOWN_HOSTS: ${{ secrets.OVH_SSH_KNOWN_HOSTS }}

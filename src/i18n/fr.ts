@@ -1321,7 +1321,7 @@ const fr = {
     hosting: {
       title: 'Hébergement',
       intro: 'Le site est hébergé par :',
-      country: 'États-Unis',
+      country: 'France',
     },
     design: {
       title: 'Conception',

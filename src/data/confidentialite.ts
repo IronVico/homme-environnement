@@ -14,9 +14,10 @@ export const PRIVACY_UPDATED: string | null = null;
 export const NEWSLETTER_TOOL: string | null = null;
 
 /**
- * Outil de mesure d'audience sans cookie, chargé dans BaseLayout (<Analytics />).
+ * Outil de mesure d'audience sans cookie, chargé dans BaseLayout (emplacement en fin de <body>).
+ * TODO Victor / ONG : à choisir (Umami ou GoatCounter, sans cookies) ; aucun outil pour l'instant.
  */
-export const ANALYTICS_TOOL: string | null = 'Vercel Web Analytics';
+export const ANALYTICS_TOOL: string | null = null;
 
 /** Durées de conservation (texte affiché tel quel). TODO ONG : à fournir. */
 export const RETENTION = {

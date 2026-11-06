@@ -19,12 +19,13 @@ export const LEGAL_UPDATED: string | null = null;
 /** Conception et réalisation du site. TODO ONG : nom à fournir. */
 export const SITE_DESIGNER: string | null = null;
 
+/** Hébergeur du site (offre d'hébergement Web de l'ONG chez OVHcloud). */
 export const HOST = {
-  name: 'Vercel Inc.',
+  name: 'OVH SAS',
   // Pays : texte traduit (mentionsLegales.hosting.country).
-  address: ['440 N Barranca Ave #4133', 'Covina, CA 91723'],
-  url: 'https://vercel.com',
-  urlLabel: 'vercel.com',
+  address: ['2 rue Kellermann', '59100 Roubaix'],
+  url: 'https://www.ovhcloud.com/fr/',
+  urlLabel: 'ovhcloud.com',
 };
 
 /** Auteurs des photographies du site, dans l'ordre de la maquette. */
