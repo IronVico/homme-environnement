@@ -1,0 +1,745 @@
+---
+/**
+ * Bulle « Une question ? » en bas à droite de toutes les pages (BaseLayout) : un petit échange
+ * façon messagerie pour envoyer une question ; l'ONG répond plus tard, par e-mail.
+ * - Sans JS : la bulle est un simple lien vers le formulaire de la page Contact.
+ * - Avec JS : le lien devient un bouton qui ouvre un <dialog> modal (focus piégé par le navigateur,
+ *   Échap ferme, focus rendu à la bulle). Le panneau est cloné depuis un <template> à la première
+ *   ouverture. Panneau ancré au-dessus de la bulle sur ordinateur, plein écran sous 700px.
+ * Échange en trois temps, une seule zone de saisie en bas : la question, l'adresse e-mail, puis
+ * l'accord (bouton « J'accepte, envoyer »). Les réponses de la membre de l'équipe sont annoncées
+ * par la zone role="status". Une deuxième question réutilise l'adresse et l'accord.
+ * Envoi : le même que la page Contact (CONTACT_ENDPOINT, règles de src/lib/contact.ts, champ piège),
+ * sujet QUESTION_SUBJECT, sans nom. Membre de l'équipe qui signe : src/data/question.ts.
+ */
+import MessageCircle from '@lucide/astro/icons/message-circle';
+import Send from '@lucide/astro/icons/send';
+import X from '@lucide/astro/icons/x';
+import { CONTACT_EMAIL, pagePath } from '../data/navigation';
+import { QUESTION_HOST } from '../data/question';
+import { getLang, t } from '../i18n';
+import { fill } from '../lib/don';
+import { CONTACT_ENDPOINT, CONTACT_FORM_ANCHOR, CONTACT_MAX, CONTACT_TRAP, QUESTION_SUBJECT } from '../lib/contact';
+import Portrait from './Portrait.astro';
+
+const lang = getLang(Astro.currentLocale);
+const q = t(lang).question;
+const host = QUESTION_HOST;
+const hostSays = `${host.firstName} ${q.hostSays} `;
+const tooLong = (max: number) => fill(q.errors.tooLong, { max: String(max) });
+---
+
+<div class="question" data-question>
+  <a
+    class="question__bubble btn-motion"
+    href={`${pagePath(lang, 'contact')}#${CONTACT_FORM_ANCHOR}`}
+    aria-label={q.open}
+    data-tooltip={q.open}
+    data-tooltip-align="end"
+    data-question-toggle
+  >
+    <MessageCircle size={26} aria-hidden="true" />
+  </a>
+
+  <template data-question-template>
+    <dialog class="question__panel" id="question-panneau" aria-labelledby="question-titre" aria-modal="true">
+      <div class="question__head">
+        <Portrait
+          name={host.name}
+          photo={host.photo}
+          position={host.photoPosition}
+          class="question__avatar"
+          widths={[48, 96]}
+          sizes="48px"
+        />
+        <div class="question__host">
+          <h2 class="visually-hidden" id="question-titre">{q.title}</h2>
+          <p class="question__name">{host.firstName}</p>
+          <p class="question__role">{host.role[lang]}</p>
+        </div>
+        <button
+          class="question__close"
+          type="button"
+          aria-label={q.close}
+          data-tooltip={q.close}
+          data-tooltip-align="end"
+          data-tooltip-pos="below"
+          data-question-close
+        >
+          <X size={24} aria-hidden="true" />
+        </button>
+      </div>
+
+      <div class="question__body" data-question-body>
+        <div class="question__thread" data-question-thread>
+          <p class="question__msg question__msg--host">
+            <span class="visually-hidden">{hostSays}</span>{q.greeting}
+          </p>
+        </div>
+      </div>
+
+      <!-- Réponses de la membre de l'équipe, annoncées aux lecteurs d'écran (le fil n'est pas une zone live). -->
+      <p class="visually-hidden" role="status" data-question-status></p>
+
+      <form
+        class="question__composer"
+        action={CONTACT_ENDPOINT}
+        method="post"
+        aria-labelledby="question-titre"
+        data-question-form
+        data-sending={q.sending}
+        data-retry={q.retry}
+        data-mail-subject={q.mailSubject}
+        data-email={CONTACT_EMAIL}
+      >
+        <input type="hidden" name="lang" value={lang} />
+        <input type="hidden" name="sujet" value={QUESTION_SUBJECT} />
+        <input type="hidden" name="message" data-value="message" />
+        <input type="hidden" name="email" data-value="email" />
+        <!-- Activé par le bouton « J'accepte, envoyer » : même champ que la case de la page Contact. -->
+        <input type="hidden" name="consentement" value="on" disabled data-value="consentement" />
+
+        <!-- Champ piège (comme la page Contact) : hors écran, sauté au clavier ; rempli, le message est ignoré. -->
+        <div class="question__trap" aria-hidden="true">
+          <label for="question-piege">{q.trap}</label>
+          <input id="question-piege" name={CONTACT_TRAP} type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <p class="question__error" id="question-erreur" aria-live="polite" data-question-error></p>
+
+        <div class="question__bar" data-step="message">
+          <label class="visually-hidden" for="question-message">{q.message}</label>
+          <textarea
+            class="question__input"
+            id="question-message"
+            rows="1"
+            maxlength={CONTACT_MAX.message}
+            placeholder={q.messagePlaceholder}
+            aria-describedby="question-erreur"
+            data-field="message"
+            data-error-required={q.errors.message}
+            data-error-too-long={tooLong(CONTACT_MAX.message)}></textarea>
+          <button class="question__send" type="submit" aria-label={q.send} data-tooltip={q.send} data-tooltip-align="end">
+            <Send size={20} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div class="question__bar" data-step="email" hidden>
+          <label class="visually-hidden" for="question-email">{q.email}</label>
+          <input
+            class="question__input"
+            id="question-email"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            maxlength={CONTACT_MAX.email}
+            placeholder={q.emailPlaceholder}
+            aria-describedby="question-erreur"
+            data-field="email"
+            data-error-required={q.errors.email}
+            data-error-email={q.errors.emailInvalid}
+            data-error-too-long={tooLong(CONTACT_MAX.email)}
+          />
+          <button class="question__send" type="submit" aria-label={q.send} data-tooltip={q.send} data-tooltip-align="end">
+            <Send size={20} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div class="question__actions" data-step="consent" hidden>
+          <button class="question__primary btn-motion" type="submit" data-question-consent>{q.consentButton}</button>
+        </div>
+
+        <div class="question__actions" data-step="done" hidden>
+          <button class="question__secondary" type="button" data-question-another>{q.another}</button>
+        </div>
+      </form>
+
+      <!-- Messages ajoutés au fil au cours de l'échange. -->
+      <template data-msg="email">
+        <p class="question__msg question__msg--host"><span class="visually-hidden">{hostSays}</span>{q.askEmail}</p>
+      </template>
+      <template data-msg="consent">
+        <p class="question__msg question__msg--host">
+          <span class="visually-hidden">{hostSays}</span>{q.askConsent}<a href={pagePath(lang, 'confidentialite')}
+            >{q.privacyLink}</a
+          >.
+        </p>
+      </template>
+      <template data-msg="sending">
+        <p class="question__msg question__msg--host question__msg--pending">{q.sending}</p>
+      </template>
+      <template data-msg="received">
+        <p class="question__msg question__msg--host"><span class="visually-hidden">{hostSays}</span>{q.received}</p>
+      </template>
+      <template data-msg="failed">
+        <p class="question__msg question__msg--host">
+          <span class="visually-hidden">{hostSays}</span>{q.failed}<a data-mailto>{q.failedLink}</a>.
+        </p>
+      </template>
+      <template data-msg="you">
+        <p class="question__msg question__msg--you">
+          <span class="visually-hidden">{q.youSay} </span><span data-text></span>
+        </p>
+      </template>
+    </dialog>
+  </template>
+</div>
+
+<script>
+  import { readContactValues, validateContactField, type ContactError, type ContactField } from '../lib/contact';
+
+  type Step = 'message' | 'email' | 'consent' | 'done';
+  type Control = HTMLInputElement | HTMLTextAreaElement;
+
+  const ERROR_ATTRIBUTE: Record<ContactError, string> = {
+    required: 'errorRequired',
+    email: 'errorEmail',
+    tooLong: 'errorTooLong',
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-question]');
+  const link = root?.querySelector<HTMLAnchorElement>('[data-question-toggle]');
+  const template = root?.querySelector<HTMLTemplateElement>('[data-question-template]');
+
+  if (root && link && template) {
+    // Le lien vers la page Contact devient un bouton (mêmes classes, libellé et infobulle).
+    const bubble = document.createElement('button');
+    for (const { name, value } of link.attributes) if (name !== 'href') bubble.setAttribute(name, value);
+    bubble.type = 'button';
+    bubble.setAttribute('aria-haspopup', 'dialog');
+    bubble.setAttribute('aria-expanded', 'false');
+    bubble.setAttribute('aria-controls', 'question-panneau');
+    bubble.append(...link.childNodes);
+    link.replaceWith(bubble);
+
+    let dialog: HTMLDialogElement | null = null;
+    let focusStep: () => void = () => {};
+
+    const setup = (panel: HTMLDialogElement) => {
+      const form = panel.querySelector<HTMLFormElement>('[data-question-form]')!;
+      const body = panel.querySelector<HTMLElement>('[data-question-body]')!;
+      const thread = panel.querySelector<HTMLElement>('[data-question-thread]')!;
+      const status = panel.querySelector<HTMLElement>('[data-question-status]')!;
+      const error = panel.querySelector<HTMLElement>('[data-question-error]')!;
+      const consentButton = form.querySelector<HTMLButtonElement>('[data-question-consent]')!;
+      const steps = [...form.querySelectorAll<HTMLElement>('[data-step]')];
+      const field = (name: string) => form.querySelector<Control>(`[data-field="${name}"]`)!;
+      const value = (name: string) => form.querySelector<HTMLInputElement>(`[data-value="${name}"]`)!;
+      const textarea = field('message') as HTMLTextAreaElement;
+      let step: Step = 'message';
+      let sending = false;
+      form.noValidate = true;
+
+      const scrollToEnd = () => body.scrollTo({ top: body.scrollHeight });
+
+      /** Ajoute un message au fil ; ceux de la membre de l'équipe sont aussi annoncés. */
+      const say = (name: string, text?: string) => {
+        const source = panel.querySelector<HTMLTemplateElement>(`template[data-msg="${name}"]`)!;
+        const message = source.content.firstElementChild!.cloneNode(true) as HTMLElement;
+        if (text !== undefined) message.querySelector('[data-text]')!.textContent = text;
+        thread.append(message);
+        if (name !== 'you') status.textContent = message.textContent?.trim() ?? '';
+        scrollToEnd();
+        return message;
+      };
+
+      const show = (next: Step) => {
+        step = next;
+        steps.forEach((element) => (element.hidden = element.dataset.step !== next));
+        focusStep();
+      };
+
+      focusStep = () => {
+        const current = steps.find((element) => element.dataset.step === step);
+        current?.querySelector<HTMLElement>('textarea, input, button')?.focus();
+      };
+
+      const showError = (control: Control, problem: ContactError | null) => {
+        const text = problem ? (control.dataset[ERROR_ATTRIBUTE[problem]] ?? control.dataset.errorRequired ?? '') : '';
+        if (error.textContent !== text) error.textContent = text;
+        if (problem) control.setAttribute('aria-invalid', 'true');
+        else control.removeAttribute('aria-invalid');
+      };
+
+      /** Mêmes règles que la page Contact, sur la valeur saisie. */
+      const check = (control: Control) => {
+        const data = new FormData(form);
+        data.set(control.dataset.field!, control.value);
+        const problem = validateContactField(control.dataset.field as ContactField, readContactValues(data));
+        showError(control, problem);
+        return problem;
+      };
+
+      [field('message'), field('email')].forEach((control) => {
+        control.addEventListener('input', () => {
+          if (control.hasAttribute('aria-invalid')) check(control);
+        });
+      });
+
+      // Zone de saisie qui grandit avec le texte ; Entrée envoie, Maj + Entrée passe à la ligne.
+      textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      });
+      textarea.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+          event.preventDefault();
+          form.requestSubmit();
+        }
+      });
+
+      const send = async () => {
+        sending = true;
+        consentButton.setAttribute('aria-disabled', 'true');
+        const pending = say('sending');
+        let sent = false;
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+          const result = (await response.json().catch(() => ({}))) as { ok?: boolean };
+          sent = response.ok && result.ok === true;
+        } catch {
+          sent = false;
+        } finally {
+          sending = false;
+          consentButton.removeAttribute('aria-disabled');
+          pending.remove();
+        }
+        if (sent) {
+          say('received');
+          value('message').value = '';
+          show('done');
+        } else {
+          // Échec : lien mailto prérempli avec la question, et nouvel essai possible.
+          const failed = say('failed');
+          const mailto = failed.querySelector<HTMLAnchorElement>('[data-mailto]')!;
+          mailto.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(form.dataset.mailSubject ?? '')}&body=${encodeURIComponent(value('message').value)}`;
+          consentButton.textContent = form.dataset.retry ?? '';
+          show('consent');
+        }
+      };
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (sending) return;
+
+        if (step === 'message' || step === 'email') {
+          const control = field(step);
+          if (check(control)) {
+            control.focus();
+            return;
+          }
+          const text = control.value.trim();
+          value(step).value = text;
+          control.value = '';
+          if (control === textarea) textarea.style.height = '';
+          say('you', text);
+          if (step === 'message' && !value('email').value) {
+            say('email');
+            show('email');
+          } else if (value('consentement').disabled) {
+            say('consent');
+            show('consent');
+          } else {
+            void send();
+          }
+          return;
+        }
+
+        if (step === 'consent') {
+          value('consentement').disabled = false;
+          void send();
+        }
+      });
+
+      panel.querySelector('[data-question-another]')!.addEventListener('click', () => show('message'));
+      panel.querySelector('[data-question-close]')!.addEventListener('click', () => panel.close());
+      // Clic hors du panneau (sur le fond) : fermeture.
+      panel.addEventListener('click', (event) => {
+        if (event.target !== panel) return;
+        const box = panel.getBoundingClientRect();
+        const inside =
+          event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom;
+        if (!inside) panel.close();
+      });
+      panel.addEventListener('close', () => {
+        document.documentElement.classList.remove('question-open');
+        bubble.setAttribute('aria-expanded', 'false');
+        bubble.focus();
+      });
+    };
+
+    bubble.addEventListener('click', () => {
+      if (!dialog) {
+        root.append(template.content.cloneNode(true));
+        dialog = root.querySelector<HTMLDialogElement>('dialog')!;
+        setup(dialog);
+      }
+      if (dialog.open) return;
+      dialog.showModal();
+      document.documentElement.classList.add('question-open');
+      bubble.setAttribute('aria-expanded', 'true');
+      focusStep();
+    });
+  }
+</script>
+
+<style>
+  /* Bulle : 56px, en bas à droite, sous le loader de la page (z-index 100) et au-dessus du header. */
+  .question__bubble {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+  }
+
+  .question__bubble:hover {
+    background: var(--texte-fort);
+    color: var(--texte-sur-bouton);
+  }
+
+  .question__bubble:focus-visible {
+    outline-offset: 3px;
+  }
+
+  /* Panneau : ~380 × 560px, ancré au-dessus de la bulle (bulle 56px + 16px + écart 12px). */
+  .question__panel {
+    position: fixed;
+    inset: auto max(16px, env(safe-area-inset-right)) calc(max(16px, env(safe-area-inset-bottom)) + 68px) auto;
+    display: none;
+    flex-direction: column;
+    width: min(380px, calc(100vw - 32px));
+    height: min(560px, calc(100dvh - 100px));
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card-lg);
+    background: var(--surface);
+    color: var(--texte);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .question__panel[open] {
+    display: flex;
+  }
+
+  .question__panel::backdrop {
+    background: transparent;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .question__panel[open] {
+      animation: question-in 200ms ease-out;
+    }
+
+    .question__msg {
+      animation: question-msg-in 160ms ease-out;
+    }
+  }
+
+  @keyframes question-in {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+  }
+
+  @keyframes question-msg-in {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
+  /* Mobile : modale plein écran, page figée derrière. */
+  @media (max-width: 699px) {
+    .question__panel {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    :global(html.question-open) {
+      overflow: hidden;
+    }
+  }
+
+  .question__head {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+    padding-top: max(var(--space-3), env(safe-area-inset-top));
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .question__head :global(.question__avatar) {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  .question__host {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .question__name {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .question__role {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--texte-doux);
+  }
+
+  .question__close {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--texte);
+    cursor: pointer;
+    transition: background-color var(--transition-ui);
+  }
+
+  .question__close:hover {
+    background: var(--section);
+  }
+
+  /* Fil de la conversation : seul à défiler, les derniers messages juste au-dessus de la saisie. */
+  .question__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-5);
+  }
+
+  .question__thread {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: auto;
+  }
+
+  .question__msg {
+    max-width: 85%;
+    padding: var(--space-3) 16px;
+    border-radius: 18px;
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+
+  .question__msg--host {
+    align-self: flex-start;
+    border-bottom-left-radius: 6px;
+    background: var(--section);
+    color: var(--texte);
+  }
+
+  .question__msg--host a {
+    color: var(--texte);
+    font-weight: 500;
+  }
+
+  .question__msg--you {
+    align-self: flex-end;
+    border-bottom-right-radius: 6px;
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .question__msg--pending {
+    font-style: italic;
+  }
+
+  /* Zone de saisie, en bas du panneau. */
+  .question__composer {
+    flex-shrink: 0;
+    padding: var(--space-3) var(--space-5);
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--trait);
+  }
+
+  .question__error {
+    margin-bottom: var(--space-2);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .question__error:empty {
+    display: none;
+  }
+
+  /* Contour à 3:1 minimum (WCAG 1.4.11), comme les champs de la page Contact ; le focus du champ
+     est porté par la barre entière (contour autour de la barre, pas du champ seul). */
+  .question__bar {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+    padding: 4px 4px 4px 16px;
+    border: 1.5px solid var(--texte-doux);
+    border-radius: 26px;
+    background: var(--surface);
+    transition: border-color var(--transition-ui);
+  }
+
+  .question__bar:hover,
+  .question__bar:focus-within,
+  .question__bar:has([aria-invalid='true']) {
+    border-color: var(--texte);
+  }
+
+  .question__bar:has(.question__input:focus-visible) {
+    outline: 2px solid var(--texte);
+    outline-offset: 2px;
+  }
+
+  .question__bar:has([aria-invalid='true']) {
+    border-width: 2px;
+  }
+
+  .question__bar[hidden],
+  .question__actions[hidden] {
+    display: none;
+  }
+
+  .question__input {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    max-height: 132px;
+    margin: 0;
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    color: var(--texte);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: none;
+  }
+
+  .question__input:focus-visible {
+    outline: none;
+  }
+
+  .question__input::placeholder {
+    color: var(--texte-doux);
+    opacity: 1;
+  }
+
+  .question__send {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+    cursor: pointer;
+    transition: background-color var(--transition-ui);
+  }
+
+  .question__send:hover {
+    background: var(--texte-fort);
+  }
+
+  .question__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .question__primary,
+  .question__secondary {
+    min-height: 44px;
+    padding: 12px 22px;
+    border-radius: var(--radius-pill);
+    font: inherit;
+    font-size: var(--fs-body-sm);
+    font-weight: 600;
+    line-height: 1.25;
+    cursor: pointer;
+  }
+
+  .question__primary {
+    border: 0;
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+  }
+
+  .question__primary:hover {
+    background: var(--texte-fort);
+  }
+
+  .question__primary[aria-disabled='true'] {
+    cursor: progress;
+  }
+
+  .question__secondary {
+    border: 1.5px solid var(--texte);
+    background: transparent;
+    color: var(--texte);
+    transition: background-color var(--transition-ui);
+  }
+
+  .question__secondary:hover {
+    background: var(--section);
+  }
+
+  .question__trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .question__bar,
+    .question__close,
+    .question__send,
+    .question__secondary {
+      transition: none;
+    }
+  }
+</style>

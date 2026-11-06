@@ -1606,6 +1606,8 @@ const fr = {
         entreprise: 'Partenariat entreprise',
         presse: 'Presse',
         autre: 'Autre',
+        /** Messages de la bulle « Une question ? », absent de la liste de la page. */
+        question: 'Question rapide',
       },
       message: 'Message',
       messageHelp: 'Précisez si besoin le site ou le projet concerné.',
@@ -1815,6 +1817,48 @@ const fr = {
     home: "Retour à l'accueil",
     /** Suivi de l'adresse e-mail de l'ONG. */
     contact: 'Si le problème continue, écrivez-nous à ',
+  },
+
+  /**
+   * Bulle « Une question ? » sur toutes les pages (QuestionBubble.astro) : message rapide, réponse
+   * par e-mail. Envoi par le formulaire de contact (src/lib/contact.ts, sujet « Question rapide »).
+   */
+  question: {
+    open: 'Une question ?',
+    title: 'Une question ?',
+    close: 'Fermer',
+    /** Avant chaque message de la membre de l'équipe (son prénom à la suite), pour les lecteurs d'écran. */
+    hostSays: 'écrit :',
+    youSay: 'Vous avez écrit :',
+    greeting: 'Bonjour ! Posez-nous votre question, on vous répond par e-mail sous quelques jours.',
+    askEmail: 'Merci ! À quelle adresse e-mail pouvons-nous vous répondre ?',
+    /** Suivi du lien vers la politique de confidentialité. */
+    askConsent: "Dernière étape : votre adresse sert uniquement à vous répondre, rien d'autre. ",
+    privacyLink: 'Lire la politique de confidentialité',
+    /** Valeur du consentement envoyée avec le message (même règle que la page Contact). */
+    consentButton: "J'accepte, envoyer",
+    message: 'Votre question',
+    messagePlaceholder: 'Écrivez votre question…',
+    email: 'Votre adresse e-mail',
+    emailPlaceholder: 'nom@exemple.fr',
+    send: 'Envoyer',
+    another: 'Poser une autre question',
+    trap: 'Ne remplissez pas ce champ',
+    errors: {
+      message: 'Écrivez votre question.',
+      email: 'Indiquez votre adresse e-mail.',
+      emailInvalid: 'Cette adresse e-mail semble incomplète. Exemple : nom@exemple.fr',
+      /** {max} : nombre de caractères autorisés. */
+      tooLong: 'Ce texte est trop long : {max} caractères au maximum.',
+    },
+    sending: 'Envoi en cours…',
+    received: 'Message bien reçu ! On vous répond par e-mail sous quelques jours.',
+    /** Envoi impossible : lien mailto prérempli à la suite. */
+    failed: "Le message n'a pas pu partir. Vous pouvez l'envoyer depuis votre messagerie : ",
+    failedLink: 'ouvrir un e-mail prérempli',
+    retry: "Réessayer l'envoi",
+    /** Objet de l'e-mail prérempli. */
+    mailSubject: 'Question rapide',
   },
 };
 

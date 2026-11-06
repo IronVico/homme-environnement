@@ -2,6 +2,7 @@
 import Intro from '../components/Intro.astro';
 import { getLang, languages, localeUrl, pathWithoutLocale, t, type Lang } from '../i18n';
 import { ogImageFor } from '../lib/og';
+import QuestionBubble from '../components/QuestionBubble.astro';
 import Analytics from '@vercel/analytics/astro';
 import '../styles/global.css';
 
@@ -110,6 +111,7 @@ const ogVideo = isHome ? new URL(`/video/partage-accueil-${lang}.mp4`, mediaOrig
     <div class="site">
       <slot />
     </div>
+    <QuestionBubble />
     <script>
       import { initImages } from '../scripts/images';
       import { initIntro } from '../scripts/intro';

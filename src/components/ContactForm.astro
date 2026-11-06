@@ -13,7 +13,7 @@ import Send from '@lucide/astro/icons/send';
 import { CONTACT_EMAIL, pagePath } from '../data/navigation';
 import { getLang, t } from '../i18n';
 import { fill } from '../lib/don';
-import { CONTACT_ANCHORS, CONTACT_ENDPOINT, CONTACT_MAX, CONTACT_SUBJECTS, CONTACT_TRAP } from '../lib/contact';
+import { CONTACT_ANCHORS, CONTACT_ENDPOINT, CONTACT_FORM_SUBJECTS, CONTACT_MAX, CONTACT_TRAP } from '../lib/contact';
 
 interface Props {
   /** id du titre de la carte (nom accessible du formulaire). */
@@ -94,7 +94,7 @@ const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) })
         data-error-required={form.errors.sujet}
       >
         <option value="" disabled selected>{form.subjectPlaceholder}</option>
-        {CONTACT_SUBJECTS.map((subject) => <option value={subject}>{form.subjects[subject]}</option>)}
+        {CONTACT_FORM_SUBJECTS.map((subject) => <option value={subject}>{form.subjects[subject]}</option>)}
       </select>
       <ChevronDown class="contact-form__chevron" size={20} />
     </span>
@@ -159,8 +159,8 @@ const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) })
 
 <script>
   import {
+    CONTACT_FORM_SUBJECTS,
     CONTACT_SUBJECT_PARAM,
-    isContactSubject,
     readContactValues,
     validateContactField,
     type ContactError,
@@ -186,7 +186,7 @@ const tooLong = (max: number) => fill(form.errors.tooLong, { max: String(max) })
     // Sujet présélectionné quand on arrive d'un bouton « Nous écrire » (?sujet=entreprise).
     const preset = new URLSearchParams(window.location.search).get(CONTACT_SUBJECT_PARAM);
     const subjectSelect = form.querySelector<HTMLSelectElement>('select[name="sujet"]');
-    if (subjectSelect && preset && isContactSubject(preset)) subjectSelect.value = preset;
+    if (subjectSelect && preset && (CONTACT_FORM_SUBJECTS as string[]).includes(preset)) subjectSelect.value = preset;
 
     const showError = (control: Control, error: ContactError | null) => {
       const message = document.getElementById(`${control.id}-erreur`);
