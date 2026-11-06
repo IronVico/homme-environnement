@@ -161,6 +161,7 @@ const fr = {
     },
     partners: {
       title: 'Ils nous font confiance',
+      link: 'Voir tous nos partenaires',
     },
     newsletter: {
       titleStrong: 'Des nouvelles du terrain,',

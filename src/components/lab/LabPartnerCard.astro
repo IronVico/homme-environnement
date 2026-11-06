@@ -1,0 +1,34 @@
+---
+/** Lab, page PartnerCard : partenaires réels (logo couleur en clair, monochrome en sombre ; monogramme sans logo). */
+import { PARTNERS } from '../../data/partenaires';
+import { t } from '../../i18n';
+import PartnerCard from '../PartnerCard.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const withLogo = PARTNERS.find((partner) => partner.logo && partner.logoMono);
+const withoutLogo = PARTNERS.find((partner) => !partner.logo);
+const partners = [withLogo, withoutLogo].filter((partner) => partner !== undefined);
+---
+
+<LabExample
+  id="lab-partenaires"
+  title="Cartes partenaire"
+  text="Logo, type, nom. La carte n’est pas un lien : pas de survol. Le contenu propre à la page (rôle, sites, lien) passe en slot. Avec logo, puis sans logo fourni."
+  tone="section"
+>
+  <ul class="partners" role="list">
+    {partners.map((partner) => <PartnerCard partner={partner} typeLabel={dict.partenaires.types[partner.type]} />)}
+  </ul>
+</LabExample>
+
+<style>
+  .partners {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+/**
+ * Lab, page Motifs : ContourPattern (hero, footer) et FooterStamp, sur fond footer.
+ * Leur position est normalement gérée par le parent : ici, affichés dans le flux.
+ */
+import ContourPattern from '../ContourPattern.astro';
+import FooterStamp from '../FooterStamp.astro';
+import LabExample from './LabExample.astro';
+---
+
+<LabExample
+  id="lab-contours"
+  title="ContourPattern"
+  text="Courbes de niveau sauge, trait 1,3px, qui « respirent » lentement ; figées avec <code>prefers-reduced-motion</code>. Opacité ×0,6 en sombre (<code>--motif-opacite</code>). <code>hero</code> puis <code>footer</code>."
+>
+  <div class="motifs">
+    <div class="motifs__box"><ContourPattern variant="hero" class="lab-contours" /></div>
+    <div class="motifs__box"><ContourPattern variant="footer" class="lab-contours" /></div>
+  </div>
+</LabExample>
+
+<LabExample
+  id="lab-tampon"
+  title="FooterStamp"
+  text="Sceau incliné, texte en cercle qui tourne (un tour en 40 s, immobile avec <code>prefers-reduced-motion</code>). Au clic : coup de tampon, purement décoratif (pas de focus)."
+>
+  <div class="motifs__box motifs__box--stamp"><FooterStamp class="lab-stamp" /></div>
+</LabExample>
+
+<style>
+  .motifs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: var(--space-5);
+  }
+
+  .motifs__box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    padding: var(--space-5);
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--footer);
+  }
+
+  .motifs__box :global(.lab-contours) {
+    position: static;
+    width: 100%;
+    height: auto;
+    mask-image: none;
+  }
+
+  .motifs__box :global(.lab-stamp) {
+    position: static;
+    width: 180px;
+    height: 180px;
+  }
+</style>

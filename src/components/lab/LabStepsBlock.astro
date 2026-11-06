@@ -1,0 +1,24 @@
+---
+/** Lab, page StepsBlock : « Candidater » de la page Stages, dans ses deux tons. */
+import { STAGES_EMAIL } from '../../data/navigation';
+import { t } from '../../i18n';
+import StepsBlock from '../StepsBlock.astro';
+import LabExample from './LabExample.astro';
+
+const apply = t('fr').stages.apply;
+const props = {
+  titleStrong: apply.titleStrong,
+  titleLight: apply.titleLight,
+  text: apply.text,
+  button: { label: apply.button, href: `mailto:${STAGES_EMAIL}` },
+  steps: apply.steps,
+};
+---
+
+<LabExample id="lab-steps-section" title="tone=&quot;section&quot;" text="Encart vert clair, pour une section blanche. Son titre est un <code>h2</code> (<code>SectionHeading</code>).">
+  <StepsBlock id="lab-candidater-1" {...props} tone="section" />
+</LabExample>
+
+<LabExample id="lab-steps-surface" title="tone=&quot;surface&quot; et compact" text="Carte blanche pour une section vert clair ; <code>compact</code> réduit le titre (page Entreprises)." tone="section">
+  <StepsBlock id="lab-candidater-2" {...props} tone="surface" compact />
+</LabExample>

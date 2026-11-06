@@ -1,0 +1,100 @@
+---
+/**
+ * Lab, page StatCard : bande sauge de l'accueil (StatsBand), les autres illustrations avec les
+ * chiffres des pages Madagascar, Burkina Faso et Autres projets, puis la variante icône (Vohimana).
+ */
+import Calendar from '@lucide/astro/icons/calendar';
+import MapIcon from '@lucide/astro/icons/map';
+import { getEntry } from 'astro:content';
+import { MADAGASCAR, SITE_FIGURES } from '../../data/chiffres';
+import { PROGRAMME } from '../../data/projets-soutenus';
+import { t } from '../../i18n';
+import StatCard from '../StatCard.astro';
+import StatsBand from '../StatsBand.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const { home } = dict;
+
+const homeStats = (
+  [
+    { value: 30, illustration: 'ring' },
+    { value: 400000, illustration: 'bars' },
+    { value: 5000, illustration: 'dots' },
+  ] as const
+).map((stat, i) => {
+  const text = home.stats[i]!;
+  return { ...stat, unit: text.unit, text: text.text, illustrationLabel: text.illustrationLabel };
+});
+
+const mg = dict.madagascar.stats;
+const autres = dict.autresProjets.stats;
+const otherStats = [
+  { value: MADAGASCAR.hectares, prefix: '≈', illustration: 'sites', unit: mg[0]!.unit, text: mg[0]!.text, illustrationLabel: mg[0]!.illustrationLabel },
+  {
+    value: MADAGASCAR.beneficiaries,
+    prefix: '≈',
+    illustration: 'share',
+    ratio: MADAGASCAR.beneficiaries / MADAGASCAR.inhabitants,
+    unit: mg[1]!.unit,
+    text: mg[1]!.text,
+    illustrationLabel: mg[1]!.illustrationLabel,
+  },
+  { value: MADAGASCAR.threatenedSpecies, illustration: 'families', unit: mg[2]!.unit, text: mg[2]!.text, illustrationLabel: mg[2]!.illustrationLabel },
+  { value: dict.site.missing, illustration: 'water', text: dict.burkina.stats[1]!.text, illustrationLabel: dict.burkina.stats[1]!.illustrationLabel },
+  { value: `${PROGRAMME.from}–${PROGRAMME.to}`, illustration: 'ticks', count: 10, text: autres.yearsText, illustrationLabel: autres.yearsLabel },
+  { value: PROGRAMME.projects, illustration: 'grid', count: PROGRAMME.projects, text: autres.projectsText, illustrationLabel: autres.projectsLabel },
+  { value: PROGRAMME.countries, illustration: 'segments', count: PROGRAMME.countries, text: autres.countriesText, illustrationLabel: autres.countriesLabel },
+] as const;
+
+const vohimana = await getEntry('sites', 'vohimana');
+const figures = SITE_FIGURES.vohimana ?? {};
+const figureText = (key: string) => vohimana?.data.figures?.find((figure) => figure.key === key)?.text ?? '';
+const iconStats = [
+  { value: figures.hectares ?? dict.site.missing, unit: dict.site.units.hectares, text: figureText('hectares'), Icon: MapIcon },
+  { value: figures.years ?? dict.site.missing, unit: dict.site.units.years, text: figureText('years'), Icon: Calendar },
+];
+---
+
+<LabExample
+  id="lab-stats-band"
+  title="StatsBand"
+  text="Bande sauge de l’accueil, illustrations <code>ring</code>, <code>bars</code>, <code>dots</code>. Compteur animé au défilement, figé avec <code>prefers-reduced-motion</code>."
+  flush
+>
+  <StatsBand stats={homeStats} label="Exemple : chiffres clés de l’accueil" />
+</LabExample>
+
+<LabExample
+  id="lab-illustrations"
+  title="Illustrations"
+  text="<code>sites</code>, <code>share</code>, <code>families</code> (Madagascar), <code>water</code> avec une valeur à fournir, sans compteur (Burkina Faso), <code>ticks</code>, <code>grid</code>, <code>segments</code> (Autres projets soutenus)."
+  tone="section"
+>
+  <div class="stats">{otherStats.map((stat) => <StatCard {...stat} />)}</div>
+</LabExample>
+
+<LabExample id="lab-stat-icone" title="Variante icône" text="Sans illustration : icône Lucide de 28px dans un disque de 64px (fiches site, ici Vohimana)." tone="section">
+  <div class="stats">
+    {
+      iconStats.map(({ Icon, ...stat }) => (
+        <StatCard {...stat}>
+          <Icon slot="icon" size={28} />
+        </StatCard>
+      ))
+    }
+  </div>
+</LabExample>
+
+<script>
+  import { initStats } from '../../scripts/stats';
+  initStats();
+</script>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: var(--space-5);
+  }
+</style>

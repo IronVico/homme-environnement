@@ -9,6 +9,8 @@
  * le <head> réaffiche tout au bout de 3s (classe .reveal-off).
  */
 
+import { whenPageRevealed } from './intro';
+
 const STAGGER_MS = 90;
 
 export function initReveal() {
@@ -37,5 +39,6 @@ export function initReveal() {
     { threshold: 0.15, rootMargin: '0px 0px -8% 0px' },
   );
 
-  elements.forEach((el) => observer.observe(el));
+  // Écran d'ouverture : la page apparaît quand le rideau se lève.
+  whenPageRevealed().then(() => elements.forEach((el) => observer.observe(el)));
 }

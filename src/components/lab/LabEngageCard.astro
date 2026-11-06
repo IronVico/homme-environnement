@@ -1,0 +1,98 @@
+---
+/** Lab, page EngageCard : variantes engage et country (accueil), et CountryCard. */
+import { donatePath, pagePath } from '../../data/navigation';
+import { t } from '../../i18n';
+import { getExplorerSites } from '../../lib/explorer-sites';
+import CountryCard from '../CountryCard.astro';
+import EngageCard from '../EngageCard.astro';
+import LabExample from './LabExample.astro';
+
+import engagerDonner from '../../assets/photos/engager-donner.jpg';
+import engagerEntreprises from '../../assets/photos/engager-entreprises.jpg';
+import engagerTerrain from '../../assets/photos/engager-terrain.jpg';
+import paysBurkina from '../../assets/photos/pays-burkina-elephants.jpg';
+import paysMadagascar from '../../assets/photos/pays-madagascar.jpg';
+import projetsSoutenus from '../../assets/photos/projets-soutenus-nicaragua.jpg';
+
+const lang = 'fr';
+const { home } = t(lang);
+const media = [
+  { href: donatePath(lang), image: engagerDonner, imagePosition: '40% 60%' },
+  { href: pagePath(lang, 'stages'), image: engagerTerrain, imagePosition: '50% 30%' },
+  { href: pagePath(lang, 'entreprises'), image: engagerEntreprises, imagePosition: '50% 40%' },
+];
+const engagements = home.engage.cards.map((card, i) => ({ ...card, ...media[i]! }));
+const sites = await getExplorerSites(lang, [], 'madagascar');
+---
+
+<LabExample
+  id="lab-engage"
+  title="variant=&quot;engage&quot;"
+  text="Toute la carte est un lien (<code>card-lift</code>) : élévation au survol et au focus, flèche décalée. Accueil, section « S’engager »."
+>
+  <div class="grid-3">{engagements.map((item) => <EngageCard {...item} />)}</div>
+</LabExample>
+
+<LabExample id="lab-country" title="variant=&quot;country&quot; et CountryCard" text="Pays mis en avant (<code>CountryCard</code>, avec ses <code>Chip</code>) et pays secondaires. Accueil, « Où nous agissons ».">
+  <div class="countries">
+    <CountryCard
+      class="countries__main"
+      name={home.actions.madagascar.name}
+      description={home.actions.madagascar.description.replace('{count}', String(sites.length))}
+      sites={sites.map((site) => site.name)}
+      href={pagePath(lang, 'madagascar')}
+      image={paysMadagascar}
+    />
+    <div class="countries__side">
+      <EngageCard
+        variant="country"
+        title={home.actions.burkina.title}
+        text={home.actions.burkina.text}
+        href={pagePath(lang, 'burkina')}
+        image={paysBurkina}
+        imageAlt={home.actions.burkina.imageAlt}
+        imagePosition="50% 60%"
+      />
+      <EngageCard
+        variant="country"
+        title={home.actions.supported.title}
+        text={home.actions.supported.text}
+        href={pagePath(lang, 'autresProjets')}
+        image={projetsSoutenus}
+        imageAlt={home.actions.supported.imageAlt}
+      />
+    </div>
+  </div>
+</LabExample>
+
+<style>
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: var(--space-5);
+  }
+
+  /* Même disposition que l'accueil (HomePage). */
+  .countries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+  }
+
+  .countries :global(.countries__main) {
+    flex: 2 1 560px;
+    min-width: 0;
+  }
+
+  .countries__side {
+    flex: 1 1 320px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .countries__side > :global(*) {
+    flex: 1 1 auto;
+  }
+</style>

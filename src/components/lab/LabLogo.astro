@@ -1,0 +1,28 @@
+---
+/** Lab, page Logo : version française et anglaise ; le nom suit le mode (--logo-nom). */
+import { t } from '../../i18n';
+import Logo from '../Logo.astro';
+import LabExample from './LabExample.astro';
+---
+
+<LabExample
+  id="lab-logos"
+  title="Français et anglais"
+  text="SVG dans la page : nom basalte en clair, blanc en sombre (<code>--logo-nom</code>). Version anglaise : « Man &amp; the Environment »."
+>
+  <div class="lab-row logos">
+    <Logo class="logo-demo" lang="fr" alt={t('fr').ui.logoAlt} />
+    <Logo class="logo-demo" lang="en" alt={t('en').ui.logoAlt} />
+  </div>
+</LabExample>
+
+<style>
+  .logos {
+    gap: var(--space-8);
+  }
+
+  .logos :global(.logo-demo) {
+    width: auto;
+    height: 96px;
+  }
+</style>

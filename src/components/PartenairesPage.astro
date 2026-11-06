@@ -138,7 +138,7 @@ const breadcrumb = [
         <ul class="partners-grid">
           {
             partners.map((partner) => (
-              <PartnerCard partner={partner} typeLabel={partner.typeLabel} data-type={partner.type}>
+              <PartnerCard id={partner.id} partner={partner} typeLabel={partner.typeLabel} data-type={partner.type}>
                 {partner.role && <p class="partner-card__role">{partner.role}</p>}
                 {(partner.siteNames.length > 0 || partner.url) && (
                   <span class="partner-card__foot">
@@ -400,6 +400,32 @@ const breadcrumb = [
     }
   }
 
+  /*
+   * Fiche ciblée par une ancre (logos de l'accueil : /ong/partenaires#<id>) : un peu d'air
+   * sous le header en plus du scroll-padding global, et un contour discret qui apparaît en
+   * fondu (immédiat avec prefers-reduced-motion).
+   */
+  .partners-grid :global(.partner-card) {
+    scroll-margin-top: var(--space-6);
+  }
+
+  .partners-grid :global(.partner-card:target) {
+    border-color: var(--carte-active);
+    box-shadow:
+      0 0 0 1px var(--carte-active),
+      var(--shadow-card);
+    animation: partner-target 900ms ease-out;
+  }
+
+  @keyframes partner-target {
+    from {
+      border-color: var(--bordure-carte);
+      box-shadow:
+        0 0 0 1px transparent,
+        var(--shadow-card);
+    }
+  }
+
   .partner-card__role {
     font-size: 14px;
     line-height: 1.5;
@@ -604,6 +630,10 @@ const breadcrumb = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .partners-grid :global(.partner-card:target) {
+      animation: none;
+    }
+
     .text-link__label,
     .filters__pill,
     .join-card__link :global(.join-card__arrow),

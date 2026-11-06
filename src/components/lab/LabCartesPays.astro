@@ -1,0 +1,45 @@
+---
+/**
+ * Lab, page Cartes pays : MadagascarMap et BurkinaMap dans SitesExplorer, comme sur les pages
+ * pays, avec les SiteCard des sites (premier site sélectionné, état lié repère / carte).
+ */
+import { t } from '../../i18n';
+import { getExplorerSites } from '../../lib/explorer-sites';
+import SitesExplorer from '../SitesExplorer.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const madagascar = await getExplorerSites('fr', [], 'madagascar');
+const burkina = await getExplorerSites('fr', [], 'burkina-faso');
+---
+
+<LabExample
+  id="lab-madagascar"
+  title="MadagascarMap"
+  text="Carte verticale, collée pendant qu’on parcourt la liste. Survoler ou tabuler un repère ou une <code>SiteCard</code> met le site en avant des deux côtés (<code>selected</code> : contour basalte, sauge en sombre)."
+  tone="section"
+  flush
+>
+  <div class="explorer">
+    <SitesExplorer map={dict.madagascar.sites.map} sites={madagascar} country="madagascar" />
+  </div>
+</LabExample>
+
+<LabExample id="lab-burkina" title="BurkinaMap" text="Carte large et note de position ; avec un seul site, son nom s’affiche sous le repère." tone="section" flush>
+  <div class="explorer">
+    <SitesExplorer map={dict.burkina.sites.map} sites={burkina} country="burkina-faso" />
+  </div>
+</LabExample>
+
+<style>
+  /* Sans marge en mobile : la carte garde la largeur qu'elle a sur la page pays (repères séparés). */
+  .explorer {
+    padding: var(--space-6);
+  }
+
+  @media (max-width: 560px) {
+    .explorer {
+      padding: var(--space-5) 0;
+    }
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+/** Lab, page Infobulles : data-tooltip des boutons à icône seule, avec ShareButtons (page Don). */
+import { t } from '../../i18n';
+import ShareButtons from '../ShareButtons.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+---
+
+<LabExample
+  id="lab-tooltip"
+  title="data-tooltip"
+  text="Bouton ou lien à icône seule : <code>aria-label</code> et infobulle au même texte. Elle apparaît après 500 ms de survol, ou tout de suite au focus clavier ; Échap la ferme. <code>ShareButtons</code> (page Don) : premier bouton en <code>data-tooltip-align=&quot;start&quot;</code>."
+>
+  <ShareButtons label={dict.don.further.campaign.share} text={dict.don.further.campaign.shareText} />
+</LabExample>
+
+<LabExample id="lab-tooltip-options" title="Options" bare>
+  <dl class="lab-table">
+    <div>
+      <dt><code>data-tooltip-align="start"</code></dt>
+      <dd>Bord gauche de l’écran : l’infobulle s’aligne sur le bord gauche du bouton.</dd>
+    </div>
+    <div>
+      <dt><code>data-tooltip-align="end"</code></dt>
+      <dd>Bord droit de l’écran.</dd>
+    </div>
+    <div>
+      <dt><code>data-tooltip-pos="below"</code></dt>
+      <dd>En haut de page : infobulle sous le bouton (bascule clair / sombre de la barre du lab).</dd>
+    </div>
+    <div>
+      <dt><code>[data-tooltips-off]</code></dt>
+      <dd>Posé sur <code>html</code> par Échap (src/scripts/tooltip.ts) : masque les infobulles jusqu’au prochain mouvement de souris ou changement de focus.</dd>
+    </div>
+  </dl>
+</LabExample>

@@ -1,0 +1,42 @@
+---
+/** Lab, page SpeciesCard : espèces de la fiche Vohimana (statut menacé en pastille basalte). */
+import { getEntry } from 'astro:content';
+import { t } from '../../i18n';
+import SpeciesCard from '../SpeciesCard.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const vohimana = await getEntry('sites', 'vohimana');
+const species = vohimana?.data.species.slice(0, 3) ?? [];
+const status = (value: (typeof species)[number]['status']) =>
+  value && { label: dict.site.species.status[value], threatened: ['CR', 'EN', 'VU'].includes(value) };
+---
+
+<LabExample id="lab-especes" title="Espèces d’une fiche site" text="Photo, nom scientifique, statut UICN (basalte si menacée), texte. Fiche Vohimana." tone="section">
+  <ul class="species" role="list">
+    {
+      species.map((item) => (
+        <SpeciesCard
+          name={item.name}
+          status={status(item.status)}
+          text={item.text ?? dict.site.missing}
+          photo={item.photo}
+          photoAlt={item.photoAlt}
+          photoPosition={item.photoPosition}
+          photoMissing={dict.site.photoMissing}
+        />
+      ))
+    }
+  </ul>
+</LabExample>
+
+<style>
+  .species {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

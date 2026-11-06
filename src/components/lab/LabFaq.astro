@@ -1,0 +1,36 @@
+---
+/** Lab, page Faq : questions de la page Don, puis de la page Stages (réponse avec lien email). */
+import { STAGES_EMAIL } from '../../data/navigation';
+import { t } from '../../i18n';
+import Faq, { type FaqAnswer } from '../Faq.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const don = dict.don.faq.items.slice(0, 3).map(({ question, answer }) => ({ question, answer: [answer] }));
+const mailto = `mailto:${STAGES_EMAIL}`;
+const stages = dict.stages.faq.items
+  .map(({ question, answer }) => {
+    const [before, after] = answer.split('{email}');
+    const parts: FaqAnswer = after === undefined ? [answer] : [before ?? '', { label: STAGES_EMAIL, href: mailto }, after];
+    return { question, answer: parts };
+  })
+  .filter(({ answer }) => answer.length > 1)
+  .slice(0, 1);
+---
+
+<LabExample
+  id="lab-faq"
+  title="Questions dépliables"
+  text="Une carte par question, en <code>&lt;details&gt;</code> : sans JS, ouverture au clavier (Entrée, Espace). Page Don."
+  tone="section"
+>
+  <Faq items={don} />
+</LabExample>
+
+{
+  stages.length > 0 && (
+    <LabExample id="lab-faq-lien" title="Réponse avec lien" text="Une réponse mêle texte et liens (adresse email, page). Page Stages." tone="section">
+      <Faq items={stages} />
+    </LabExample>
+  )
+}

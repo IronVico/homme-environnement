@@ -4,10 +4,12 @@
  * pays en sauge avec courbes de niveau et lavis aquarelle, rose des vents, capitale
  * et pays voisins. Les repères des sites sont posés par-dessus par le composant
  * parent (slot), en % de la carte.
+ * Le lavis est précalculé en masques (composant Aquarelle, src/lib/aquarelle.ts).
  * Couleurs en variables CSS (tokens de rôle) : la carte suit le mode clair / sombre.
  */
 import { CAPITAL, COUNTRY_CENTER, COUNTRY_PATH, COUNTRY_VIEWBOX, NEIGHBOUR_POSITIONS } from '../lib/burkina';
 import { uid } from '../lib/uid';
+import Aquarelle from './Aquarelle.astro';
 
 interface Props {
   labels: { capital: string; north: string; neighbours: string[] };
@@ -15,19 +17,13 @@ interface Props {
 
 const { labels } = Astro.props;
 
-const id = uid('bf');
-const filterId = `${id}-aquarelle`;
-const clipId = `${id}-pays`;
+const clipId = `${uid('bf')}-pays`;
 
 const { x: cx, y: cy } = COUNTRY_CENTER;
 /** Transformation centrée sur le pays : échelle (x, y) et rotation en degrés. */
 const around = (sx: number, sy = sx, rotate = 0) =>
   `translate(${cx} ${cy}) rotate(${rotate}) scale(${sx} ${sy}) translate(${-cx} ${-cy})`;
 
-const washes = [
-  { transform: around(1.12, 1.16), opacity: 'var(--aquarelle-1)' },
-  { transform: around(1.05, 1.07, 3), opacity: 'var(--aquarelle-2)' },
-];
 const halos = [
   { scale: 1.035, width: 2, opacity: 0.9 },
   { scale: 1.075, width: 1.5, opacity: 0.6 },
@@ -42,32 +38,11 @@ const contours = [
 ---
 
 <div class="bf-map">
+  <Aquarelle map="burkina" />
   <svg class="bf-map__svg" viewBox={COUNTRY_VIEWBOX} aria-hidden="true" focusable="false">
     <defs>
-      <filter id={filterId} x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="4" seed="7" result="warp"></feTurbulence>
-        <feDisplacementMap in="SourceGraphic" in2="warp" scale="52" xChannelSelector="R" yChannelSelector="G" result="shape"></feDisplacementMap>
-        <feGaussianBlur in="shape" stdDeviation="2.5" result="soft"></feGaussianBlur>
-        <feMorphology in="soft" operator="erode" radius="6" result="inner"></feMorphology>
-        <feComposite in="soft" in2="inner" operator="out" result="rim"></feComposite>
-        <feGaussianBlur in="rim" stdDeviation="1.6" result="rimS"></feGaussianBlur>
-        <feColorMatrix in="rimS" type="matrix" values="0 0 0 0 0.40  0 0 0 0 0.47  0 0 0 0 0.34  0 0 0 1.1 0" result="rimC"></feColorMatrix>
-        <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="3" result="grain"></feTurbulence>
-        <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.25" result="grainA"></feColorMatrix>
-        <feComposite in="soft" in2="grainA" operator="in" result="grained"></feComposite>
-        <feMerge><feMergeNode in="grained"></feMergeNode><feMergeNode in="rimC"></feMergeNode></feMerge>
-      </filter>
       <clipPath id={clipId}><path d={COUNTRY_PATH}></path></clipPath>
     </defs>
-    {
-      washes.map((wash) => (
-        <g filter={`url(#${filterId})`}>
-          <g transform={wash.transform}>
-            <path d={COUNTRY_PATH} style={`fill: var(--accent); fill-opacity: ${wash.opacity}`} />
-          </g>
-        </g>
-      ))
-    }
     {
       halos.map((halo) => (
         <g transform={around(halo.scale)}>

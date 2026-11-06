@@ -68,7 +68,10 @@ const en: Dictionary = {
   },
 
   // TODO traduction : contenu de la home encore en français (copie de fr.ts).
-  home: structuredClone(fr.home),
+  home: {
+    ...structuredClone(fr.home),
+    partners: { ...fr.home.partners, link: 'See all our partners' },
+  },
 
   // TODO traduction : contenu de la page Madagascar encore en français (copie de fr.ts).
   madagascar: structuredClone(fr.madagascar),

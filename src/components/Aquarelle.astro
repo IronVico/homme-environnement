@@ -1,0 +1,84 @@
+---
+/**
+ * Lavis aquarelle sous une carte pays (MadagascarMap, BurkinaMap) : masques précalculés
+ * (src/lib/aquarelle.ts, npm run aquarelle) sur des aplats en tokens, à la place du filtre
+ * SVG que WebKit recalculait sur le processeur (issue #44). À placer dans le conteneur de
+ * la carte, avant
+ * le SVG : positions en % du repère, donc alignées avec les tracés à toutes les largeurs.
+ * Deux couches, chacune en deux calques : forme grainée en --accent, bord en --aquarelle-bord.
+ */
+import { AQUARELLE_MAPS, GRAIN_TILE, GRAIN_URL, aquarelleRegion, washImageUrl, type AquarelleMap } from '../lib/aquarelle';
+
+interface Props {
+  map: AquarelleMap;
+}
+
+const { map } = Astro.props;
+const { width, height, washes } = AQUARELLE_MAPS[map];
+const region = aquarelleRegion(map);
+const percent = (value: number, total: number) => `${((value / total) * 100).toFixed(4)}%`;
+
+const box = [
+  `left: ${percent(region.x, width)}`,
+  `top: ${percent(region.y, height)}`,
+  `width: ${percent(region.width, width)}`,
+  `height: ${percent(region.height, height)}`,
+  `--grain: url(${GRAIN_URL})`,
+  `--grain-taille: ${percent(GRAIN_TILE, region.width)}`,
+].join('; ');
+---
+
+<div class="aquarelle" style={box} aria-hidden="true">
+  {
+    washes.map((_, wash) => (
+      <>
+        <div
+          class="aquarelle__forme"
+          style={`--masque: url(${washImageUrl(map, wash, 'forme')}); --opacite: var(--aquarelle-${wash + 1})`}
+        />
+        <div
+          class="aquarelle__bord"
+          style={`--masque: url(${washImageUrl(map, wash, 'bord')}); --opacite: var(--aquarelle-${wash + 1})`}
+        />
+      </>
+    ))
+  }
+</div>
+
+<style>
+  .aquarelle {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .aquarelle > div {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Forme × grain : le masque de la forme croisé avec la tuile de grain répétée. */
+  .aquarelle__forme {
+    background: var(--accent);
+    opacity: var(--opacite);
+    -webkit-mask-image: var(--masque), var(--grain);
+    mask-image: var(--masque), var(--grain);
+    -webkit-mask-size: 100% 100%, var(--grain-taille) auto;
+    mask-size: 100% 100%, var(--grain-taille) auto;
+    -webkit-mask-repeat: no-repeat, repeat;
+    mask-repeat: no-repeat, repeat;
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  /* Bord : opacité ×1,1, comme la matrice de couleur du filtre d'origine. */
+  .aquarelle__bord {
+    background: var(--aquarelle-bord);
+    opacity: calc(var(--opacite) * 1.1);
+    -webkit-mask-image: var(--masque);
+    mask-image: var(--masque);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+</style>
