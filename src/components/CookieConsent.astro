@@ -1,0 +1,221 @@
+---
+/**
+ * Bandeau cookies de la mesure d'audience (Google Analytics 4), sans service tiers, selon les
+ * recommandations de la CNIL : « Refuser » et « Accepter » au même niveau, fermer vaut refus,
+ * lien vers la politique de confidentialité. Rendu seulement si un identifiant GA4 est
+ * renseigné (src/data/mesure-audience.ts). Logique dans src/scripts/consent.ts.
+ *
+ * Placé au début du <body> : atteint dès les premiers Tab. Fixé en bas sur toute la largeur ;
+ * caché par défaut, le script l'affiche s'il n'y a pas de choix valide, et le bouton
+ * « Gérer les cookies » (footer, page Confidentialité) le rouvre.
+ */
+import XIcon from '@lucide/astro/icons/x';
+import { pagePath } from '../data/navigation';
+import { GA_ID } from '../data/mesure-audience';
+import { getLang, t } from '../i18n';
+
+const lang = getLang(Astro.currentLocale);
+const c = t(lang).consent;
+---
+
+{
+  GA_ID && (
+    <section
+      class="consent"
+      id="bandeau-cookies"
+      aria-labelledby="consent-titre"
+      tabindex="-1"
+      data-consent
+      data-ga-id={GA_ID}
+      hidden
+    >
+      <div class="consent__inner container">
+        <div class="consent__text">
+          <p id="consent-titre" class="consent__title">{c.title}</p>
+          <p class="consent__desc">
+            {c.text}
+            <a href={pagePath(lang, 'confidentialite')}>{c.privacyLink}</a>
+          </p>
+          <p class="consent__current" data-consent-current data-granted={c.currentGranted} data-denied={c.currentDenied} hidden />
+        </div>
+        <div class="consent__actions">
+          <button type="button" class="consent__btn btn-motion" data-consent-choice="denied">{c.refuse}</button>
+          <button type="button" class="consent__btn btn-motion" data-consent-choice="granted">{c.accept}</button>
+        </div>
+        <button
+          type="button"
+          class="consent__close"
+          data-consent-choice="denied"
+          aria-label={c.close}
+          data-tooltip={c.close}
+          data-tooltip-align="end"
+        >
+          <XIcon size={22} />
+        </button>
+      </div>
+    </section>
+  )
+}
+
+<script>
+  import { initConsent } from '../scripts/consent';
+  initConsent();
+</script>
+
+<style>
+  /* Au-dessus du header (30), sous la bulle « Une question ? » (40) et le loader (100). */
+  .consent {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 35;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: var(--surface);
+    color: var(--texte);
+    border-top: 1px solid var(--trait);
+    box-shadow: 0 -10px 28px color-mix(in srgb, var(--ombre-teinte) 14%, transparent);
+  }
+
+  .consent[hidden] {
+    display: none;
+  }
+
+  /* Focus posé par « Gérer les cookies » : contour à l'intérieur du bandeau. */
+  .consent:focus-visible {
+    outline-offset: -4px;
+  }
+
+  .consent__inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-6) var(--space-8);
+    padding-top: var(--space-5);
+    padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
+  }
+
+  .consent__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    /* Place du bouton de fermeture. */
+    padding-right: 52px;
+  }
+
+  .consent__title {
+    margin: 0 0 4px;
+    font-weight: 700;
+    font-size: var(--fs-body);
+  }
+
+  .consent__desc,
+  .consent__current {
+    margin: 0;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body);
+  }
+
+  .consent__current {
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  .consent__actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: var(--space-3);
+    margin-right: 52px;
+  }
+
+  /* « Refuser » et « Accepter » : même style, même taille (CNIL). */
+  .consent__btn {
+    min-height: 44px;
+    min-width: 128px;
+    padding: 10px 22px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--bouton-plein);
+    color: var(--texte-sur-bouton);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  .consent__btn:hover {
+    background: var(--texte-fort);
+  }
+
+  .consent__close {
+    position: absolute;
+    top: 50%;
+    right: calc(var(--gutter) - 10px);
+    translate: 0 -50%;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--texte);
+    cursor: pointer;
+  }
+
+  .consent__close:hover {
+    background: var(--section);
+  }
+
+  /* Mobile : texte au-dessus, boutons côte à côte sur toute la largeur. */
+  @media (max-width: 760px) {
+    .consent__inner {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .consent__actions {
+      margin-right: 0;
+    }
+
+    .consent__btn {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .consent__close {
+      top: calc(var(--space-5) - 10px);
+      translate: none;
+    }
+  }
+
+  /* Libellés de bouton sur deux lignes plutôt que coupés. */
+  @media (max-width: 399px) {
+    .consent__btn {
+      padding-inline: 12px;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .consent:not([hidden]) {
+      animation: consent-in 240ms ease-out;
+    }
+
+    @keyframes consent-in {
+      from {
+        transform: translateY(100%);
+      }
+    }
+  }
+
+  /* Bandeau affiché : la fin de page reste lisible au-dessus, la bulle « Une question ? »
+     (QuestionBubble, PR #51) remonte au-dessus du bandeau. */
+  :global(html[data-consent-open] body) {
+    padding-bottom: var(--bandeau-cookies, 0px);
+  }
+
+  :global(html[data-consent-open] .question__bubble) {
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + var(--bandeau-cookies, 0px));
+  }
+</style>

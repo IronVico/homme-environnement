@@ -15,6 +15,7 @@ import {
   RETENTION,
 } from '../data/confidentialite';
 import { LEGAL_CONTACT_EMAIL, PUBLISHER } from '../data/mentions-legales';
+import { GA_ID } from '../data/mesure-audience';
 import { pagePath } from '../data/navigation';
 import { getLang, t } from '../i18n';
 import { fill } from '../lib/don';
@@ -79,9 +80,18 @@ const mail = `mailto:${LEGAL_CONTACT_EMAIL}`;
 
   <section id="audience" class="legal-section" aria-labelledby="audience-t">
     <h2 id="audience-t" class="legal-section__title">{page.audience.title}</h2>
-    <p>{page.audience.text}{ANALYTICS_TOOL ?? <TodoPill>{page.missing}</TodoPill>}.</p>
+    <p>{page.audience.text}{ANALYTICS_TOOL ?? <TodoPill>{page.missing}</TodoPill>}{page.audience.textAfter}</p>
+    <p>{page.audience.cookies}</p>
+    <p>{page.audience.transfer}</p>
     <InfoNote icon={ShieldCheckIcon} title={page.audience.note.title}>
-      {page.audience.note.text}<TodoPill>{page.audience.note.toConfirm}</TodoPill>
+      {page.audience.note.text}
+      {
+        GA_ID && (
+          <button type="button" class="manage-cookies" data-consent-open aria-controls="bandeau-cookies">
+            {page.audience.note.manage}
+          </button>
+        )
+      }
     </InfoNote>
   </section>
 
@@ -146,6 +156,26 @@ const mail = `mailto:${LEGAL_CONTACT_EMAIL}`;
 </LegalPage>
 
 <style>
+  /* Rouvre le bandeau cookies (CookieConsent), sous le texte de l'encart. */
+  .manage-cookies {
+    display: flex;
+    margin-top: var(--space-3);
+    min-height: 44px;
+    align-items: center;
+    padding: 0 20px;
+    border: 2px solid currentColor;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--texte);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .manage-cookies:hover {
+    color: var(--texte-fort);
+    background: var(--section);
+  }
+
   /* Tableau des durées : en-tête vert clair, cadre arrondi ; défile seul s'il déborde. */
   .retention {
     overflow-x: auto;
