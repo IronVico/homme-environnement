@@ -91,7 +91,7 @@ src/
 
 The rules come from the NGO's design system (the "Design System" artifact): colours, typography, cards, buttons, accessibility, animations. Every value goes through the variables in [`src/styles/tokens.css`](src/styles/tokens.css); do not add hard-coded colours in a component.
 
-Internal showcase: `/lab/` shows the design system as coded, in light and dark mode: one page per foundation (colours by role, typography, spacing, radii, shadows, motion) and per component, with a left-hand navigation. Tokens are read from `tokens.css` at build time ([`src/lib/lab-tokens.ts`](src/lib/lab-tokens.ts)), components are the real ones with site data. Pages listed in [`src/lib/lab-nav.ts`](src/lib/lab-nav.ts), content in `src/components/lab/`, shell in [`src/layouts/LabLayout.astro`](src/layouts/LabLayout.astro). French only, `noindex` (so out of the sitemap), not linked from the site.
+Internal showcase: `/lab/` shows the design system as coded, in light and dark mode: one page per foundation (colours by role, typography, spacing, radii, shadows, motion) and per component, with a left-hand navigation. Tokens are read from `tokens.css` at build time ([`src/lib/lab-tokens.ts`](src/lib/lab-tokens.ts)), components are the real ones with site data. Pages listed in [`src/lib/lab-nav.ts`](src/lib/lab-nav.ts), content in `src/components/lab/`, shell in [`src/layouts/LabLayout.astro`](src/layouts/LabLayout.astro). French only, `noindex`, not linked from the site, and **not built in production** (`VERCEL_ENV=production`): run `npm run dev` and open `/lab/`, or use a Vercel preview deployment.
 
 Reminders:
 

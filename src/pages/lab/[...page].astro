@@ -1,6 +1,11 @@
 ---
-/** Pages du lab (/lab/couleurs/, /lab/button/…) : contenu dans src/components/lab/, liste dans src/lib/lab-nav.ts. */
+/**
+ * Pages du lab : /lab/ (accueil) et /lab/couleurs/, /lab/button/… Contenu dans src/components/lab/,
+ * liste dans src/lib/lab-nav.ts. Aucune page générée en production (LAB_ENABLED) : le lab
+ * n'existe qu'en local et sur les previews Vercel.
+ */
 import type { GetStaticPaths } from 'astro';
+import LabAccueil from '../../components/lab/LabAccueil.astro';
 import LabBreadcrumb from '../../components/lab/LabBreadcrumb.astro';
 import LabButton from '../../components/lab/LabButton.astro';
 import LabCartesPays from '../../components/lab/LabCartesPays.astro';
@@ -27,7 +32,7 @@ import LabStepsBlock from '../../components/lab/LabStepsBlock.astro';
 import LabThemeToggle from '../../components/lab/LabThemeToggle.astro';
 import LabTypographie from '../../components/lab/LabTypographie.astro';
 import LabLayout from '../../layouts/LabLayout.astro';
-import { LAB_PAGES, type LabPage } from '../../lib/lab-nav';
+import { LAB_ENABLED, LAB_PAGES, type LabPage } from '../../lib/lab-nav';
 
 const CONTENT = {
   couleurs: LabCouleurs,
@@ -58,13 +63,29 @@ const CONTENT = {
 };
 
 export const getStaticPaths = (() =>
-  LAB_PAGES.map((page) => ({ params: { page: page.slug }, props: { page } }))) satisfies GetStaticPaths;
+  LAB_ENABLED
+    ? [
+        { params: { page: undefined }, props: { page: undefined } },
+        ...LAB_PAGES.map((page) => ({ params: { page: page.slug }, props: { page } })),
+      ]
+    : []) satisfies GetStaticPaths;
 
-const { page } = Astro.props as { page: LabPage };
-const Content = CONTENT[page.slug as keyof typeof CONTENT];
-if (!Content) throw new Error(`Lab : pas de contenu pour la page « ${page.slug} » (src/pages/lab/[page].astro).`);
+const { page } = Astro.props as { page?: LabPage };
+const Content = page ? CONTENT[page.slug as keyof typeof CONTENT] : LabAccueil;
+if (!Content) throw new Error(`Lab : pas de contenu pour la page « ${page?.slug} » (src/pages/lab/[...page].astro).`);
 ---
 
-<LabLayout page={page} title={page.label} description={page.description}>
-  <Content />
-</LabLayout>
+{
+  page ? (
+    <LabLayout page={page} title={page.label} description={page.description}>
+      <Content />
+    </LabLayout>
+  ) : (
+    <LabLayout
+      title="Design system"
+      description="Le design system de L’Homme & l’Environnement tel qu’il est codé : tokens lus dans src/styles/tokens.css au build, composants réels de src/components avec les données du site. À comparer aux maquettes, en clair et en sombre (bascule en haut à droite)."
+    >
+      <Content />
+    </LabLayout>
+  )
+}
