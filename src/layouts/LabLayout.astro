@@ -1,0 +1,538 @@
+---
+/**
+ * Gabarit des pages du lab (/lab/…), vitrine interne du design system tel qu'il est codé.
+ * Barre du haut (logo, lien vers le site, bascule clair / sombre du header), navigation à
+ * gauche groupée en Fondations et Composants (src/lib/lab-nav.ts), contenu à droite.
+ * Sous 760px, la navigation se replie derrière un bouton « Sommaire » (Échap la ferme).
+ * Pages en français seulement, noindex : hors sitemap (astro.config.mjs) ; sans image de
+ * partage propre (absentes de src/lib/og.ts) ; aucun lien depuis le reste du site.
+ * Textes en dur : le lab n'est pas traduit.
+ */
+import ArrowLeft from '@lucide/astro/icons/arrow-left';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Menu from '@lucide/astro/icons/menu';
+import Logo from '../components/Logo.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import { t } from '../i18n';
+import { LAB_GROUPS, LAB_PAGES, labPath, type LabPage } from '../lib/lab-nav';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  /** Page affichée ; absente : accueil du lab. */
+  page?: LabPage;
+  title: string;
+  description: string;
+}
+
+const { page, title, description } = Astro.props;
+const { ui } = t('fr');
+const group = page && LAB_GROUPS.find((g) => g.pages.includes(page));
+const index = page ? LAB_PAGES.indexOf(page) : -1;
+const prev = index > 0 ? LAB_PAGES[index - 1] : undefined;
+const next = page ? LAB_PAGES[index + 1] : LAB_PAGES[0];
+---
+
+<BaseLayout title={`${title} · Lab`} description={description} noindex>
+  <header class="lab-bar">
+    <a class="lab-bar__home" href={labPath()}>
+      <Logo class="lab-bar__logo" lang="fr" alt={ui.logoAlt} />
+      <span class="lab-bar__name">Lab <span class="lab-bar__sub">design system</span></span>
+    </a>
+    <div class="lab-bar__actions">
+      <button class="lab-bar__menu" type="button" aria-expanded="false" aria-controls="lab-nav" data-lab-menu>
+        <Menu size={18} />
+        Sommaire
+      </button>
+      <a class="lab-bar__site" href="/">Voir le site</a>
+      <ThemeToggle variant="button" />
+    </div>
+  </header>
+
+  <div class="lab-shell">
+    <nav id="lab-nav" class="lab-side" aria-label="Navigation du lab" data-lab-nav>
+      <a class="lab-side__link" href={labPath()} aria-current={page ? undefined : 'page'}>Introduction</a>
+      {
+        LAB_GROUPS.map((g) => (
+          <div class="lab-side__group">
+            <p class="lab-side__title" id={`lab-nav-${g.title.toLowerCase()}`}>
+              {g.title}
+            </p>
+            <ul class="lab-side__list" aria-labelledby={`lab-nav-${g.title.toLowerCase()}`}>
+              {g.pages.map((p) => (
+                <li>
+                  <a class="lab-side__link" href={labPath(p.slug)} aria-current={p === page ? 'page' : undefined}>
+                    {p.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+
+    <main id="contenu" class="lab">
+      <header class="lab-head">
+        {group && <p class="lab-head__group">{group.title}</p>}
+        <h1 class="lab-head__title">{title}</h1>
+        <p class="lab-head__text">{description}</p>
+        {
+          page?.components && (
+            <p class="lab-head__components">
+              {page.components.map((name) => (
+                <code>{name}</code>
+              ))}
+            </p>
+          )
+        }
+      </header>
+
+      <slot />
+
+      {
+        (prev || next) && (
+          <nav class="lab-pager" aria-label="Pages voisines">
+            {prev ? (
+              <a class="lab-pager__link" href={labPath(prev.slug)}>
+                <span class="lab-pager__dir">
+                  <ArrowLeft size={16} /> Précédent
+                </span>
+                {prev.label}
+              </a>
+            ) : (
+              <span />
+            )}
+            {next && (
+              <a class="lab-pager__link lab-pager__link--next" href={labPath(next.slug)}>
+                <span class="lab-pager__dir">
+                  Suivant <ArrowRight size={16} />
+                </span>
+                {next.label}
+              </a>
+            )}
+          </nav>
+        )
+      }
+    </main>
+  </div>
+</BaseLayout>
+
+<script>
+  // Sommaire replié sous 760px : bouton à aria-expanded, Échap ferme et rend le focus au bouton.
+  const button = document.querySelector<HTMLButtonElement>('[data-lab-menu]');
+  const nav = document.querySelector<HTMLElement>('[data-lab-nav]');
+  if (button && nav) {
+    const setOpen = (open: boolean) => {
+      button.setAttribute('aria-expanded', String(open));
+      nav.toggleAttribute('data-open', open);
+    };
+    button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || button.getAttribute('aria-expanded') !== 'true') return;
+      setOpen(false);
+      button.focus();
+    });
+  }
+</script>
+
+<style>
+  .lab-bar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    height: 64px;
+    padding-inline: var(--space-5);
+    border-bottom: 1px solid var(--trait);
+    background: var(--header-translucide);
+    backdrop-filter: blur(10px);
+  }
+
+  .lab-bar__home {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+    text-decoration: none;
+  }
+
+  .lab-bar__home :global(.lab-bar__logo) {
+    flex-shrink: 0;
+    width: auto;
+    height: 40px;
+  }
+
+  .lab-bar__name {
+    font-size: 16px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .lab-bar__sub {
+    font-weight: 400;
+  }
+
+  .lab-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .lab-bar__site,
+  .lab-bar__menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--trait);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--texte);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .lab-bar__site:hover,
+  .lab-bar__menu:hover {
+    border-color: var(--texte);
+    background: var(--section);
+  }
+
+  .lab-bar__menu {
+    display: none;
+  }
+
+  .lab-shell {
+    display: grid;
+    grid-template-columns: clamp(200px, 20vw, 248px) minmax(0, 1fr);
+  }
+
+  .lab-side {
+    position: sticky;
+    top: 64px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    height: calc(100vh - 64px);
+    padding: var(--space-6) var(--space-3) var(--space-12);
+    overflow-y: auto;
+    border-right: 1px solid var(--trait);
+  }
+
+  .lab-side__title {
+    margin-bottom: 6px;
+    padding-inline: 12px;
+    color: var(--texte-doux);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+  }
+
+  .lab-side__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-side__link {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    color: var(--texte);
+    font-size: 15px;
+    text-decoration: none;
+  }
+
+  .lab-side__link:hover {
+    background: var(--section);
+    color: var(--texte-fort);
+  }
+
+  .lab-side__link[aria-current='page'] {
+    background: var(--section);
+    font-weight: 700;
+  }
+
+  .lab {
+    min-width: 0;
+    max-width: 1120px;
+    padding: var(--space-12) clamp(16px, 4vw, 56px) var(--space-12);
+    color: var(--texte);
+  }
+
+  .lab-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .lab-head__group {
+    color: var(--texte-doux);
+    font-size: var(--fs-eyebrow);
+    font-weight: 600;
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+  }
+
+  .lab-head__title {
+    font-size: clamp(34px, 4vw, 48px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: var(--ls-h2);
+  }
+
+  .lab-head__text {
+    max-width: 65ch;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  .lab-head__components {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .lab-pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--trait);
+  }
+
+  .lab-pager__link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--space-3) var(--space-5);
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-card-sm);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .lab-pager__link:hover {
+    border-color: var(--texte);
+  }
+
+  .lab-pager__link--next {
+    grid-column: 2;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .lab-pager__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--texte-doux);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 759px) {
+    .lab-shell {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    :global(html.js) .lab-bar__menu {
+      display: inline-flex;
+    }
+
+    /* Avec JS : sommaire replié sous la barre, ouvert par le bouton. Sans JS : affiché en tête. */
+    .lab-side {
+      position: static;
+      height: auto;
+      border-right: 0;
+      border-bottom: 1px solid var(--trait);
+    }
+
+    :global(html.js) .lab-side {
+      position: fixed;
+      inset: 64px 0 auto;
+      z-index: 25;
+      display: none;
+      max-height: calc(100vh - 64px);
+      background: var(--fond);
+      box-shadow: var(--shadow-card);
+    }
+
+    :global(html.js) .lab-side[data-open] {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .lab-bar {
+      padding-inline: var(--space-3);
+    }
+
+    .lab-bar__sub,
+    .lab-bar__site {
+      display: none;
+    }
+
+    .lab-pager {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .lab-pager__link--next {
+      grid-column: 1;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Styles communs du contenu des pages du lab (src/components/lab/). */
+  .lab code {
+    padding: 0.05em 0.4em;
+    border-radius: 6px;
+    background: var(--disque);
+    color: var(--texte);
+    font-family: inherit;
+    font-size: 0.92em;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .lab-example {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-top: var(--space-12);
+  }
+
+  .lab-example__title {
+    font-size: var(--fs-card-title);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .lab-example__text {
+    max-width: 70ch;
+    line-height: var(--lh-body);
+  }
+
+  .lab-preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin-top: var(--space-2);
+    padding: var(--space-6);
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-card-sm);
+    background: var(--fond);
+  }
+
+  .lab-preview--section {
+    background: var(--section);
+  }
+
+  /* Fond basalte volontairement sombre, identique dans les deux modes : couleurs en dur. */
+  .lab-preview--dark {
+    background: var(--basalte);
+    color: var(--blanc);
+  }
+
+  .lab-preview--dark :focus-visible {
+    outline-color: var(--blanc);
+  }
+
+  .lab-preview--dark code {
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--blanc);
+  }
+
+  /* Composants pleine largeur (bande, bannière, fil d'Ariane) : sans marge intérieure. */
+  .lab-preview--flush {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .lab-label {
+    color: var(--texte-doux);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .lab-preview--section .lab-label {
+    color: var(--texte);
+  }
+
+  .lab-preview--dark .lab-label {
+    color: var(--blanc);
+  }
+
+  .lab-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-table {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .lab-table > div {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .lab-table dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .lab-note {
+    display: block;
+    color: var(--texte-doux);
+    font-size: 14px;
+  }
+
+  @media (max-width: 560px) {
+    .lab-preview {
+      padding: var(--space-5) var(--space-3);
+    }
+
+    .lab-preview--flush {
+      padding: 0;
+    }
+
+    .lab-table > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+  }
+</style>

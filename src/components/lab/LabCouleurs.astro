@@ -1,0 +1,304 @@
+---
+/**
+ * Lab, page Couleurs : tokens de rôle classés par usage, valeur claire et sombre côte à côte
+ * (chacune sur le fond de son mode), puis voiles, charte et opacités.
+ * Les pastilles sont peintes avec les valeurs lues dans tokens.css (src/lib/lab-tokens.ts) :
+ * couleurs en dur voulues, pour montrer les deux modes quel que soit le mode affiché.
+ * Un token de rôle absent des groupes ci-dessous tombe dans « Autres » : rien ne se perd.
+ */
+import { getImage } from 'astro:assets';
+import { byPrefix, darkOf, inGroup, isColor, lightOf, TOKENS, tokenByName, type Token } from '../../lib/lab-tokens';
+import LabExample from './LabExample.astro';
+
+import paysMadagascar from '../../assets/photos/pays-madagascar.jpg';
+
+const GROUPS = [
+  { id: 'fonds', title: 'Fonds', text: 'Fond de page, cartes, sections teintées, footer et disques d’icônes.', names: ['--fond', '--surface', '--section', '--footer', '--disque'] },
+  { id: 'texte', title: 'Texte', text: '<code>--texte-doux</code> seulement sur <code>--fond</code> ou <code>--surface</code>.', names: ['--texte', '--texte-doux', '--texte-fort', '--texte-sur-bouton', '--logo-nom'] },
+  { id: 'traits', title: 'Traits et contours', text: 'Bordures de cartes, séparateurs, contour des champs, carte active, grilles des illustrations.', names: ['--bordure-carte', '--trait', '--carte-active', '--ligne-grille'] },
+  { id: 'actions', title: 'Actions et marque', text: 'Pêche réservée au don. Sauge jamais en texte.', names: ['--bouton-plein', '--accent', '--don'] },
+  { id: 'illustrations', title: 'Illustrations et header', text: 'Cartes pays, ombres teintées, pilule du header au défilement.', names: ['--aquarelle-bord', '--carte-capitale', '--ombre-teinte', '--header-translucide'] },
+];
+
+const roles = TOKENS.filter(
+  (token) => /^(Tokens de rôle|Dérivés)/.test(token.group) && !token.name.startsWith('--ombre-papier'),
+);
+const roleColors = roles.filter(isColor);
+const opacities = roles.filter((token) => !isColor(token));
+const grouped = new Set(GROUPS.flatMap((g) => g.names));
+const others = roleColors.filter((token) => !grouped.has(token.name));
+const groups = [
+  ...GROUPS.map((g) => ({ ...g, tokens: g.names.flatMap((name) => tokenByName(name) ?? []) })),
+  ...(others.length > 0 ? [{ id: 'autres', title: 'Autres', text: 'Tokens de rôle pas encore classés dans cette page.', tokens: others }] : []),
+];
+
+const fond = tokenByName('--fond')!;
+const modes = [
+  { key: 'clair', label: 'Clair', fond: lightOf(fond), value: lightOf },
+  { key: 'sombre', label: 'Sombre', fond: darkOf(fond), value: darkOf },
+];
+/** Valeur à afficher : écrite, puis résolue quand elle passe par un autre token. */
+const written = (token: Token, mode: 'clair' | 'sombre') => (mode === 'clair' ? token.value : (token.dark ?? token.value));
+
+const charte = inGroup('Couleurs');
+const voiles = byPrefix('--voile');
+const voilePhoto = await getImage({ src: paysMadagascar, width: 320, format: 'webp' });
+---
+
+{
+  groups.map((group) => (
+    <LabExample id={`lab-${group.id}`} title={group.title} text={group.text} bare>
+      <ul class="colors" role="list">
+        <li class="colors__head" aria-hidden="true">
+          <span>Token</span>
+          {modes.map((mode) => <span>{mode.label}</span>)}
+        </li>
+        {group.tokens.map((token) => (
+          <li class="colors__row">
+            <span class="colors__name">
+              <code>{token.name}</code>
+              {token.note && <span class="lab-note">{token.note}</span>}
+            </span>
+            {modes.map((mode) => {
+              const final = mode.value(token);
+              const raw = written(token, mode.key as 'clair' | 'sombre');
+              return (
+                <span class="colors__mode">
+                  <span class="colors__frame" style={`background: ${mode.fond}`}>
+                    <span class="colors__chip" style={`background: ${final}`} />
+                  </span>
+                  <span class="colors__value">
+                    <span class="colors__mode-label">{mode.label} : </span>
+                    {raw}
+                    {raw !== final && <span class="lab-note">{final}</span>}
+                  </span>
+                </span>
+              );
+            })}
+          </li>
+        ))}
+      </ul>
+    </LabExample>
+  ))
+}
+
+<LabExample
+  id="lab-voiles"
+  title="Voiles sur photo"
+  text="Sous <strong>tout</strong> texte posé sur une photo, sur-titre compris. Identiques dans les deux modes."
+  bare
+>
+  <ul class="lab-grid" role="list">
+    {
+      voiles.map((token) => (
+        <li class="voile">
+          <span class="voile__photo" style={`background-image: url(${voilePhoto.src})`}>
+            <span class="voile__layer" style={`background: var(${token.name})`} />
+            <span class="voile__text">Texte blanc</span>
+          </span>
+          <code>{token.name}</code>
+          <span class="lab-note">{token.value}</span>
+        </li>
+      ))
+    }
+  </ul>
+</LabExample>
+
+<LabExample
+  id="lab-charte"
+  title="Couleurs de la charte"
+  text="Jamais en direct dans un composant : elles passent par les tokens de rôle ci-dessus."
+  bare
+>
+  <ul class="charte" role="list">
+    {
+      charte.map((token) => (
+        <li class="charte__item">
+          <span class="charte__chip" style={`background: var(${token.name})`} />
+          <code>{token.name}</code>
+          <span class="charte__value">{token.value}</span>
+          {token.note && <span class="lab-note">{token.note}</span>}
+        </li>
+      ))
+    }
+  </ul>
+</LabExample>
+
+<LabExample id="lab-opacites" title="Opacités des illustrations" bare>
+  <dl class="lab-table">
+    {
+      opacities.map((token) => (
+        <div>
+          <dt>
+            <code>{token.name}</code>
+          </dt>
+          <dd>
+            Clair : {token.value}
+            {token.dark && ` · sombre : ${token.dark}`}
+            {token.note && <span class="lab-note">{token.note}</span>}
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</LabExample>
+
+<style>
+  .colors {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-card-sm);
+    list-style: none;
+  }
+
+  .colors__head,
+  .colors__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-5);
+    padding: var(--space-3) var(--space-5);
+  }
+
+  .colors__head {
+    color: var(--texte-doux);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+  }
+
+  .colors__row {
+    align-items: center;
+    border-top: 1px solid var(--trait);
+  }
+
+  .colors__name {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .colors__mode {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+  }
+
+  /* Cadre peint au fond du mode : une couleur translucide s'y lit comme sur le site. */
+  .colors__frame {
+    flex-shrink: 0;
+    display: flex;
+    padding: 6px;
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+  }
+
+  .colors__chip {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.35);
+  }
+
+  .colors__value {
+    min-width: 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  /* Nom du mode : lu par les lecteurs d'écran (l'en-tête est décoratif), affiché en mobile. */
+  .colors__mode-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .voile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .voile__photo {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    height: 140px;
+    padding: var(--space-3);
+    overflow: hidden;
+    border-radius: var(--radius-card-sm);
+    background-position: center;
+    background-size: cover;
+  }
+
+  .voile__layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Texte blanc sur photo voilée : fond fixe, hors thème. */
+  .voile__text {
+    position: relative;
+    color: var(--blanc);
+    font-weight: 700;
+  }
+
+  .charte {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .charte__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .charte__chip {
+    width: 100%;
+    height: 88px;
+    margin-bottom: 6px;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-card-sm);
+  }
+
+  .charte__value {
+    font-size: 14px;
+  }
+
+  @media (max-width: 700px) {
+    .colors__head {
+      display: none;
+    }
+
+    .colors__row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
+    }
+
+    .colors__mode-label {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+    }
+  }
+</style>

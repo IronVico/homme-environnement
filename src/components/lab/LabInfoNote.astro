@@ -1,0 +1,29 @@
+---
+/** Lab, page InfoNote : texte simple, puis contenu en slot avec TodoPill (page Confidentialité). */
+import Info from '@lucide/astro/icons/info';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import { t } from '../../i18n';
+import { labProjects } from '../../lib/lab-data';
+import InfoNote from '../InfoNote.astro';
+import TodoPill from '../TodoPill.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const note = dict.confidentialite.audience.note;
+const projects = await labProjects();
+const story = projects.find((project) => project.data.story?.note)?.data.story?.note;
+---
+
+{
+  story && (
+    <LabExample id="lab-note-texte" title="Texte simple" text="Icône Lucide nue, titre en gras, texte. Fiche projet.">
+      <InfoNote icon={Info} title={story.title} text={story.text} />
+    </LabExample>
+  )
+}
+
+<LabExample id="lab-note-slot" title="Contenu en slot" text="Texte avec pastille ou lien passé en slot. Page Confidentialité.">
+  <InfoNote icon={ShieldCheck} title={note.title}>
+    {note.text}<TodoPill>{note.toConfirm}</TodoPill>
+  </InfoNote>
+</LabExample>

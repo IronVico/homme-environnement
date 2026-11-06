@@ -1,0 +1,42 @@
+---
+/** Lab, page Rayons : chaque --radius-* sur un carré de 120px. */
+import { byPrefix } from '../../lib/lab-tokens';
+import LabExample from './LabExample.astro';
+
+const radii = byPrefix('--radius-');
+---
+
+<LabExample id="lab-rayons" title="Arrondis" text="Sur un carré de 120px : <code>--radius-arch</code> et <code>--radius-pill</code> en font un cercle.">
+  <ul class="lab-grid tiles" role="list">
+    {
+      radii.map((token) => (
+        <li class="tile">
+          <span class="tile__shape" style={`border-radius: var(${token.name})`} />
+          <code>{token.name}</code>
+          <span class="lab-note">{token.value}</span>
+        </li>
+      ))
+    }
+  </ul>
+</LabExample>
+
+<style>
+  .tiles {
+    grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .tile__shape {
+    width: 120px;
+    height: 120px;
+    margin-bottom: var(--space-2);
+    border: 1.5px solid var(--texte);
+    background: var(--section);
+  }
+</style>

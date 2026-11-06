@@ -1,0 +1,32 @@
+---
+/**
+ * Exemple d'une page du lab : titre h2, phrase d'explication, puis l'aperçu encadré (slot).
+ * `text` est du HTML écrit dans le lab (balises <code>), jamais une donnée extérieure.
+ * tone : fond de l'aperçu (fond de page, section teintée, carte basalte fixe).
+ * flush : aperçu sans marge intérieure (composants pleine largeur). bare : sans cadre.
+ */
+interface Props {
+  id: string;
+  title: string;
+  text?: string;
+  tone?: 'fond' | 'section' | 'dark';
+  flush?: boolean;
+  bare?: boolean;
+}
+
+const { id, title, text, tone = 'fond', flush = false, bare = false } = Astro.props;
+---
+
+<section class="lab-example" aria-labelledby={id}>
+  <h2 id={id} class="lab-example__title">{title}</h2>
+  {text && <p class="lab-example__text" set:html={text} />}
+  {
+    bare ? (
+      <slot />
+    ) : (
+      <div class:list={['lab-preview', `lab-preview--${tone}`, { 'lab-preview--flush': flush }]}>
+        <slot />
+      </div>
+    )
+  }
+</section>

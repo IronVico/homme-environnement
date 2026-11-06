@@ -1,0 +1,91 @@
+---
+/**
+ * Pages du lab : /lab/ (accueil) et /lab/couleurs/, /lab/button/… Contenu dans src/components/lab/,
+ * liste dans src/lib/lab-nav.ts. Aucune page générée en production (LAB_ENABLED) : le lab
+ * n'existe qu'en local et sur les previews Vercel.
+ */
+import type { GetStaticPaths } from 'astro';
+import LabAccueil from '../../components/lab/LabAccueil.astro';
+import LabBreadcrumb from '../../components/lab/LabBreadcrumb.astro';
+import LabButton from '../../components/lab/LabButton.astro';
+import LabCartesPays from '../../components/lab/LabCartesPays.astro';
+import LabCouleurs from '../../components/lab/LabCouleurs.astro';
+import LabEngageCard from '../../components/lab/LabEngageCard.astro';
+import LabEspacements from '../../components/lab/LabEspacements.astro';
+import LabFaq from '../../components/lab/LabFaq.astro';
+import LabInfobulles from '../../components/lab/LabInfobulles.astro';
+import LabInfoNote from '../../components/lab/LabInfoNote.astro';
+import LabLogo from '../../components/lab/LabLogo.astro';
+import LabMotifs from '../../components/lab/LabMotifs.astro';
+import LabMouvement from '../../components/lab/LabMouvement.astro';
+import LabOmbres from '../../components/lab/LabOmbres.astro';
+import LabPartnerCard from '../../components/lab/LabPartnerCard.astro';
+import LabPastilles from '../../components/lab/LabPastilles.astro';
+import LabPhotoBanner from '../../components/lab/LabPhotoBanner.astro';
+import LabPillarCard from '../../components/lab/LabPillarCard.astro';
+import LabProjectCard from '../../components/lab/LabProjectCard.astro';
+import LabRayons from '../../components/lab/LabRayons.astro';
+import LabSectionHeading from '../../components/lab/LabSectionHeading.astro';
+import LabSpeciesCard from '../../components/lab/LabSpeciesCard.astro';
+import LabStatCard from '../../components/lab/LabStatCard.astro';
+import LabStepsBlock from '../../components/lab/LabStepsBlock.astro';
+import LabThemeToggle from '../../components/lab/LabThemeToggle.astro';
+import LabTypographie from '../../components/lab/LabTypographie.astro';
+import LabLayout from '../../layouts/LabLayout.astro';
+import { LAB_ENABLED, LAB_PAGES, type LabPage } from '../../lib/lab-nav';
+
+const CONTENT = {
+  couleurs: LabCouleurs,
+  typographie: LabTypographie,
+  espacements: LabEspacements,
+  rayons: LabRayons,
+  ombres: LabOmbres,
+  mouvement: LabMouvement,
+  button: LabButton,
+  'section-heading': LabSectionHeading,
+  pastilles: LabPastilles,
+  'engage-card': LabEngageCard,
+  'pillar-card': LabPillarCard,
+  'project-card': LabProjectCard,
+  'species-card': LabSpeciesCard,
+  'partner-card': LabPartnerCard,
+  'stat-card': LabStatCard,
+  'photo-banner': LabPhotoBanner,
+  'cartes-pays': LabCartesPays,
+  breadcrumb: LabBreadcrumb,
+  logo: LabLogo,
+  infobulles: LabInfobulles,
+  'theme-toggle': LabThemeToggle,
+  motifs: LabMotifs,
+  'info-note': LabInfoNote,
+  faq: LabFaq,
+  'steps-block': LabStepsBlock,
+};
+
+export const getStaticPaths = (() =>
+  LAB_ENABLED
+    ? [
+        { params: { page: undefined }, props: { page: undefined } },
+        ...LAB_PAGES.map((page) => ({ params: { page: page.slug }, props: { page } })),
+      ]
+    : []) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page?: LabPage };
+const Content = page ? CONTENT[page.slug as keyof typeof CONTENT] : LabAccueil;
+if (!Content) throw new Error(`Lab : pas de contenu pour la page « ${page?.slug} » (src/pages/lab/[...page].astro).`);
+---
+
+{
+  page ? (
+    <LabLayout page={page} title={page.label} description={page.description}>
+      <Content />
+    </LabLayout>
+  ) : (
+    <LabLayout
+      title="Design system"
+      description="Le design system de L’Homme & l’Environnement tel qu’il est codé : tokens lus dans src/styles/tokens.css au build, composants réels de src/components avec les données du site. À comparer aux maquettes, en clair et en sombre (bascule en haut à droite)."
+    >
+      <Content />
+    </LabLayout>
+  )
+}

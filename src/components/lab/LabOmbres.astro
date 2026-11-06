@@ -1,0 +1,56 @@
+---
+/** Lab, page Ombres : ombres des cartes (valeur sombre propre) et ombre papier du tampon. */
+import { byPrefix } from '../../lib/lab-tokens';
+import LabExample from './LabExample.astro';
+
+const sets = [
+  { id: 'lab-ombres-cartes', title: 'Cartes', text: 'Ombre teintée basalte en clair, noire en sombre.', tokens: byPrefix('--shadow-'), paper: false },
+  {
+    id: 'lab-ombre-papier',
+    title: 'Ombre papier',
+    text: 'Ombre nette du tampon du footer, montrée ici avec un décalage de 4 × 6px.',
+    tokens: byPrefix('--ombre-papier'),
+    paper: true,
+  },
+];
+---
+
+{
+  sets.map((set) => (
+    <LabExample id={set.id} title={set.title} text={set.text} tone="section">
+      <ul class="lab-grid" role="list">
+        {set.tokens.map((token) => (
+          <li class="shadow">
+            <span class="shadow__card" style={set.paper ? `box-shadow: 4px 6px 0 var(${token.name})` : `box-shadow: var(${token.name})`} />
+            <code>{token.name}</code>
+            <span class="shadow__value">Clair : {token.value}</span>
+            {token.dark && <span class="shadow__value">Sombre : {token.dark}</span>}
+          </li>
+        ))}
+      </ul>
+    </LabExample>
+  ))
+}
+
+<style>
+  .shadow {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .shadow__card {
+    width: 100%;
+    height: 120px;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+  }
+
+  .shadow__value {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+</style>
