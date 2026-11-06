@@ -1,0 +1,86 @@
+---
+/**
+ * Lab, page Button : variantes, tailles, flèche, icônes, lien courant, focus figé.
+ * Libellés et liens réels du site. Seules les combinaisons utilisées par le site sont montrées
+ * (un <button> n'existe qu'en variante primary : voir la PR du lab).
+ */
+import { donatePath, fieldPath, pagePath, STAGES_EMAIL } from '../../data/navigation';
+import { FEATURED_REPORT_ID, REPORTS } from '../../data/rapports';
+import { localeUrl, t } from '../../i18n';
+import Button from '../Button.astro';
+import LabExample from './LabExample.astro';
+
+const lang = 'fr';
+const dict = t(lang);
+const { home, ui } = dict;
+const featuredReport = REPORTS.find((report) => report.id === FEATURED_REPORT_ID);
+const sitesCount = 6;
+---
+
+<LabExample
+  id="lab-variantes"
+  title="Variantes"
+  text="<code>don</code> : pêche, réservé à « Faire un don ». <code>primary</code> : action principale d’une page. <code>secondary</code> : contour (variante par défaut)."
+>
+  <div class="lab-row">
+    <Button href={donatePath(lang)} variant="don">{ui.donate}</Button>
+    <Button href={pagePath(lang, 'contact')} variant="primary">{dict.partenaires.hero.become}</Button>
+    <Button href={pagePath(lang, 'projets')} variant="secondary">{home.hero.secondaryCta}</Button>
+  </div>
+</LabExample>
+
+<LabExample
+  id="lab-sur-photo"
+  title="Sur photo"
+  text="<code>on-dark-primary</code> et <code>on-dark</code> : inchangés dans les deux modes. Aperçu sur carte basalte fixe."
+  tone="dark"
+>
+  <div class="lab-row">
+    <Button href={localeUrl(lang)} variant="on-dark-primary">{dict.notFound.home}</Button>
+    <Button href={fieldPath(lang)} variant="on-dark">{dict.projets.cta.field}</Button>
+  </div>
+</LabExample>
+
+<LabExample id="lab-tailles" title="Tailles" text="<code>md</code> (par défaut) dans les pages, <code>sm</code> dans le header et le footer.">
+  <div class="lab-row">
+    <Button href={donatePath(lang)} variant="don">{ui.donate}</Button>
+    <Button href={donatePath(lang)} variant="don" size="sm">{ui.donate}</Button>
+  </div>
+</LabExample>
+
+<LabExample
+  id="lab-icones"
+  title="Flèche et icônes"
+  text="<code>arrow=&quot;down&quot;</code> pour une ancre dans la page. <code>icon</code> remplace la flèche : <code>mail</code> (lien mailto), <code>book</code> (lire en ligne), <code>download</code>. Sans <code>href</code>, le composant rend un <code>&lt;button&gt;</code> (« Lire en ligne », page Rapports)."
+>
+  <div class="lab-row">
+    <Button href="#lab-icones" variant="secondary" arrow="down">{dict.madagascar.hero.cta.replace('{count}', String(sitesCount))}</Button>
+    <Button href={`mailto:${STAGES_EMAIL}`} variant="primary" icon="mail">{dict.stages.apply.button}</Button>
+    <Button variant="primary" icon="book">{dict.rapports.featured.read}</Button>
+    {
+      featuredReport?.file && (
+        <Button href={featuredReport.file} variant="secondary" icon="download" download>
+          {dict.rapports.featured.download}
+        </Button>
+      )
+    }
+  </div>
+</LabExample>
+
+<LabExample
+  id="lab-etats"
+  title="États"
+  text="Survol : léger soulèvement et couleur plus forte. <code>current</code> pose <code>aria-current=&quot;page&quot;</code>. Le second bouton montre le contour de <code>:focus-visible</code>, figé pour l’aperçu : tabulez pour le voir en vrai."
+>
+  <div class="lab-row">
+    <Button href={pagePath(lang, 'projets')} variant="secondary" current>{dict.nav.main[2]}</Button>
+    <Button href={pagePath(lang, 'projets')} variant="secondary" class="lab-focus">{home.hero.secondaryCta}</Button>
+  </div>
+</LabExample>
+
+<style>
+  .lab-row :global(.lab-focus) {
+    outline: 2px solid var(--texte);
+    outline-offset: 2px;
+  }
+</style>

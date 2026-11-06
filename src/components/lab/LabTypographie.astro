@@ -1,0 +1,146 @@
+---
+/** Lab, page Typographie : police, puis chaque taille --fs-* avec son --lh-* et son --ls-*. */
+import { t } from '../../i18n';
+import { byPrefix } from '../../lib/lab-tokens';
+import LabExample from './LabExample.astro';
+
+const fontSizes = byPrefix('--fs-');
+const lineHeights = new Map(byPrefix('--lh-').map((token) => [token.name.slice(5), token]));
+const letterSpacings = new Map(byPrefix('--ls-').map((token) => [token.name.slice(5), token]));
+/** Interlignage et interlettrage d'une taille : même suffixe (display, h2…), sinon ceux du corps. */
+const scale = fontSizes.map((size) => {
+  const key = size.name.slice(5);
+  return {
+    size,
+    lh: lineHeights.get(key) ?? (key.startsWith('body') ? lineHeights.get('body') : undefined),
+    ls: letterSpacings.get(key),
+  };
+});
+const fontFamily = byPrefix('--font-');
+const { home } = t('fr');
+---
+
+<LabExample id="lab-police" title="Police" text="Rubik est la seule police du site, de 300 (Light) à 900, avec son italique." bare>
+  <dl class="lab-table">
+    {
+      fontFamily.map((token) => (
+        <div>
+          <dt>
+            <code>{token.name}</code>
+          </dt>
+          <dd>{token.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+  <div class="lab-preview">
+    <p class="weights">
+      <span style="font-weight: 300">Light 300</span>
+      <span style="font-weight: 400">Regular 400</span>
+      <span style="font-weight: 500">Medium 500</span>
+      <span style="font-weight: 600">SemiBold 600</span>
+      <span style="font-weight: 800">ExtraBold 800</span>
+    </p>
+  </div>
+</LabExample>
+
+<LabExample
+  id="lab-echelle"
+  title="Échelle"
+  text="Taille calculée à la largeur actuelle de la fenêtre. Les tailles sans <code>--lh-*</code> ni <code>--ls-*</code> propre prennent l’interlignage fixé par le composant."
+  bare
+>
+  <ul class="scale" role="list">
+    {
+      scale.map(({ size, lh, ls }) => (
+        <li class="scale__row">
+          <p
+            class="scale__sample"
+            style={[`font-size: var(${size.name})`, lh && `line-height: var(${lh.name})`, ls && `letter-spacing: var(${ls.name})`]
+              .filter(Boolean)
+              .join('; ')}
+            aria-hidden="true"
+          >
+            {home.engage.titleStrong}
+          </p>
+          <p class="scale__meta">
+            <code>{size.name}</code> {size.value}
+            <span class="lab-note" data-computed>
+              calculé : —
+            </span>
+            {lh && (
+              <span>
+                <code>{lh.name}</code> {lh.value}
+              </span>
+            )}
+            {ls && (
+              <span>
+                <code>{ls.name}</code> {ls.value}
+              </span>
+            )}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</LabExample>
+
+<LabExample id="lab-eyebrow" title="Sur-titre" text="Classe utilitaire <code>.eyebrow</code> (global.css) : <code>--fs-eyebrow</code>, <code>--ls-eyebrow</code>, capitales.">
+  <p class="eyebrow">{home.engage.eyebrow}</p>
+</LabExample>
+
+<script>
+  const update = () => {
+    document.querySelectorAll<HTMLElement>('[data-computed]').forEach((el) => {
+      const sample = el.closest('li')?.querySelector<HTMLElement>('.scale__sample');
+      if (sample) el.textContent = `calculé : ${Math.round(parseFloat(getComputedStyle(sample).fontSize) * 10) / 10}px`;
+    });
+  };
+  update();
+  window.addEventListener('resize', update);
+</script>
+
+<style>
+  .weights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    font-size: var(--fs-body-lg);
+  }
+
+  .scale {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .scale__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 16rem);
+    gap: var(--space-5);
+    align-items: center;
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .scale__sample {
+    font-weight: 800;
+    overflow-wrap: break-word;
+  }
+
+  .scale__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 760px) {
+    .scale__row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2);
+    }
+  }
+</style>

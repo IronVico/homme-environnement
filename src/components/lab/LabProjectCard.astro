@@ -1,0 +1,88 @@
+---
+/** Lab, page ProjectCard : carte compacte (avec et sans lien) dans ProjectGrid, puis ProjectPhotoCard. */
+import { projectPath } from '../../data/navigation';
+import { t } from '../../i18n';
+import { labProjects } from '../../lib/lab-data';
+import ProjectCard from '../ProjectCard.astro';
+import ProjectGrid from '../ProjectGrid.astro';
+import ProjectPhotoCard from '../ProjectPhotoCard.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const projects = await labProjects();
+const [first, second, third] = projects;
+---
+
+<LabExample
+  id="lab-project-card"
+  title="ProjectCard"
+  text="Carte compacte des pages pays et fiches site, dans un <code>ProjectGrid</code> (3, 2 puis 1 colonne). Avec <code>href</code> : carte-lien, flèche et survol. Sans <code>href</code> (action d’un site sans projet relié) : ni flèche ni survol (dernière carte)."
+  tone="section"
+>
+  <ProjectGrid>
+    {
+      [first, second].map(
+        (project) =>
+          project && (
+            <ProjectCard
+              icon={project.data.icon}
+              title={project.data.title}
+              text={project.data.summary}
+              sites={project.siteList}
+              sitesLabel={dict.projectCard.sitesLabel}
+              href={projectPath('fr', project.id)}
+              linkLabel={dict.projectCard.link}
+            />
+          ),
+      )
+    }
+    {
+      third && (
+        <ProjectCard
+          icon={third.data.icon}
+          title={third.data.title}
+          text={third.data.summary}
+          sites={third.siteList}
+          sitesLabel={dict.projectCard.sitesLabel}
+          linkLabel={dict.projectCard.link}
+        />
+      )
+    }
+  </ProjectGrid>
+</LabExample>
+
+<LabExample id="lab-project-photo" title="ProjectPhotoCard" text="Carte avec photo, réservée à la page « Nos projets » : pastilles thème et pays, sites en pied." tone="section">
+  <ul class="tiles" role="list">
+    {
+      [first, second].map(
+        (project) =>
+          project && (
+            <ProjectPhotoCard
+              id={project.id}
+              title={project.data.title}
+              summary={project.data.summary}
+              theme={project.data.theme}
+              themeLabel={dict.projets.themes[project.data.theme]}
+              countries={project.data.countries.map((country) => ({ id: country, label: dict.projets.countries[country] }))}
+              sites={project.siteList}
+              sitesLabel={dict.projets.list.sitesLabel}
+              image={project.data.photo}
+              imagePosition={project.data.photoPosition}
+              href={projectPath('fr', project.id)}
+            />
+          ),
+      )
+    }
+  </ul>
+</LabExample>
+
+<style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

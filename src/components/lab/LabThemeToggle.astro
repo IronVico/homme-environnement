@@ -1,0 +1,28 @@
+---
+/** Lab, page ThemeToggle : bouton du header (celui de la barre du lab) et choix segmenté du menu mobile. */
+import ThemeToggle from '../ThemeToggle.astro';
+import LabExample from './LabExample.astro';
+---
+
+<LabExample
+  id="lab-toggle-button"
+  title="variant=&quot;button&quot;"
+  text="Header desktop : bouton rond de 44px, lune en clair, soleil en sombre. Libellé et infobulle disent l’action (« Passer en mode clair ») : pas d’<code>aria-pressed</code>. C’est la bascule en haut à droite du lab."
+  bare
+/>
+
+<LabExample
+  id="lab-toggle-segmented"
+  title="variant=&quot;segmented&quot;"
+  text="Menu mobile : Auto · Clair · Sombre, choix courant en <code>aria-pressed=&quot;true&quot;</code>. Le choix est enregistré sur l’appareil et vaut pour tout le site."
+>
+  <div class="segmented">
+    <ThemeToggle variant="segmented" />
+  </div>
+</LabExample>
+
+<style>
+  .segmented {
+    max-width: 360px;
+  }
+</style>

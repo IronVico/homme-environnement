@@ -1,0 +1,27 @@
+---
+/** Lab, page SectionHeading : combinaisons réelles (accueil, page Madagascar). */
+import { pagePath } from '../../data/navigation';
+import { t } from '../../i18n';
+import SectionHeading from '../SectionHeading.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const { home } = dict;
+---
+
+<LabExample id="lab-sh-lien" title="Titre et lien" text="Lien d’action aligné à droite (accueil, « Où nous agissons »). Le composant rend un <code>h2</code>.">
+  <SectionHeading id="lab-sh-1" strong={home.actions.title} link={{ label: home.actions.link, href: pagePath('fr', 'madagascar') }} />
+</LabExample>
+
+<LabExample id="lab-sh-eyebrow" title="Sur-titre et titre en deux temps" text="Partie forte en ExtraBold, partie douce en Light (accueil, « S’engager »).">
+  <SectionHeading id="lab-sh-2" eyebrow={home.engage.eyebrow} strong={home.engage.titleStrong} light={home.engage.titleLight} />
+</LabExample>
+
+<LabExample id="lab-sh-chapeau" title="Chapeau" text="Toujours sous le titre, jamais à côté (page Madagascar).">
+  <SectionHeading
+    id="lab-sh-3"
+    strong={dict.madagascar.projects.titleStrong}
+    light={dict.madagascar.projects.titleLight}
+    lead={dict.madagascar.projects.lead}
+  />
+</LabExample>

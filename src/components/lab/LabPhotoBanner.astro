@@ -1,0 +1,52 @@
+---
+/** Lab, page PhotoBanner : bannière newsletter de l'accueil (NewsletterForm), puis bannière à boutons (Madagascar). */
+import { donatePath, fieldPath } from '../../data/navigation';
+import { t } from '../../i18n';
+import Button from '../Button.astro';
+import NewsletterForm from '../NewsletterForm.astro';
+import PhotoBanner from '../PhotoBanner.astro';
+import LabExample from './LabExample.astro';
+
+import paysMadagascar from '../../assets/photos/pays-madagascar.jpg';
+import souimanga from '../../assets/photos/pilier-biodiversite-souimanga.jpg';
+
+const dict = t('fr');
+const { home, ui } = dict;
+const cta = dict.madagascar.cta;
+---
+
+<LabExample
+  id="lab-banner-newsletter"
+  title="Avec NewsletterForm"
+  text="Photo sous un voile <code>--voile</code> (62 %), texte blanc, focus blanc. Champ et bouton dans une seule pilule ; l’envoi est bloqué tant que l’outil d’emailing n’est pas choisi."
+  flush
+>
+  <PhotoBanner id="lab-newsletter-titre" titleStrong={home.newsletter.titleStrong} titleLight={home.newsletter.titleLight} text={home.newsletter.text} image={paysMadagascar}>
+    <div class="form">
+      <NewsletterForm id="lab-newsletter" />
+    </div>
+  </PhotoBanner>
+</LabExample>
+
+<LabExample id="lab-banner-boutons" title="Avec boutons" text="Bandeau de soutien des pages pays : <code>Button</code> <code>don</code> et <code>on-dark</code>." flush>
+  <PhotoBanner id="lab-soutenir-titre" titleStrong={cta.titleStrong} titleLight={cta.titleLight} text={cta.text} image={souimanga} imagePosition="50% 45%">
+    <div class="buttons">
+      <Button href={donatePath('fr')} variant="don">{ui.donate}</Button>
+      <Button href={fieldPath('fr')} variant="on-dark">{cta.field}</Button>
+    </div>
+  </PhotoBanner>
+</LabExample>
+
+<style>
+  .form {
+    flex: 1 1 420px;
+    min-width: 0;
+    max-width: 560px;
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+/**
+ * Lab, page Mouvement : transitions et élévations. Survol réservé à ce qui est interactif :
+ * la démo passe par de vrais liens (Button, carte-lien card-lift).
+ */
+import { donatePath } from '../../data/navigation';
+import { t } from '../../i18n';
+import { byPrefix } from '../../lib/lab-tokens';
+import Button from '../Button.astro';
+import LabExample from './LabExample.astro';
+
+const motion = byPrefix('--transition-', '--lift-', '--nudge-');
+const { ui } = t('fr');
+---
+
+<LabExample id="lab-tokens-mouvement" title="Tokens" bare>
+  <dl class="lab-table">
+    {
+      motion.map((token) => (
+        <div>
+          <dt>
+            <code>{token.name}</code>
+          </dt>
+          <dd>
+            {token.value}
+            {token.note && <span class="lab-note">{token.note}</span>}
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</LabExample>
+
+<LabExample
+  id="lab-survol"
+  title="Au survol"
+  text="Bouton : <code>--lift-button-hover</code>. Cartes-liens <code>a.card-lift</code> : <code>--lift-card-hover</code>, <code>--shadow-card-hover</code> et flèche décalée de <code>--nudge-arrow-hover</code> (voir les pages EngageCard et ProjectCard). Tout est coupé avec <code>prefers-reduced-motion</code>."
+>
+  <div class="lab-row">
+    <Button href={donatePath('fr')} variant="don">{ui.donate}</Button>
+  </div>
+</LabExample>

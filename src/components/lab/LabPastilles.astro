@@ -1,0 +1,40 @@
+---
+/** Lab, page Pastilles : Chip (sites de Madagascar), TodoPill, CountryFlag. */
+import { t } from '../../i18n';
+import { getExplorerSites } from '../../lib/explorer-sites';
+import Chip from '../Chip.astro';
+import CountryFlag from '../CountryFlag.astro';
+import TodoPill from '../TodoPill.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const sites = await getExplorerSites('fr', [], 'madagascar');
+---
+
+<LabExample id="lab-chip" title="Chip" text="Nom d’un site, sur la carte pays de l’accueil (<code>CountryCard</code>). Non cliquable.">
+  <div class="lab-row">{sites.map((site) => <Chip label={site.name} />)}</div>
+</LabExample>
+
+<LabExample id="lab-todo" title="TodoPill" text="Valeur à fournir ou à confirmer par l’ONG : pastille en pointillés.">
+  <div class="lab-row">
+    <TodoPill>{dict.site.missing}</TodoPill>
+    <TodoPill>{dict.confidentialite.toConfirm}</TodoPill>
+  </div>
+</LabExample>
+
+<LabExample id="lab-flag" title="CountryFlag" text="Drapeau rond, décoratif : le nom du pays est toujours écrit à côté. <code>size</code> : 18px par défaut, 14px dans les cartes, 22px en titre.">
+  <div class="lab-row">
+    <span class="flag"><CountryFlag country="madagascar" size={14} /> {dict.projets.countries.madagascar}</span>
+    <span class="flag"><CountryFlag country="madagascar" /> {dict.projets.countries.madagascar}</span>
+    <span class="flag"><CountryFlag country="burkina-faso" size={22} /> {dict.projets.countries['burkina-faso']}</span>
+  </div>
+</LabExample>
+
+<style>
+  .flag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 500;
+  }
+</style>

@@ -1,0 +1,90 @@
+---
+/** Accueil du lab (/lab/) : présentation, une tuile par page, composants non montrés. */
+import LabExample from '../../components/lab/LabExample.astro';
+import LabLayout from '../../layouts/LabLayout.astro';
+import { LAB_GROUPS, labPath } from '../../lib/lab-nav';
+---
+
+<LabLayout
+  title="Design system"
+  description="Le design system de L’Homme & l’Environnement tel qu’il est codé : tokens lus dans src/styles/tokens.css au build, composants réels de src/components avec les données du site. À comparer aux maquettes, en clair et en sombre (bascule en haut à droite)."
+>
+  {
+    LAB_GROUPS.map((group) => (
+      <LabExample id={`lab-${group.title.toLowerCase()}`} title={group.title} bare>
+        <ul class="tiles" role="list">
+          {group.pages.map((page) => (
+            <li>
+              <a class="tile" href={labPath(page.slug)}>
+                <span class="tile__title">{page.label}</span>
+                <span class="tile__text">{page.description}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </LabExample>
+    ))
+  }
+
+  <LabExample id="lab-absents" title="Non montrés ici" bare>
+    <ul class="absents">
+      <li><code>Hero</code>, <code>PageHero</code> : portent le <code>h1</code> de leur page (un seul par page).</li>
+      <li><code>Header</code>, <code>LangSwitcher</code>, <code>Footer</code> : lien vers une version anglaise du lab, qui n’existe pas ; à voir sur n’importe quelle page du site.</li>
+      <li><code>DonationForm</code>, <code>ContactForm</code> : liés au script et à l’envoi de leur page.</li>
+      <li><code>RecentDonations</code> : n’affiche que de vrais dons (vide en production).</li>
+      <li><code>PdfReader</code>, <code>ReportCover</code>, <code>PhotoMarquee</code>, <code>PartnersStrip</code>, <code>WorldMap</code>, <code>Portrait</code> : propres à une page (Rapports, Galerie, accueil, Autres projets, Équipe).</li>
+      <li><code>Intro</code>, <code>Aquarelle</code>, <code>PartnerLink</code> : écran d’ouverture, lavis des cartes pays, lien des cartes partenaire, visibles à travers les composants qui les contiennent.</li>
+      <li>Pages (<code>*Page.astro</code>) : gabarits complets, sur le site.</li>
+    </ul>
+  </LabExample>
+</LabLayout>
+
+<style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--trait);
+    border-left: 1px solid var(--trait);
+    list-style: none;
+  }
+
+  .tiles li {
+    display: flex;
+    border-right: 1px solid var(--trait);
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    padding: var(--space-5);
+    text-decoration: none;
+  }
+
+  .tile:hover {
+    background: var(--section);
+  }
+
+  .tile__title {
+    font-weight: 800;
+    font-size: var(--fs-body-lg);
+  }
+
+  .tile__text {
+    font-size: var(--fs-body-sm);
+    line-height: 1.5;
+  }
+
+  .absents {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 80ch;
+    line-height: var(--lh-body);
+  }
+</style>

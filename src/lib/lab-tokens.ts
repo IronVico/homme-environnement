@@ -101,3 +101,10 @@ export const byPrefix = (...prefixes: string[]) =>
 
 /** Une valeur se lit comme une couleur (hex, rgb, var vers une couleur). */
 export const isColor = (token: Token) => /^(#|rgba?\()/.test(token.resolved ?? token.value);
+
+export const tokenByName = (name: string) => TOKENS.find((token) => token.name === name);
+
+/** Valeur finale en mode clair et en mode sombre (identique si le token ne change pas). */
+export const lightOf = (token: Token) => token.resolved ?? token.value;
+/** En sombre, un token sans valeur propre suit les tokens qu'il référence (var(--texte)…). */
+export const darkOf = (token: Token) => resolve(token.dark ?? token.value, darkMerged);

@@ -1,0 +1,26 @@
+---
+/** Lab, page PillarCard : les trois piliers de l'accueil. Pas un lien : aucun survol. */
+import { t } from '../../i18n';
+import PillarCard from '../PillarCard.astro';
+import LabExample from './LabExample.astro';
+
+import pilierBiodiversite from '../../assets/photos/pilier-biodiversite-souimanga.jpg';
+import pilierEconomie from '../../assets/photos/pilier-economie-fete-ambohidravy.jpg';
+import pilierResponsabilisation from '../../assets/photos/pilier-responsabilisation-classe.jpg';
+
+const { home } = t('fr');
+const images = [pilierBiodiversite, pilierEconomie, pilierResponsabilisation];
+const pillars = home.approach.pillars.map((pillar, i) => ({ ...pillar, image: images[i]! }));
+---
+
+<LabExample id="lab-piliers" title="Piliers de l’approche" text="Photo en arche, titre <code>h3</code> et texte. La carte n’est pas un lien : aucun effet de survol.">
+  <div class="pillars">{pillars.map((pillar) => <PillarCard {...pillar} />)}</div>
+</LabExample>
+
+<style>
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: var(--space-8);
+  }
+</style>

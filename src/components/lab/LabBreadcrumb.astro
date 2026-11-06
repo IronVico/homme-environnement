@@ -1,0 +1,29 @@
+---
+/** Lab, page Breadcrumb : fil d'Ariane de la page Madagascar (rubrique sans page : sans lien). */
+import { localeUrl, t } from '../../i18n';
+import Breadcrumb from '../Breadcrumb.astro';
+import LabExample from './LabExample.astro';
+
+const dict = t('fr');
+const items = [
+  { label: dict.ui.breadcrumbHome, href: localeUrl('fr') },
+  { label: dict.nav.main[1]!, href: '#' },
+];
+---
+
+<LabExample
+  id="lab-fil"
+  title="Fil d’Ariane"
+  text="Pages parentes, puis la page courante (<code>aria-current=&quot;page&quot;</code>). Une rubrique sans page (<code>href=&quot;#&quot;</code>) s’affiche sans lien."
+  flush
+>
+  <div class="crumb">
+    <Breadcrumb items={items} current={dict.madagascar.title} />
+  </div>
+</LabExample>
+
+<style>
+  .crumb {
+    padding-block: var(--space-3);
+  }
+</style>
