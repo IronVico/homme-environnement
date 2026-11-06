@@ -91,6 +91,8 @@ src/
 
 The rules come from the NGO's design system (the "Design System" artifact): colours, typography, cards, buttons, accessibility, animations. Every value goes through the variables in [`src/styles/tokens.css`](src/styles/tokens.css); do not add hard-coded colours in a component.
 
+Internal showcase: [`/lab/`](src/pages/lab.astro) shows the tokens (read from `tokens.css` at build time by [`src/lib/lab-tokens.ts`](src/lib/lab-tokens.ts)) and the real components with site data, in light and dark mode. French only, `noindex` (so out of the sitemap), not linked from the site.
+
 Reminders:
 
 - **Rubik** is the only font. **Sage** is never used for text; `noir-95` text on sage and on peach.

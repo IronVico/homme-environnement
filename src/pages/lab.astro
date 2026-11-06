@@ -1,0 +1,1327 @@
+---
+/**
+ * Lab : vitrine interne du design system tel qu'il est codé (tokens et composants réels).
+ * Page en français seulement, sans version anglaise, noindex (donc hors sitemap, voir
+ * astro.config.mjs), sans image de partage propre (absente de src/lib/og.ts) et sans lien
+ * depuis le reste du site. Textes de la vitrine en dur : la page n'est pas traduite.
+ * Données d'exemple : collections (src/content), données (src/data) et i18n, jamais inventées.
+ * Les tokens sont lus dans src/styles/tokens.css au build (src/lib/lab-tokens.ts).
+ */
+import Calendar from '@lucide/astro/icons/calendar';
+import Info from '@lucide/astro/icons/info';
+import MapIcon from '@lucide/astro/icons/map';
+import { getImage } from 'astro:assets';
+import { getCollection, getEntry } from 'astro:content';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import Button from '../components/Button.astro';
+import Chip from '../components/Chip.astro';
+import ContourPattern from '../components/ContourPattern.astro';
+import CountryCard from '../components/CountryCard.astro';
+import CountryFlag from '../components/CountryFlag.astro';
+import EngageCard from '../components/EngageCard.astro';
+import Faq from '../components/Faq.astro';
+import FooterStamp from '../components/FooterStamp.astro';
+import InfoNote from '../components/InfoNote.astro';
+import Logo from '../components/Logo.astro';
+import NewsletterForm from '../components/NewsletterForm.astro';
+import PartnerCard from '../components/PartnerCard.astro';
+import PhotoBanner from '../components/PhotoBanner.astro';
+import PillarCard from '../components/PillarCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+import ProjectPhotoCard from '../components/ProjectPhotoCard.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ShareButtons from '../components/ShareButtons.astro';
+import SitesExplorer from '../components/SitesExplorer.astro';
+import SpeciesCard from '../components/SpeciesCard.astro';
+import StatCard from '../components/StatCard.astro';
+import StatsBand from '../components/StatsBand.astro';
+import StepsBlock from '../components/StepsBlock.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import TodoPill from '../components/TodoPill.astro';
+import { MADAGASCAR, SITE_FIGURES } from '../data/chiffres';
+import { donatePath, fieldPath, pagePath, projectPath, STAGES_EMAIL } from '../data/navigation';
+import { getPartner } from '../data/partenaires';
+import { PROGRAMME } from '../data/projets-soutenus';
+import { FEATURED_REPORT_ID, REPORTS } from '../data/rapports';
+import { localeUrl, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getExplorerSites } from '../lib/explorer-sites';
+import { byPrefix, inGroup, isColor, TOKENS, type Token } from '../lib/lab-tokens';
+
+import engagerDonner from '../assets/photos/engager-donner.jpg';
+import engagerTerrain from '../assets/photos/engager-terrain.jpg';
+import paysBurkina from '../assets/photos/pays-burkina-elephants.jpg';
+import paysMadagascar from '../assets/photos/pays-madagascar.jpg';
+import pilierBiodiversite from '../assets/photos/pilier-biodiversite-souimanga.jpg';
+import pilierEconomie from '../assets/photos/pilier-economie-fete-ambohidravy.jpg';
+import pilierResponsabilisation from '../assets/photos/pilier-responsabilisation-classe.jpg';
+
+const lang = 'fr';
+const dict = t(lang);
+const { home, ui } = dict;
+
+// --- Tokens ---------------------------------------------------------------------------------------
+
+const charte = inGroup('Couleurs');
+// Tokens de rôle et leurs dérivés : couleurs d'un côté, opacités des illustrations de l'autre.
+// Les ombres du tampon (--ombre-papier*) sont avec les ombres.
+const derived = TOKENS.filter((token) => /^(Tokens de rôle|Dérivés)/.test(token.group) && !token.name.startsWith('--ombre-papier'));
+const roleColors = derived.filter(isColor);
+const opacities = derived.filter((token) => !isColor(token));
+const voiles = byPrefix('--voile');
+// Aperçu des voiles sur une vraie photo du site.
+const voilePhoto = await getImage({ src: paysMadagascar, width: 160, format: 'webp' });
+
+const fontSizes = byPrefix('--fs-');
+const lineHeights = new Map(byPrefix('--lh-').map((token) => [token.name.slice(5), token]));
+const letterSpacings = new Map(byPrefix('--ls-').map((token) => [token.name.slice(5), token]));
+/** Interlignage et interlettrage d'une taille : même suffixe (display, h2…), sinon ceux du corps. */
+const typeScale = fontSizes.map((size) => {
+  const key = size.name.slice(5);
+  return {
+    size,
+    lh: lineHeights.get(key) ?? (key.startsWith('body') ? lineHeights.get('body') : undefined),
+    ls: letterSpacings.get(key),
+  };
+});
+const fontFamily = byPrefix('--font-');
+
+const spaces = byPrefix('--space-', '--gutter', '--content-max');
+const radii = byPrefix('--radius-');
+const shadows = byPrefix('--shadow-', '--ombre-papier');
+const motion = byPrefix('--transition-', '--lift-', '--nudge-');
+
+/** Valeur affichée : brute, puis résolue si elle passe par d'autres tokens. */
+const shown = (value: string, resolved?: string) => (resolved ? `${value} → ${resolved}` : value);
+const hasDark = (token: Token) => token.dark !== undefined;
+
+// --- Données d'exemple (réelles) ------------------------------------------------------------------
+
+const madagascarSites = await getExplorerSites(lang, [], 'madagascar');
+const burkinaSites = await getExplorerSites(lang, [], 'burkina-faso');
+
+const allSites = await getCollection('sites');
+const siteNames = new Map(allSites.map((site) => [site.id, site.data.name]));
+const projets = (await getCollection('projets')).sort((a, b) => a.data.order - b.data.order);
+const siteList = (data: (typeof projets)[number]['data']) => [
+  ...data.sites.map((ref) => siteNames.get(ref.id) ?? ref.id),
+  ...data.otherSites,
+];
+const [firstProject, secondProject] = projets;
+
+const pillarImages = [pilierBiodiversite, pilierEconomie, pilierResponsabilisation];
+const pillars = home.approach.pillars.map((pillar, i) => ({ ...pillar, image: pillarImages[i]! }));
+const [donCard, terrainCard] = home.engage.cards;
+
+const homeStats = (
+  [
+    { value: 30, illustration: 'ring' },
+    { value: 400000, illustration: 'bars' },
+    { value: 5000, illustration: 'dots' },
+  ] as const
+).map((stat, i) => {
+  const text = home.stats[i]!;
+  return { ...stat, unit: text.unit, text: text.text, illustrationLabel: text.illustrationLabel };
+});
+
+const mgStats = dict.madagascar.stats;
+const autres = dict.autresProjets.stats;
+const otherStats = [
+  { value: MADAGASCAR.hectares, prefix: '≈', illustration: 'sites', unit: mgStats[0]!.unit, text: mgStats[0]!.text, illustrationLabel: mgStats[0]!.illustrationLabel },
+  {
+    value: MADAGASCAR.beneficiaries,
+    prefix: '≈',
+    illustration: 'share',
+    ratio: MADAGASCAR.beneficiaries / MADAGASCAR.inhabitants,
+    unit: mgStats[1]!.unit,
+    text: mgStats[1]!.text,
+    illustrationLabel: mgStats[1]!.illustrationLabel,
+  },
+  { value: MADAGASCAR.threatenedSpecies, illustration: 'families', unit: mgStats[2]!.unit, text: mgStats[2]!.text, illustrationLabel: mgStats[2]!.illustrationLabel },
+  { value: dict.site.missing, illustration: 'water', text: dict.burkina.stats[1]!.text, illustrationLabel: dict.burkina.stats[1]!.illustrationLabel },
+  { value: `${PROGRAMME.from}–${PROGRAMME.to}`, illustration: 'ticks', count: 10, text: autres.yearsText, illustrationLabel: autres.yearsLabel },
+  { value: PROGRAMME.projects, illustration: 'grid', count: PROGRAMME.projects, text: autres.projectsText, illustrationLabel: autres.projectsLabel },
+  { value: PROGRAMME.countries, illustration: 'segments', count: PROGRAMME.countries, text: autres.countriesText, illustrationLabel: autres.countriesLabel },
+] as const;
+
+// Variante icône : chiffres de la fiche Vohimana.
+const vohimana = await getEntry('sites', 'vohimana');
+const vohimanaFigures = SITE_FIGURES.vohimana ?? {};
+const figureText = (key: string) => vohimana?.data.figures?.find((figure) => figure.key === key)?.text ?? '';
+const iconStats = [
+  { value: vohimanaFigures.hectares ?? dict.site.missing, unit: dict.site.units.hectares, text: figureText('hectares'), Icon: MapIcon },
+  { value: vohimanaFigures.years ?? dict.site.missing, unit: dict.site.units.years, text: figureText('years'), Icon: Calendar },
+];
+
+const species = vohimana?.data.species.slice(0, 2) ?? [];
+const speciesStatus = (status: (typeof species)[number]['status']) =>
+  status && { label: dict.site.species.status[status], threatened: ['CR', 'EN', 'VU'].includes(status) };
+
+const partner = getPartner('rainforest-trust');
+const featuredReport = REPORTS.find((report) => report.id === FEATURED_REPORT_ID);
+const stages = dict.stages;
+const faqItems = dict.don.faq.items.slice(0, 3).map(({ question, answer }) => ({ question, answer: [answer] }));
+const breadcrumb = [
+  { label: ui.breadcrumbHome, href: localeUrl(lang) },
+  { label: dict.nav.main[1]!, href: '#' },
+];
+
+const SECTIONS = [
+  { id: 'couleurs', label: 'Couleurs' },
+  { id: 'typographie', label: 'Typographie' },
+  { id: 'espacements', label: 'Espacements' },
+  { id: 'rayons', label: 'Rayons' },
+  { id: 'ombres', label: 'Ombres' },
+  { id: 'mouvement', label: 'Mouvement' },
+  { id: 'button', label: 'Button' },
+  { id: 'section-heading', label: 'SectionHeading' },
+  { id: 'chip', label: 'Chip' },
+  { id: 'cartes', label: 'Cartes' },
+  { id: 'stat-card', label: 'StatCard' },
+  { id: 'photo-banner', label: 'PhotoBanner' },
+  { id: 'cartes-pays', label: 'Cartes pays' },
+  { id: 'navigation', label: 'Navigation' },
+  { id: 'infobulles', label: 'Infobulles et états' },
+  { id: 'motifs', label: 'Motifs' },
+  { id: 'contenus', label: 'Contenus' },
+  { id: 'absents', label: 'Non montrés' },
+];
+---
+
+<BaseLayout title="Lab du design system" description="Vitrine interne des tokens et composants du site, tels qu'ils sont codés." noindex>
+  <header class="lab-bar">
+    <div class="lab-bar__inner container">
+      <Logo class="lab-bar__logo" lang={lang} alt={ui.logoAlt} />
+      <span class="lab-bar__name">Lab</span>
+      <ThemeToggle variant="button" class="lab-bar__theme" />
+    </div>
+  </header>
+
+  <main id="contenu" class="lab">
+    <div class="lab-intro container">
+      <h1 class="lab-intro__title"><span class="lab-intro__strong">Lab</span> <span class="lab-intro__light">du design system</span></h1>
+      <p class="lab-intro__lead">
+        Le design system tel qu'il est codé : tokens lus dans <code>src/styles/tokens.css</code> au build, composants
+        réels de <code>src/components/</code> avec les données du site. La bascule en haut à droite passe la page en
+        clair ou en sombre (même réglage que le header du site).
+      </p>
+      <nav class="lab-toc" aria-label="Sommaire du lab">
+        <ul role="list">
+          {SECTIONS.map(({ id, label }) => <li><a href={`#${id}`}>{label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+
+    {/* ---------------------------------------------------------------- Tokens */}
+
+    <section id="couleurs" class="lab-section container" aria-labelledby="couleurs-titre">
+      <h2 id="couleurs-titre" class="lab-title">Couleurs</h2>
+      <p class="lab-text">
+        Tokens de rôle : pastille rendue avec <code>var(--…)</code>, elle suit le mode affiché. Valeur claire, puis
+        sombre quand elle change.
+      </p>
+      <ul class="swatches" role="list">
+        {
+          roleColors.map((token) => (
+            <li class="swatch">
+              <span class="swatch__chip" style={`background: var(${token.name})`} />
+              <span class="swatch__body">
+                <code class="swatch__name">{token.name}</code>
+                <span class="swatch__value">{shown(token.value, token.resolved)}</span>
+                {hasDark(token) && <span class="swatch__value">Sombre : {shown(token.dark!, token.darkResolved)}</span>}
+                {token.note && <span class="swatch__note">{token.note}</span>}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="lab-subtitle">Voiles sur photo</h3>
+      <ul class="swatches" role="list">
+        {
+          voiles.map((token) => (
+            <li class="swatch">
+              <span class="swatch__chip swatch__chip--photo" style={`background-image: url(${voilePhoto.src})`}>
+                <span style={`background: var(${token.name})`} />
+              </span>
+              <span class="swatch__body">
+                <code class="swatch__name">{token.name}</code>
+                <span class="swatch__value">{token.value}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="lab-subtitle">Couleurs de la charte</h3>
+      <p class="lab-text">À ne pas utiliser en direct dans un composant : elles passent par les tokens de rôle.</p>
+      <ul class="swatches" role="list">
+        {
+          charte.map((token) => (
+            <li class="swatch">
+              <span class="swatch__chip" style={`background: var(${token.name})`} />
+              <span class="swatch__body">
+                <code class="swatch__name">{token.name}</code>
+                <span class="swatch__value">{token.value}</span>
+                {token.note && <span class="swatch__note">{token.note}</span>}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="lab-subtitle">Opacités des illustrations</h3>
+      <dl class="token-table">
+        {
+          opacities.map((token) => (
+            <div>
+              <dt><code>{token.name}</code></dt>
+              <dd>
+                {token.value}
+                {hasDark(token) && ` · sombre : ${token.dark}`}
+                {token.note && <span class="token-table__note">{token.note}</span>}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section id="typographie" class="lab-section container" aria-labelledby="typographie-titre">
+      <h2 id="typographie-titre" class="lab-title">Typographie</h2>
+      <dl class="token-table">
+        {
+          fontFamily.map((token) => (
+            <div>
+              <dt><code>{token.name}</code></dt>
+              <dd>{token.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <ul class="type-scale" role="list">
+        {
+          typeScale.map(({ size, lh, ls }) => (
+            <li class="type-scale__row">
+              <p
+                class="type-scale__sample"
+                style={[
+                  `font-size: var(${size.name})`,
+                  lh && `line-height: var(${lh.name})`,
+                  ls && `letter-spacing: var(${ls.name})`,
+                ]
+                  .filter(Boolean)
+                  .join('; ')}
+                aria-hidden="true"
+              >
+                L'Homme & l'Environnement
+              </p>
+              <p class="type-scale__meta">
+                <code>{size.name}</code> {size.value} · <span data-computed={size.name}>calculé : —</span>
+                {lh && (
+                  <>
+                    <br />
+                    <code>{lh.name}</code> {lh.value}
+                  </>
+                )}
+                {ls && (
+                  <>
+                    <br />
+                    <code>{ls.name}</code> {ls.value}
+                  </>
+                )}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="lab-text">
+        Les tailles sans <code>--lh-*</code> ni <code>--ls-*</code> propre prennent l'interlignage fixé par le
+        composant. Classe utilitaire <code>.eyebrow</code> :
+      </p>
+      <p class="eyebrow">{home.engage.eyebrow}</p>
+    </section>
+
+    <section id="espacements" class="lab-section container" aria-labelledby="espacements-titre">
+      <h2 id="espacements-titre" class="lab-title">Espacements</h2>
+      <ul class="spaces" role="list">
+        {
+          spaces.map((token) => (
+            <li class="spaces__row">
+              <code class="spaces__name">{token.name}</code>
+              <span class="spaces__bar" style={`width: var(${token.name})`} />
+              <span class="spaces__value">
+                {token.value}
+                {!/^\d+px$/.test(token.value) && (
+                  <>
+                    {' · calculé : '}
+                    <span data-computed-width={token.name}>—</span>
+                  </>
+                )}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section id="rayons" class="lab-section container" aria-labelledby="rayons-titre">
+      <h2 id="rayons-titre" class="lab-title">Rayons</h2>
+      <ul class="tiles" role="list">
+        {
+          radii.map((token) => (
+            <li class="tile">
+              <span class="tile__radius" style={`border-radius: var(${token.name})`} />
+              <code>{token.name}</code>
+              <span class="tile__value">{token.value}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section id="ombres" class="lab-section container" aria-labelledby="ombres-titre">
+      <h2 id="ombres-titre" class="lab-title">Ombres</h2>
+      <ul class="tiles tiles--wide" role="list">
+        {
+          shadows.map((token) => (
+            <li class="tile">
+              <span
+                class="tile__shadow"
+                style={token.name.startsWith('--ombre') ? `box-shadow: 4px 6px 0 var(${token.name})` : `box-shadow: var(${token.name})`}
+              />
+              <code>{token.name}</code>
+              <span class="tile__value">{token.value}</span>
+              {hasDark(token) && <span class="tile__value">Sombre : {token.dark}</span>}
+              {token.note && <span class="tile__value">{token.note}</span>}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="lab-text">
+        <code>--ombre-papier*</code> : ombre nette décalée du tampon (aperçu avec un décalage de 4 × 6px).
+      </p>
+    </section>
+
+    <section id="mouvement" class="lab-section container" aria-labelledby="mouvement-titre">
+      <h2 id="mouvement-titre" class="lab-title">Transitions et élévations</h2>
+      <dl class="token-table">
+        {
+          motion.map((token) => (
+            <div>
+              <dt><code>{token.name}</code></dt>
+              <dd>
+                {token.value}
+                {token.note && <span class="token-table__note">{token.note}</span>}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+      <p class="lab-text">
+        Survol réservé à ce qui est interactif : pour les voir, survolez les boutons (<code>--lift-button-hover</code>)
+        et les cartes-liens <code>a.card-lift</code> (<code>--lift-card-hover</code>, <code>--nudge-arrow-hover</code>)
+        plus bas. Tout est coupé avec <code>prefers-reduced-motion</code>.
+      </p>
+    </section>
+
+    {/* ---------------------------------------------------------------- Composants */}
+
+    <section id="button" class="lab-section container" aria-labelledby="button-titre">
+      <h2 id="button-titre" class="lab-title"><code>Button</code></h2>
+      <div class="demo">
+        <p class="demo__label"><code>variant="don"</code> · <code>"primary"</code> · <code>"secondary"</code> · <code>arrow="down"</code></p>
+        <div class="demo__row">
+          <Button href={donatePath(lang)} variant="don">{ui.donate}</Button>
+          <Button href={pagePath(lang, 'contact')} variant="primary">{dict.partenaires.hero.become}</Button>
+          <Button href={pagePath(lang, 'projets')} variant="secondary">{home.hero.secondaryCta}</Button>
+          <Button href="#cartes-pays" variant="secondary" arrow="down">{dict.madagascar.hero.cta.replace('{count}', String(madagascarSites.length))}</Button>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo__label"><code>icon="mail"</code> · <code>"book"</code> · <code>"download"</code> · <code>size="sm"</code> · sans <code>href</code> : <code>&lt;button&gt;</code> (« Lire en ligne », comme sur Rapports)</p>
+        <div class="demo__row">
+          <Button href={`mailto:${STAGES_EMAIL}`} variant="primary" icon="mail">{stages.apply.button}</Button>
+          <Button variant="primary" icon="book">{dict.rapports.featured.read}</Button>
+          {featuredReport?.file && <Button href={featuredReport.file} variant="secondary" icon="download" download>{dict.rapports.featured.download}</Button>}
+          <Button href={donatePath(lang)} variant="don" size="sm">{ui.donate}</Button>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo__label"><code>current</code> (<code>aria-current="page"</code>) · focus figé avec le contour de <code>:focus-visible</code></p>
+        <div class="demo__row">
+          <Button href={pagePath(lang, 'projets')} variant="secondary" current>{dict.nav.main[2]}</Button>
+          <Button href={pagePath(lang, 'projets')} variant="secondary" class="lab-focus">{home.hero.secondaryCta}</Button>
+        </div>
+      </div>
+      <div class="demo demo--dark">
+        <p class="demo__label demo__label--on-dark"><code>variant="on-dark-primary"</code> · <code>"on-dark"</code> · sur la carte basalte (fond fixe)</p>
+        <div class="demo__row">
+          <Button href={localeUrl(lang)} variant="on-dark-primary">{dict.notFound.home}</Button>
+          <Button href={fieldPath(lang)} variant="on-dark">{dict.projets.cta.field}</Button>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-heading" class="lab-section container" aria-labelledby="section-heading-titre">
+      <h2 id="section-heading-titre" class="lab-title"><code>SectionHeading</code></h2>
+      <p class="lab-text">Ses titres sont des <code>h2</code> : exemples tirés de l'accueil et de la page Madagascar.</p>
+      <div class="demo demo--stack">
+        <p class="demo__label"><code>strong</code> + <code>link</code></p>
+        <SectionHeading id="lab-sh-1" strong={home.actions.title} link={{ label: home.actions.link, href: pagePath(lang, 'madagascar') }} />
+      </div>
+      <div class="demo demo--stack">
+        <p class="demo__label"><code>eyebrow</code> + <code>strong</code> + <code>light</code></p>
+        <SectionHeading id="lab-sh-2" eyebrow={home.engage.eyebrow} strong={home.engage.titleStrong} light={home.engage.titleLight} />
+      </div>
+      <div class="demo demo--stack">
+        <p class="demo__label"><code>strong</code> + <code>light</code> + <code>lead</code></p>
+        <SectionHeading
+          id="lab-sh-3"
+          strong={dict.madagascar.projects.titleStrong}
+          light={dict.madagascar.projects.titleLight}
+          lead={dict.madagascar.projects.lead}
+        />
+      </div>
+    </section>
+
+    <section id="chip" class="lab-section container" aria-labelledby="chip-titre">
+      <h2 id="chip-titre" class="lab-title"><code>Chip</code> · <code>TodoPill</code> · <code>CountryFlag</code></h2>
+      <div class="demo__row">
+        {madagascarSites.slice(0, 4).map((site) => <Chip label={site.name} />)}
+      </div>
+      <div class="demo__row">
+        <TodoPill>{dict.site.missing}</TodoPill>
+        <span class="flag-label"><CountryFlag country="madagascar" /> {dict.projets.countries.madagascar}</span>
+        <span class="flag-label"><CountryFlag country="burkina-faso" size={22} /> {dict.projets.countries['burkina-faso']}</span>
+      </div>
+    </section>
+
+    <section id="cartes" class="lab-section container" aria-labelledby="cartes-titre">
+      <h2 id="cartes-titre" class="lab-title">Cartes</h2>
+
+      <p class="demo__label"><code>EngageCard</code> · <code>variant="engage"</code> (accueil, « S'engager »)</p>
+      <div class="grid-3">
+        <EngageCard {...donCard!} href={donatePath(lang)} image={engagerDonner} imagePosition="40% 60%" />
+        <EngageCard {...terrainCard!} href={pagePath(lang, 'stages')} image={engagerTerrain} imagePosition="50% 30%" />
+      </div>
+
+      <p class="demo__label"><code>EngageCard</code> · <code>variant="country"</code> · <code>CountryCard</code> avec ses <code>Chip</code></p>
+      <div class="grid-2">
+        <CountryCard
+          name={home.actions.madagascar.name}
+          description={home.actions.madagascar.description.replace('{count}', String(madagascarSites.length))}
+          sites={madagascarSites.map((site) => site.name)}
+          href={pagePath(lang, 'madagascar')}
+          image={paysMadagascar}
+        />
+        <EngageCard
+          variant="country"
+          title={home.actions.burkina.title}
+          text={home.actions.burkina.text}
+          href={pagePath(lang, 'burkina')}
+          image={paysBurkina}
+          imageAlt={home.actions.burkina.imageAlt}
+          imagePosition="50% 60%"
+        />
+      </div>
+
+      <p class="demo__label"><code>PillarCard</code> (pas un lien : aucun survol)</p>
+      <div class="grid-3">
+        {pillars.map((pillar) => <PillarCard {...pillar} />)}
+      </div>
+
+      <p class="demo__label"><code>ProjectCard</code> dans <code>ProjectGrid</code> : avec <code>href</code>, puis sans (ni flèche ni survol)</p>
+      <ProjectGrid>
+        {
+          firstProject && (
+            <ProjectCard
+              icon={firstProject.data.icon}
+              title={firstProject.data.title}
+              text={firstProject.data.summary}
+              sites={siteList(firstProject.data)}
+              sitesLabel={dict.projectCard.sitesLabel}
+              href={projectPath(lang, firstProject.id)}
+              linkLabel={dict.projectCard.link}
+            />
+          )
+        }
+        {
+          secondProject && (
+            <ProjectCard
+              icon={secondProject.data.icon}
+              title={secondProject.data.title}
+              text={secondProject.data.summary}
+              sites={siteList(secondProject.data)}
+              sitesLabel={dict.projectCard.sitesLabel}
+              linkLabel={dict.projectCard.link}
+            />
+          )
+        }
+      </ProjectGrid>
+
+      <p class="demo__label"><code>ProjectPhotoCard</code> (page « Nos projets ») · <code>SpeciesCard</code> (fiche Vohimana)</p>
+      <ul class="grid-3 lab-list" role="list">
+        {
+          firstProject && (
+            <ProjectPhotoCard
+              id={firstProject.id}
+              title={firstProject.data.title}
+              summary={firstProject.data.summary}
+              theme={firstProject.data.theme}
+              themeLabel={dict.projets.themes[firstProject.data.theme]}
+              countries={firstProject.data.countries.map((country) => ({ id: country, label: dict.projets.countries[country] }))}
+              sites={siteList(firstProject.data)}
+              sitesLabel={dict.projets.list.sitesLabel}
+              image={firstProject.data.photo}
+              imagePosition={firstProject.data.photoPosition}
+              href={projectPath(lang, firstProject.id)}
+            />
+          )
+        }
+        {
+          species.map((item) => (
+            <SpeciesCard
+              name={item.name}
+              status={speciesStatus(item.status)}
+              text={item.text ?? dict.site.missing}
+              photo={item.photo}
+              photoAlt={item.photoAlt}
+              photoPosition={item.photoPosition}
+              photoMissing={dict.site.photoMissing}
+            />
+          ))
+        }
+      </ul>
+
+      <p class="demo__label"><code>PartnerCard</code> (logo couleur en clair, monochrome en sombre)</p>
+      <ul class="grid-3 lab-list" role="list">
+        <PartnerCard partner={partner} typeLabel={dict.partenaires.types[partner.type]} />
+      </ul>
+    </section>
+
+    <section id="stat-card" class="lab-section lab-section--full" aria-labelledby="stat-card-titre">
+      <div class="container">
+        <h2 id="stat-card-titre" class="lab-title"><code>StatsBand</code> · <code>StatCard</code></h2>
+        <p class="lab-text">Bande sauge de l'accueil (illustrations <code>ring</code>, <code>bars</code>, <code>dots</code>) :</p>
+      </div>
+      <StatsBand stats={homeStats} label="Exemple : chiffres clés de l'accueil" />
+      <div class="container">
+        <p class="demo__label">
+          <code>sites</code>, <code>share</code>, <code>families</code> (Madagascar), <code>water</code> (Burkina Faso, valeur à
+          fournir), <code>ticks</code>, <code>grid</code>, <code>segments</code> (autres projets soutenus)
+        </p>
+        <div class="grid-stats">
+          {otherStats.map((stat) => <StatCard {...stat} />)}
+        </div>
+        <p class="demo__label">Variante icône (fiche Vohimana)</p>
+        <div class="grid-stats">
+          {
+            iconStats.map(({ Icon, ...stat }) => (
+              <StatCard {...stat}>
+                <Icon slot="icon" size={28} />
+              </StatCard>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <div id="photo-banner" class="lab-anchor">
+      <div class="container">
+        <h2 class="lab-title" id="photo-banner-titre"><code>PhotoBanner</code> · <code>NewsletterForm</code></h2>
+        <p class="lab-text">
+          Carte sur photo assombrie (<code>--voile</code>), contenu libre à droite. Ici le formulaire newsletter de
+          l'accueil (envoi bloqué tant que l'outil n'est pas choisi), puis les boutons d'une page pays.
+        </p>
+      </div>
+      <PhotoBanner
+        id="lab-newsletter-titre"
+        titleStrong={home.newsletter.titleStrong}
+        titleLight={home.newsletter.titleLight}
+        text={home.newsletter.text}
+        image={paysMadagascar}
+      >
+        <div class="lab-newsletter">
+          <NewsletterForm id="lab-newsletter" />
+        </div>
+      </PhotoBanner>
+      <PhotoBanner
+        id="lab-soutenir-titre"
+        titleStrong={dict.madagascar.cta.titleStrong}
+        titleLight={dict.madagascar.cta.titleLight}
+        text={dict.madagascar.cta.text}
+        image={pilierBiodiversite}
+        imagePosition="50% 45%"
+      >
+        <div class="demo__row">
+          <Button href={donatePath(lang)} variant="don">{ui.donate}</Button>
+          <Button href={fieldPath(lang)} variant="on-dark">{dict.madagascar.cta.field}</Button>
+        </div>
+      </PhotoBanner>
+    </div>
+
+    <section id="cartes-pays" class="lab-section lab-section--tinted" aria-labelledby="cartes-pays-titre">
+      <div class="container">
+        <h2 id="cartes-pays-titre" class="lab-title"><code>MadagascarMap</code> · <code>BurkinaMap</code> · <code>SiteCard</code></h2>
+        <p class="lab-text">
+          Les cartes pays dans <code>SitesExplorer</code>, comme sur les pages pays : survoler ou tabuler un repère ou
+          une <code>SiteCard</code> met le site en avant des deux côtés (état <code>selected</code>, contour basalte, sauge
+          en sombre).
+        </p>
+        <div class="lab-stack">
+          <SitesExplorer map={dict.madagascar.sites.map} sites={madagascarSites} country="madagascar" />
+          <SitesExplorer map={dict.burkina.sites.map} sites={burkinaSites} country="burkina-faso" />
+        </div>
+      </div>
+    </section>
+
+    <section id="navigation" class="lab-section" aria-labelledby="navigation-titre">
+      <div class="container">
+        <h2 id="navigation-titre" class="lab-title"><code>Breadcrumb</code> · <code>Logo</code></h2>
+        <p class="demo__label">Fil d'Ariane de la page Madagascar (rubrique sans page : sans lien)</p>
+      </div>
+      <Breadcrumb items={breadcrumb} current={dict.madagascar.title} />
+      <div class="container">
+        <p class="demo__label"><code>Logo</code> français et anglais (nom en <code>--logo-nom</code>)</p>
+        <div class="demo__row">
+          <Logo class="lab-logo" lang="fr" alt={ui.logoAlt} />
+          <Logo class="lab-logo" lang="en" alt={t('en').ui.logoAlt} />
+        </div>
+      </div>
+    </section>
+
+    <section id="infobulles" class="lab-section container" aria-labelledby="infobulles-titre">
+      <h2 id="infobulles-titre" class="lab-title">Infobulles <code>data-tooltip</code> et états</h2>
+      <p class="lab-text">
+        Boutons à icône seule : <code>aria-label</code> et infobulle au même texte, après 500 ms de survol ou tout de
+        suite au focus clavier ; Échap la ferme. <code>ShareButtons</code> (page Don) :
+        <code>data-tooltip-align="start"</code> sur le premier.
+      </p>
+      <ShareButtons label={dict.don.further.campaign.share} text={dict.don.further.campaign.shareText} />
+      <div class="demo">
+        <p class="demo__label">
+          <code>ThemeToggle variant="button"</code> (header, <code>data-tooltip-pos="below"</code>) : c'est la bascule en
+          haut de cette page. <code>variant="segmented"</code> (menu mobile), état <code>aria-pressed</code> :
+        </p>
+        <div class="lab-segmented">
+          <ThemeToggle variant="segmented" />
+        </div>
+      </div>
+      <p class="lab-text">
+        Les filtres en pilule à <code>aria-pressed</code> (Nos projets, Partenaires, Rapports) et les cartes de montant
+        de la page Don sont propres à leur page, pas des composants : voir ces pages.
+      </p>
+    </section>
+
+    <section id="motifs" class="lab-section container" aria-labelledby="motifs-titre">
+      <h2 id="motifs-titre" class="lab-title"><code>ContourPattern</code> · <code>FooterStamp</code></h2>
+      <p class="lab-text">
+        Décoratifs, avec mouvement lent (respiration des courbes, rotation du tampon) coupé avec
+        <code>prefers-reduced-motion</code>. Opacité ×0,6 en sombre (<code>--motif-opacite</code>).
+      </p>
+      <div class="motifs">
+        <div class="motifs__box">
+          <p class="demo__label"><code>variant="hero"</code></p>
+          <ContourPattern variant="hero" class="lab-contours" />
+        </div>
+        <div class="motifs__box">
+          <p class="demo__label"><code>variant="footer"</code></p>
+          <ContourPattern variant="footer" class="lab-contours" />
+        </div>
+        <div class="motifs__box motifs__box--stamp">
+          <p class="demo__label"><code>FooterStamp</code> (cliquez : coup de tampon)</p>
+          <FooterStamp class="lab-stamp" />
+        </div>
+      </div>
+    </section>
+
+    <section id="contenus" class="lab-section container" aria-labelledby="contenus-titre">
+      <h2 id="contenus-titre" class="lab-title"><code>InfoNote</code> · <code>Faq</code> · <code>StepsBlock</code></h2>
+      <div class="demo demo--stack">
+        <InfoNote icon={Info} title={dict.confidentialite.audience.note.title}>
+          {dict.confidentialite.audience.note.text}<TodoPill>{dict.confidentialite.audience.note.toConfirm}</TodoPill>
+        </InfoNote>
+      </div>
+      <div class="demo demo--stack">
+        <p class="demo__label"><code>Faq</code> (page Don, trois questions)</p>
+        <Faq items={faqItems} />
+      </div>
+      <div class="demo demo--stack">
+        <p class="demo__label"><code>StepsBlock tone="section"</code> (page Stages ; son titre est un <code>h2</code>)</p>
+        <StepsBlock
+          id="lab-candidater-titre"
+          titleStrong={stages.apply.titleStrong}
+          titleLight={stages.apply.titleLight}
+          text={stages.apply.text}
+          button={{ label: stages.apply.button, href: `mailto:${STAGES_EMAIL}` }}
+          steps={stages.apply.steps}
+          tone="section"
+        />
+      </div>
+    </section>
+
+    <section id="absents" class="lab-section container" aria-labelledby="absents-titre">
+      <h2 id="absents-titre" class="lab-title">Non montrés ici</h2>
+      <ul class="absents">
+        <li><code>Hero</code>, <code>PageHero</code> : portent le <code>h1</code> de leur page (un seul par page).</li>
+        <li><code>Header</code>, <code>LangSwitcher</code>, <code>Footer</code> : liens vers <code>/en/lab/</code>, qui n'existe pas ; à voir sur n'importe quelle page.</li>
+        <li><code>DonationForm</code>, <code>ContactForm</code> : liés au script et à l'envoi de leur page.</li>
+        <li><code>RecentDonations</code> : n'affiche que de vrais dons (vide en production).</li>
+        <li><code>PdfReader</code>, <code>ReportCover</code>, <code>PhotoMarquee</code>, <code>PartnersStrip</code>, <code>WorldMap</code>, <code>Portrait</code> : propres à une page (Rapports, Galerie, accueil, Autres projets, Équipe).</li>
+        <li><code>Intro</code>, <code>Aquarelle</code>, <code>PartnerLink</code> : écran d'ouverture, lavis des cartes pays et lien de carte partenaire, visibles à travers les composants qui les contiennent.</li>
+        <li>Pages (<code>*Page.astro</code>) : gabarits complets, sur le site.</li>
+      </ul>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  import { initStats } from '../scripts/stats';
+  initStats();
+
+  // Valeurs calculées des tailles et espacements en clamp(), à la largeur de la fenêtre.
+  const px = (value: string) => `${Math.round(parseFloat(value) * 10) / 10}px`;
+  const update = () => {
+    document.querySelectorAll<HTMLElement>('[data-computed]').forEach((el) => {
+      const sample = el.closest('li')?.querySelector<HTMLElement>('.type-scale__sample');
+      if (sample) el.textContent = `calculé : ${px(getComputedStyle(sample).fontSize)}`;
+    });
+    document.querySelectorAll<HTMLElement>('[data-computed-width]').forEach((el) => {
+      const bar = el.closest('li')?.querySelector<HTMLElement>('.spaces__bar');
+      if (bar) el.textContent = px(getComputedStyle(bar).width);
+    });
+  };
+  update();
+  window.addEventListener('resize', update);
+</script>
+
+<style>
+  .lab-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--header-translucide);
+    border-bottom: 1px solid var(--trait);
+    backdrop-filter: blur(8px);
+  }
+
+  .lab-bar__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+  }
+
+  .lab-bar :global(.lab-bar__logo) {
+    width: auto;
+    height: 40px;
+  }
+
+  .lab-bar__name {
+    font-weight: 800;
+    font-size: 18px;
+  }
+
+  .lab-bar :global(.lab-bar__theme) {
+    margin-left: auto;
+  }
+
+  .lab {
+    color: var(--texte);
+  }
+
+  .lab-intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-block: var(--space-12) var(--space-8);
+  }
+
+  .lab-intro__title {
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+  }
+
+  .lab-intro__strong {
+    font-weight: 800;
+  }
+
+  .lab-intro__light {
+    font-weight: 300;
+  }
+
+  .lab-intro__lead {
+    max-width: 70ch;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  .lab-toc ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-toc a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 4px 14px;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-body-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .lab-toc a:hover {
+    background: var(--section);
+  }
+
+  /* Noms de tokens et de composants : Rubik (seule police du site), en pastille. */
+  code {
+    padding: 0.05em 0.35em;
+    border-radius: 6px;
+    background: var(--disque);
+    color: var(--texte);
+    font-family: inherit;
+    font-size: 0.92em;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .lab-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-block: var(--space-12);
+    border-top: 1px solid var(--trait);
+  }
+
+  /* Sections pleine largeur (bande, bannières) : le contenu est dans des .container. En flex,
+     un .container à marges auto se réduirait à son contenu : affichage en bloc. */
+  .lab-section:not(.container),
+  .lab-anchor {
+    display: block;
+  }
+
+  .lab-section:not(.container) > * + *,
+  .lab-anchor > * + * {
+    margin-top: var(--space-6);
+  }
+
+  .lab-section:not(.container) > .container,
+  .lab-anchor > .container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .lab-section--tinted {
+    background: var(--section);
+  }
+
+  .lab-anchor {
+    padding-block: var(--space-12);
+    border-top: 1px solid var(--trait);
+    scroll-margin-top: 64px;
+  }
+
+  .lab-section,
+  .lab-anchor {
+    scroll-margin-top: 64px;
+  }
+
+  .lab-title {
+    font-size: var(--fs-card-title);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .lab-title code {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  .lab-subtitle {
+    margin-top: var(--space-5);
+    font-size: var(--fs-body-lg);
+    font-weight: 700;
+  }
+
+  .lab-text {
+    max-width: 75ch;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+  }
+
+  .lab-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  /* Couleurs */
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .swatch {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-3);
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card-sm);
+    background: var(--surface);
+  }
+
+  .swatch__chip {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--trait);
+    border-radius: var(--radius-card-sm);
+  }
+
+  /* Aperçu du voile sur une photo du site (image en style, posée dans le HTML). */
+  .swatch__chip--photo {
+    overflow: hidden;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .swatch__chip--photo span {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .swatch__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .swatch__name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .swatch__value,
+  .swatch__note {
+    overflow-wrap: anywhere;
+  }
+
+  .swatch__note {
+    color: var(--texte-doux);
+  }
+
+  .token-table {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+
+  .token-table > div {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .token-table dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .token-table__note {
+    display: block;
+    color: var(--texte-doux);
+    font-size: 14px;
+  }
+
+  /* Typographie */
+  .type-scale {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .type-scale__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
+    gap: var(--space-5);
+    align-items: center;
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .type-scale__sample {
+    font-weight: 800;
+    overflow-wrap: break-word;
+  }
+
+  .type-scale__meta {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Espacements */
+  .spaces {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .spaces__row {
+    display: grid;
+    grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+    gap: var(--space-2) var(--space-5);
+    align-items: center;
+  }
+
+  .spaces__name {
+    justify-self: start;
+  }
+
+  .spaces__bar {
+    display: block;
+    max-width: 100%;
+    height: 16px;
+    border-radius: 4px;
+    background: var(--accent);
+  }
+
+  .spaces__value {
+    grid-column: 2;
+    font-size: 14px;
+  }
+
+  /* Rayons et ombres */
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+    gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tiles--wide {
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    font-size: 14px;
+  }
+
+  .tile__value {
+    overflow-wrap: anywhere;
+    color: var(--texte-doux);
+  }
+
+  .tile__radius {
+    display: block;
+    width: 120px;
+    height: 120px;
+    margin-bottom: var(--space-2);
+    background: var(--section);
+    border: 1.5px solid var(--texte);
+  }
+
+  .tile__shadow {
+    display: block;
+    height: 120px;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+  }
+
+  /* Démos de composants */
+  .demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .demo--stack {
+    gap: var(--space-5);
+  }
+
+  /* Carte basalte volontairement sombre, identique dans les deux modes : couleurs en dur. */
+  .demo--dark {
+    padding: var(--space-6);
+    border-radius: var(--radius-card-lg);
+    background: var(--basalte);
+  }
+
+  .demo--dark :global(:focus-visible) {
+    outline-color: var(--blanc);
+  }
+
+  .demo__label {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--texte-doux);
+  }
+
+  .demo__label--on-dark,
+  .demo__label--on-dark code {
+    color: var(--blanc);
+  }
+
+  .demo__label--on-dark code {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .demo__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  .lab-section :global(.lab-focus) {
+    outline: 2px solid var(--texte);
+    outline-offset: 2px;
+  }
+
+  .flag-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 500;
+  }
+
+  .grid-2,
+  .grid-3 {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .grid-2 {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lab-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .grid-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: var(--space-5);
+  }
+
+  .lab-newsletter {
+    flex: 1 1 420px;
+    min-width: 0;
+    max-width: 560px;
+  }
+
+  .lab-logo,
+  .demo__row :global(.lab-logo) {
+    width: auto;
+    height: 72px;
+  }
+
+  .lab-segmented {
+    max-width: 360px;
+  }
+
+  .motifs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  .motifs__box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-height: 260px;
+    padding: var(--space-5);
+    overflow: hidden;
+    border: 1px solid var(--bordure-carte);
+    border-radius: var(--radius-card);
+    background: var(--footer);
+  }
+
+  .motifs__box :global(.lab-contours) {
+    position: static;
+    width: 100%;
+    height: auto;
+    mask-image: none;
+  }
+
+  .motifs__box :global(.lab-stamp) {
+    position: static;
+    width: 160px;
+    height: 160px;
+    margin: auto;
+  }
+
+  .absents {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 80ch;
+    line-height: var(--lh-body);
+  }
+
+  @media (max-width: 960px) {
+    .grid-2,
+    .grid-3,
+    .motifs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .type-scale__row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .token-table > div,
+    .spaces__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .spaces__value {
+      grid-column: 1;
+    }
+  }
+</style>
