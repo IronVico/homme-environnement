@@ -1,12 +1,12 @@
-# L'Homme & l'Environnement — site web
+# L'Homme & l'Environnement — website
 
-Nouveau site de l'ONG [L'Homme & l'Environnement](https://www.homme-environnement.org) (conservation et développement local, Madagascar et Burkina Faso, depuis 1993).
+New website of the NGO [L'Homme & l'Environnement](https://www.homme-environnement.org) (conservation and local development in Madagascar and Burkina Faso, since 1993).
 
-Site **statique** et **bilingue** (français par défaut à la racine, anglais sous `/en/`), construit avec [Astro](https://astro.build) et TypeScript (mode strict), sans back-end ni framework CSS.
+A **static**, **bilingual** site (French by default at the root, English under `/en/`), built with [Astro](https://astro.build) and TypeScript (strict mode), with no back end and no CSS framework.
 
-## Lancer le projet
+## Getting started
 
-Prérequis : Node.js 24 (Astro 7 demande 22.22 minimum). La version majeure est figée à `24.x` dans `package.json`, la même que dans les réglages du projet Vercel, pour que Vercel ne passe pas tout seul à une nouvelle version majeure de Node.
+Requirements: Node.js 24 (Astro 7 needs 22.22 at least). The major version is pinned to `24.x` in `package.json`, the same as in the Vercel project settings, so that Vercel does not move to a new Node major version on its own.
 
 ```bash
 npm install
@@ -16,153 +16,153 @@ npm install
 npm run dev
 ```
 
-Le site tourne sur <http://localhost:4321> (version anglaise : <http://localhost:4321/en/>).
+The site runs at <http://localhost:4321> (English version: <http://localhost:4321/en/>).
 
-| Commande          | Rôle                                                        |
-| ----------------- | ----------------------------------------------------------- |
-| `npm run dev`     | Serveur de développement avec rechargement à chaud          |
-| `npm run build`   | Vérification des types (`astro check`) puis build dans `dist/` |
-| `npm run preview` | Sert le build de `dist/` en local pour le tester            |
-| `npm run check`   | Vérification des types seule                                |
+| Command           | Purpose                                                      |
+| ----------------- | ------------------------------------------------------------ |
+| `npm run dev`     | Development server with hot reload                           |
+| `npm run build`   | Type check (`astro check`), then build into `dist/`          |
+| `npm run preview` | Serves the `dist/` build locally for testing                 |
+| `npm run check`   | Type check only                                              |
 
-Redirections 301 (anciennes URL, dont celles du site WordPress) : [`vercel.json`](vercel.json), à compléter à mesure que les pages cibles existent.
+301 redirects (old URLs, including those of the WordPress site): [`vercel.json`](vercel.json), to be extended as the target pages are built.
 
-Le dossier `dist/` est un site statique prêt à déposer sur Netlify, Vercel ou Cloudflare Pages (commande de build `npm run build`, dossier publié `dist`).
+The `dist/` folder is a static site ready to deploy on Netlify, Vercel or Cloudflare Pages (build command `npm run build`, publish directory `dist`).
 
-## Organisation
+## Project structure
 
 ```
 public/
-  fonts/              Rubik variable (woff2, sous-ensemble latin), auto-hébergée
-  favicon.svg         isotype sauge
+  fonts/              Rubik variable (woff2, Latin subset), self-hosted
+  favicon.svg         sage isotype
 src/
   assets/
-    logos/            logo couleur FR, logo couleur EN (« Man & the Environment »), isotype
-    photos/           photos sources, optimisées au build par astro:assets (AVIF/WebP)
-  components/         composants de la page (voir ci-dessous)
-  data/navigation.ts  destinations des menus, lien de don, réseaux sociaux
+    logos/            FR colour logo, EN colour logo ("Man & the Environment"), isotype
+    photos/           source photos, optimised at build time by astro:assets (AVIF/WebP)
+  components/         page components (see below)
+  data/navigation.ts  menu destinations, donation link, social networks
   i18n/
-    fr.ts             textes en français (interface + contenus de la home)
-    en.ts             textes en anglais (même forme, vérifiée par TypeScript)
-    index.ts          langues, t(lang), URL par langue
-  layouts/BaseLayout.astro  <head> : SEO, Open Graph, hreflang, police, lang
+    fr.ts             French copy (interface + home page content)
+    en.ts             English copy (same shape, checked by TypeScript)
+    index.ts          languages, t(lang), URLs per language
+  layouts/BaseLayout.astro  <head>: SEO, Open Graph, hreflang, font, lang
   pages/
-    index.astro       accueil en français (/)
-    en/index.astro    accueil en anglais (/en/)
-    sites/madagascar.astro     page pays Madagascar (/sites/madagascar)
-    en/sites/madagascar.astro  page pays en anglais (/en/sites/madagascar)
-  content/sites/      un fichier Markdown par site (nom, pays, région, photo, résumé, espèces)
-  content/projets.json  projets, reliés aux sites où ils sont menés
-  content.config.ts   schémas des collections « sites » et « projets »
-  data/chiffres.ts    chiffres de Madagascar et de chaque site (un seul endroit à modifier)
-  scripts/stats.ts    animation des chiffres clés
+    index.astro       French home page (/)
+    en/index.astro    English home page (/en/)
+    sites/madagascar.astro     Madagascar country page (/sites/madagascar)
+    en/sites/madagascar.astro  English country page (/en/sites/madagascar)
+  content/sites/      one Markdown file per site (name, country, region, photo, summary, species)
+  content/projets.json  projects, linked to the sites where they take place
+  content.config.ts   schemas of the "sites" and "projets" collections
+  data/chiffres.ts    figures for Madagascar and each site (a single place to edit)
+  scripts/stats.ts    key figures animation
   styles/
-    tokens.css        tokens du design system en variables CSS
-    global.css        reset, focus, conteneur, utilitaires
+    tokens.css        design system tokens as CSS variables
+    global.css        reset, focus, container, utilities
 ```
 
-### Composants
+### Components
 
-| Composant           | Rôle |
-| ------------------- | ---- |
-| `HomePage`          | Page d'accueil commune aux deux langues (ordre des sections, photos) |
-| `CountryPage`       | Page pays (Madagascar, Burkina Faso) commune aux deux langues ; sites et projets lus dans les collections, chiffres dans `data/chiffres.ts` |
-| `Breadcrumb`        | Fil d'Ariane des pages internes |
-| `PageHero`          | Hero des pages internes : H1 en deux temps, chapeau, bouton secondaire, photo en arche |
-| `SitesExplorer`     | Carte du pays avec repères numérotés + liste des sites, liés (clic sur un repère, survol ou focus d'une carte) |
-| `MadagascarMap` / `BurkinaMap` | Cartes SVG des pays (courbes de niveau, capitale, mers ou pays voisins), libellés traduisibles |
-| `SiteCard`          | Carte compacte d'un site, toute cliquable : numéro et nom, accroche sur 2 lignes, surface protégée |
-| `ProjectCard` / `ProjectGrid` | Carte projet compacte sans photo (icône, titre, phrase, sites), en grille de 3 colonnes : pages pays et actions des fiches site. La carte avec photo (`ProjectPhotoCard`) est réservée à « Nos projets » |
-| `PhotoBanner`       | Carte sur photo assombrie (titre + phrase) avec contenu libre : newsletter, boutons d'appel |
-| `Header`            | Logo, menu principal (pastille vert clair au survol, basalte pour la rubrique en cours), sélecteur FR / EN, bouton Don ; sous-menus déroulants (accordéon dans le burger) ; fixé en haut au scroll ; burger en dessous de 1280px |
-| `LangSwitcher`      | Pilule segmentée FR / EN du header (desktop), lien vers la même page dans l'autre langue |
-| `Button`            | Pilule : `don` (pêche, cœur), `secondary` (contour, flèche), `on-dark` |
-| `Hero`              | Sur-titre, H1 en deux temps, chapeau, boutons, photo organique et isotype |
-| `StatsBand` / `StatCard` | Bande sauge des chiffres clés, illustrations SVG (anneau, barres, pastilles, sites, part, familles, eau) ; valeur texte (« [X] ») affichée sans compteur |
-| `SectionHeading`    | Titre de section en deux temps (fort + doux), sur-titre, chapeau (toujours dessous) et lien facultatifs |
-| `PillarCard`        | Pilier de l'approche, photo en arche |
-| `CountryCard`       | Grande carte photo (pays mis en avant) avec pastilles de sites (`Chip`) |
-| `EngageCard`        | Carte blanche cliquable ; variante `country` pour les pays secondaires |
-| `PartnersStrip`     | Logos partenaires ; défilement en boucle en mobile |
-| `NewsletterSection` / `NewsletterForm` | Bloc newsletter (`PhotoBanner`), champ + bouton en une pilule |
-| `Footer`            | Pitch, bouton Don, LinkedIn et Facebook, plan du site, mentions, lien « English version » / « Version française » |
+| Component           | Purpose |
+| ------------------- | ------- |
+| `HomePage`          | Home page shared by both languages (section order, photos) |
+| `CountryPage`       | Country page (Madagascar, Burkina Faso) shared by both languages; sites and projects read from the collections, figures from `data/chiffres.ts` |
+| `Breadcrumb`        | Breadcrumb of inner pages |
+| `PageHero`          | Inner page hero: two-part H1, lead, secondary button, arch-shaped photo |
+| `SitesExplorer`     | Country map with numbered markers + list of sites, linked together (click on a marker, hover or focus on a card) |
+| `MadagascarMap` / `BurkinaMap` | SVG country maps (contour lines, capital, seas or neighbouring countries), translatable labels |
+| `SiteCard`          | Compact, fully clickable site card: number and name, two-line tagline, protected area |
+| `ProjectCard` / `ProjectGrid` | Compact project card without photo (icon, title, sentence, sites), in a 3-column grid: country pages and site page actions. The card with a photo (`ProjectPhotoCard`) is reserved for "Nos projets" |
+| `PhotoBanner`       | Card on a darkened photo (title + sentence) with free content: newsletter, call-to-action buttons |
+| `Header`            | Logo, main menu (light green pill on hover, basalt for the current section), FR / EN switcher, Donate button; drop-down submenus (accordion in the burger menu); sticky on scroll; burger menu below 1280px |
+| `LangSwitcher`      | Segmented FR / EN pill in the header (desktop), links to the same page in the other language |
+| `Button`            | Pill: `don` (peach, heart), `secondary` (outline, arrow), `on-dark` |
+| `Hero`              | Eyebrow, two-part H1, lead, buttons, organic photo and isotype |
+| `StatsBand` / `StatCard` | Sage band of key figures, SVG illustrations (ring, bars, dots, sites, share, families, water); text values ("[X]") shown without a counter |
+| `SectionHeading`    | Two-part section title (strong + light), optional eyebrow, lead (always below) and link |
+| `PillarCard`        | Pillar of the approach, arch-shaped photo |
+| `CountryCard`       | Large photo card (featured country) with site chips (`Chip`) |
+| `EngageCard`        | Clickable white card; `country` variant for secondary countries |
+| `PartnersStrip`     | Partner logos; looping scroll on mobile |
+| `NewsletterSection` / `NewsletterForm` | Newsletter block (`PhotoBanner`), field + button in a single pill |
+| `Footer`            | Pitch, Donate button, LinkedIn and Facebook, sitemap, legal notice, "English version" / "Version française" link |
 
 ## Design system
 
-Les règles viennent du design system de l'ONG (artifact « Design System ») : couleurs, typographie, cartes, boutons, accessibilité, animations. Toutes les valeurs passent par les variables de [`src/styles/tokens.css`](src/styles/tokens.css) ; ne pas ajouter de couleur en dur dans un composant.
+The rules come from the NGO's design system (the "Design System" artifact): colours, typography, cards, buttons, accessibility, animations. Every value goes through the variables in [`src/styles/tokens.css`](src/styles/tokens.css); do not add hard-coded colours in a component.
 
-Rappels :
+Reminders:
 
-- **Rubik** seule police. **Sauge** jamais en texte ; texte `noir-95` sur sauge et sur pêche.
-- **Pêche** réservée au bouton « Faire un don » et aux points d'arrivée des illustrations (10 % max).
-- Sections en aplat (pas de fondu), cartes blanches avec `--shadow-card` et bordure douce.
-- Focus visible partout : contour 2px basalte décalé de 2px.
-- Cartes cliquables (classe `card-lift`) : légère élévation au survol et au focus (`--lift-card-hover`, `--shadow-card-hover`) et flèche qui glisse vers la droite (`--nudge-arrow-hover`), sans soulignement ; sans déplacement avec `prefers-reduced-motion`.
-- Éléments graphiques nature : courbes de niveau (`ContourPattern`) en haut des pages pays, fiches site et Nos projets et dans le footer, avec un fondu vers le haut ; tampon circulaire (`FooterStamp`) en bas du footer ; lavis aquarelle sous l'île (`MadagascarMap`). Ils sont décoratifs (`aria-hidden` ou `role="img"` pour le tampon), ne prennent pas les clics et ne passent jamais derrière du texte.
-- Boutons (classe `btn-motion`) : couleurs fondues et léger soulèvement au survol (`--transition-ui`, `--lift-button-hover`), retour en place au clic ; sans déplacement avec `prefers-reduced-motion`.
+- **Rubik** is the only font. **Sage** is never used for text; `noir-95` text on sage and on peach.
+- **Peach** is reserved for the "Faire un don" (Donate) button and for the end points of illustrations (10% max).
+- Flat-colour sections (no fades), white cards with `--shadow-card` and a soft border.
+- Visible focus everywhere: 2px basalt outline offset by 2px.
+- Clickable cards (`card-lift` class): slight lift on hover and focus (`--lift-card-hover`, `--shadow-card-hover`) and an arrow that slides to the right (`--nudge-arrow-hover`), no underline; no movement with `prefers-reduced-motion`.
+- Nature graphic elements: contour lines (`ContourPattern`) at the top of country pages, site pages and Nos projets, and in the footer, fading out towards the top; circular stamp (`FooterStamp`) at the bottom of the footer; watercolour wash under the island (`MadagascarMap`). They are decorative (`aria-hidden`, or `role="img"` for the stamp), do not catch clicks and never sit behind text.
+- Buttons (`btn-motion` class): colour fades and a slight lift on hover (`--transition-ui`, `--lift-button-hover`), back in place on click; no movement with `prefers-reduced-motion`.
 
-## Langues (i18n)
+## Languages (i18n)
 
-- Routage i18n d'Astro (`astro.config.mjs`) : `fr` par défaut sans préfixe, `en` sous `/en/`.
-- Aucun texte en dur dans les composants : tout passe par `src/i18n/fr.ts` et `src/i18n/en.ts`. Ajouter une clé dans `fr.ts` oblige à l'ajouter dans `en.ts` (erreur TypeScript sinon).
-- La langue de la page vient de `Astro.currentLocale` ; `t(lang)` renvoie le dictionnaire.
-- Logo de la version anglaise : variante « Man & the Environment » (LOGO-ENG-2 de la charte), jamais la version « Human ».
-- **V1** : l'interface anglaise (menus, boutons, libellés d'accessibilité) est traduite ; le contenu de la home anglaise est encore une copie du français, à traduire (`home` dans `en.ts`).
+- Astro i18n routing (`astro.config.mjs`): `fr` by default with no prefix, `en` under `/en/`.
+- No hard-coded text in components: everything goes through `src/i18n/fr.ts` and `src/i18n/en.ts`. Adding a key to `fr.ts` requires adding it to `en.ts` (TypeScript error otherwise).
+- The page language comes from `Astro.currentLocale`; `t(lang)` returns the dictionary.
+- English version logo: the "Man & the Environment" variant (LOGO-ENG-2 in the brand guidelines), never the "Human" version.
+- **V1**: the English interface (menus, buttons, accessibility labels) is translated; the English home page content is still a copy of the French one, to be translated (`home` in `en.ts`).
 
-## Partage (Open Graph)
+## Sharing (Open Graph)
 
-- Chaque page a son image de partage 1200×630, générée au build (`src/lib/og.ts`, servie par `src/pages/og/[...page].png.ts`) : logo et titre du hero à gauche, courbes de niveau à droite. Satori + resvg, police Rubik de `@fontsource/rubik` : aucun service externe, rien à exécuter sur le serveur.
-- Les titres viennent de l'i18n (`hero.titleStrong` / `titleLight` des pages de `PAGES`) et des collections (nom et accroche des fiches). Une nouvelle page de `PAGES` a donc son image d'office ; une page absente de la liste (404, 500) reçoit celle de l'accueil.
-- Accueil seulement : vidéo de partage (`public/video/partage-accueil-fr.mp4` et `-en.mp4`, 8 s en boucle), lue par Discord, Telegram, parfois iMessage ; ailleurs, l'image fixe s'affiche. Elle n'est pas générée au build : si le titre de l'accueil change, la refaire (page HTML de la composition animée enregistrée image par image avec puppeteer-core, 30 i/s, puis `ffmpeg -framerate 30 -i f%04d.png -c:v libx264 -preset veryslow -crf 23 -pix_fmt yuv420p -movflags +faststart`).
+- Every page has its own 1200×630 share image, generated at build time (`src/lib/og.ts`, served by `src/pages/og/[...page].png.ts`): logo and hero title on the left, contour lines on the right. Satori + resvg, Rubik font from `@fontsource/rubik`: no external service, nothing to run on the server.
+- Titles come from the i18n files (`hero.titleStrong` / `titleLight` of the pages in `PAGES`) and from the collections (name and tagline of site pages). A new page in `PAGES` therefore gets its image automatically; a page missing from the list (404, 500) gets the home page one.
+- Home page only: share video (`public/video/partage-accueil-fr.mp4` and `-en.mp4`, 8 s loop), played by Discord, Telegram and sometimes iMessage; elsewhere, the still image is shown. It is not generated at build time: if the home page title changes, remake it (HTML page of the animated composition recorded frame by frame with puppeteer-core at 30 fps, then `ffmpeg -framerate 30 -i f%04d.png -c:v libx264 -preset veryslow -crf 23 -pix_fmt yuv420p -movflags +faststart`).
 
-## Animations et accessibilité
+## Animations and accessibility
 
-Règles à suivre pour toute nouvelle page (WCAG 2.2 AA, modes clair et sombre, vérifications avant PR) : [`CLAUDE.md`](CLAUDE.md).
+Rules to follow for every new page (WCAG 2.2 AA, light and dark modes, checks before a PR): [`CLAUDE.md`](CLAUDE.md).
 
-- Apparition au scroll (`src/scripts/reveal.ts`, attribut `data-reveal`) : titres, cartes, bande des logos et bloc newsletter apparaissent en fondu en remontant de 24px, une seule fois, en cascade quand ils entrent ensemble ; le hero s'anime au chargement. Masqués seulement avec JS ; si le script ne s'exécute pas, tout s'affiche au bout de 3s.
-- Chiffres clés : au premier passage dans l'écran (IntersectionObserver, une seule fois), compteur de 0 à la valeur, traits de l'anneau dans le sens horaire, barres qui poussent, pastilles une à une.
-- Logos partenaires : défilement continu en dessous de 900px, sans bouton Pause (comme la galerie de l'Équipe et les derniers dons ; voir CLAUDE.md).
-- Hero : le contour organique de la photo ondule (14 s) et l'isotype flotte (11 s), en boucle lente.
-- Courbes de niveau (`ContourPattern.astro`, hero des pages internes et footer) : chaque courbe « respire » (échelle 0,96 → 1,04 et rotation -1,5° → 1,5°, 10 s, aller-retour), décalée de 1,1 s de la suivante : les lignes glissent les unes par rapport aux autres, comme une onde lente. Le motif apparaît comme les autres éléments (`data-reveal`). Validée par Victor le 2026-10-21.
-- Tampon du footer (`FooterStamp.astro`) : le texte en cercle « DEPUIS 1993 · … » tourne lentement autour de l'isotype (un tour en 40 s, linéaire) ; l'isotype et les cercles restent fixes. Il apparaît au scroll comme les autres éléments (`data-reveal`). Au survol, le sceau se soulève ; au clic, « coup de tampon » : il s'enfonce (l'ombre disparaît) puis rebondit, et le texte fait un tour rapide (1,1 s). Seul le disque blanc capte la souris, pour ne jamais gêner les liens voisins ; interaction purement décorative, sans focus clavier.
-- Indication « Faire défiler » du hero : la flèche monte et descend doucement en boucle (1,8 s). Ces animations du hero et l'apparition au scroll sont des exceptions à la règle « pas d'autre animation décorative » du design system, à y reporter.
-- Avec `prefers-reduced-motion: reduce`, tout est désactivé (valeurs finales affichées, logos partenaires en grille, boutons Pause masqués).
-- **Sans JavaScript**, la page est complète : chiffres et illustrations affichés en entier, liens du menu visibles sous le logo en mobile.
+- Reveal on scroll (`src/scripts/reveal.ts`, `data-reveal` attribute): titles, cards, the logo strip and the newsletter block fade in while rising by 24px, only once, staggered when they enter together; the hero animates on load. Hidden only when JS runs; if the script does not run, everything shows after 3s.
+- Key figures: the first time they enter the viewport (IntersectionObserver, only once), counter from 0 to the value, ring strokes drawn clockwise, growing bars, dots one by one.
+- Partner logos: continuous scroll below 900px, with no Pause button (like the Team gallery and the latest donations; see CLAUDE.md).
+- Hero: the organic outline of the photo ripples (14 s) and the isotype floats (11 s), in a slow loop.
+- Contour lines (`ContourPattern.astro`, inner page heroes and footer): each line "breathes" (scale 0.96 → 1.04 and rotation -1.5° → 1.5°, 10 s, back and forth), offset by 1.1 s from the next one: the lines slide against each other like a slow wave. The pattern appears like the other elements (`data-reveal`). Approved by Victor on 2026-10-21.
+- Footer stamp (`FooterStamp.astro`): the circular text "DEPUIS 1993 · …" slowly turns around the isotype (one turn in 40 s, linear); the isotype and circles stay still. It appears on scroll like the other elements (`data-reveal`). On hover, the seal lifts; on click, a "stamp press": it sinks (the shadow disappears) then bounces back, and the text spins quickly (1.1 s). Only the white disc catches the mouse, so it never gets in the way of nearby links; purely decorative interaction, with no keyboard focus.
+- Hero "Faire défiler" (scroll) hint: the arrow gently moves up and down in a loop (1.8 s). These hero animations and the reveal on scroll are exceptions to the design system's "no other decorative animation" rule, to be added to it.
+- With `prefers-reduced-motion: reduce`, everything is turned off (final values shown, partner logos in a grid, Pause buttons hidden).
+- **Without JavaScript**, the page is complete: figures and illustrations shown in full, menu links visible under the logo on mobile.
 
-## À brancher plus tard
+## To connect later
 
-- **Dons** : HelloAsso. Le lien est centralisé dans `DON_URL` ([`src/data/navigation.ts`](src/data/navigation.ts)).
-- **Newsletter** : outil d'emailing pas encore choisi. Le formulaire ([`NewsletterForm.astro`](src/components/NewsletterForm.astro)) a le markup accessible mais l'envoi est bloqué côté client ; une fois l'outil choisi, renseigner l'`action` et retirer le `preventDefault`.
-- **Formulaire de contact** (page `/contact`) : voir la section suivante.
-- **Réseaux sociaux** : URL LinkedIn et Facebook en placeholder dans `SOCIAL_URLS` ([`src/data/navigation.ts`](src/data/navigation.ts)).
-- **Traduction anglaise** de la home (voir « Langues »).
-- **Contenus** : en dur dans `src/pages/index.astro` pour l'instant ; passage en Markdown / CMS à décider.
-- **Pages internes** : tous les liens pointent vers `#`.
+- **Donations**: HelloAsso. The link is centralised in `DON_URL` ([`src/data/navigation.ts`](src/data/navigation.ts)).
+- **Newsletter**: emailing tool not chosen yet. The form ([`NewsletterForm.astro`](src/components/NewsletterForm.astro)) has accessible markup but submission is blocked on the client; once the tool is chosen, fill in the `action` and remove the `preventDefault`.
+- **Contact form** (`/contact` page): see the next section.
+- **Social networks**: placeholder LinkedIn and Facebook URLs in `SOCIAL_URLS` ([`src/data/navigation.ts`](src/data/navigation.ts)).
+- **English translation** of the home page (see "Languages").
+- **Content**: hard-coded in `src/pages/index.astro` for now; move to Markdown / a CMS to be decided.
+- **Inner pages**: all links point to `#`.
 
-## Formulaire de contact
+## Contact form
 
-Le site reste statique ; seule la route `POST /api/contact` tourne côté serveur : une fonction Vercel ([`api/contact.ts`](api/contact.ts)) qui envoie le message par e-mail en SMTP, depuis une boîte de la messagerie de l'ONG (pas de service tiers, aucun cookie). Champs, sujets et validation sont partagés entre la page et la fonction ([`src/lib/contact.ts`](src/lib/contact.ts)) ; anti-spam : un champ piège invisible.
+The site stays static; only the `POST /api/contact` route runs on the server: a Vercel function ([`api/contact.ts`](api/contact.ts)) that sends the message by email over SMTP, from a mailbox of the NGO's email service (no third-party service, no cookies). Fields, subjects and validation are shared between the page and the function ([`src/lib/contact.ts`](src/lib/contact.ts)); anti-spam: an invisible honeypot field.
 
-Variables d'environnement à renseigner dans le projet Vercel (Settings → Environment Variables), modèle dans [`.env.example`](.env.example) :
+Environment variables to set in the Vercel project (Settings → Environment Variables), template in [`.env.example`](.env.example):
 
-| Variable       | Rôle |
-| -------------- | ---- |
-| `CONTACT_TO`   | Destinataire des messages |
-| `SMTP_HOST`    | Serveur SMTP de la messagerie de l'ONG |
-| `SMTP_PORT`    | `465` (SSL, par défaut) ou `587` (STARTTLS) |
-| `SMTP_USER`    | Identifiant de la boîte qui envoie |
-| `SMTP_PASS`    | Mot de passe (ou mot de passe d'application) de cette boîte |
-| `CONTACT_FROM` | Expéditeur affiché, facultatif (`SMTP_USER` par défaut) |
+| Variable       | Purpose |
+| -------------- | ------- |
+| `CONTACT_TO`   | Recipient of the messages |
+| `SMTP_HOST`    | SMTP server of the NGO's email service |
+| `SMTP_PORT`    | `465` (SSL, default) or `587` (STARTTLS) |
+| `SMTP_USER`    | Login of the sending mailbox |
+| `SMTP_PASS`    | Password (or app password) of that mailbox |
+| `CONTACT_FROM` | Displayed sender, optional (`SMTP_USER` by default) |
 
-Tant qu'elles manquent (et avec `npm run dev`, qui ne sert pas `/api`), l'envoi échoue proprement : la page propose d'envoyer le message depuis la messagerie du visiteur (lien `mailto` prérempli). Pour tester la fonction en local : `vercel dev`.
+While they are missing (and with `npm run dev`, which does not serve `/api`), sending fails gracefully: the page offers to send the message from the visitor's own email app (prefilled `mailto` link). To test the function locally: `vercel dev`.
 
-## Contenus provisoires (maquette V1)
+## Placeholder content (V1 mockup)
 
-Repris tels quels de la maquette, à valider avec l'ONG avant la mise en ligne :
+Taken as is from the mockup, to be validated with the NGO before going live:
 
-- **400 000 arbres** plantés : chiffre à confirmer.
-- **Logos partenaires** : fictifs (Fondation, Agence, collectif, Région, ENTREPRISE), à remplacer par les vrais logos.
-- La photo de la carte Madagascar est réutilisée en fond de la newsletter (le design system demande une photo unique par page).
-- La valeur de la couleur pêche est estimée d'après le CMJN de la charte : à confirmer avec le graphiste.
+- **400,000 trees** planted: figure to be confirmed.
+- **Partner logos**: fictitious (Fondation, Agence, collectif, Région, ENTREPRISE), to be replaced with the real logos.
+- The photo of the Madagascar card is reused as the newsletter background (the design system asks for a unique photo per page).
+- The peach colour value is estimated from the CMYK values in the brand guidelines: to be confirmed with the graphic designer.
 
 Photos © Day Nabih, © Marc Gansuana, © Langaha Be.
